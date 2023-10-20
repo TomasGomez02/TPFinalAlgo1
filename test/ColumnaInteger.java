@@ -1,4 +1,4 @@
-package TPFinalAlgo1.test;
+package test;
 
 public class ColumnaInteger {
     
