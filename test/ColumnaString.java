@@ -58,7 +58,6 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void concatenarColumna(Columna<String> otraColumna) {
-        // TOMAAASSS: Probar este metodo mas tarde
         for (int i = 0; i < otraColumna.length(); i++) {
             this.añadirCelda(otraColumna.getCelda(i));
         }
@@ -71,7 +70,7 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void ordenar(boolean creciente) {
-        // TOMAAAAS: hay que probar esto tambien
+        // Funciona bien. Pero, si algun valor es null, tira NullPointerException
         Comparator<String> c;
         if (creciente){
             c = (a, b) -> a.compareTo(b);
@@ -86,6 +85,11 @@ public class ColumnaString extends Columna<String> {
     public ColumnaString clone(){
         ColumnaString copia = new ColumnaString(this.data);
         return copia;
+    }
+
+    @Override
+    public String toString() {
+        return this.data.toString();
     }
     
 }

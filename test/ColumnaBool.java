@@ -10,6 +10,10 @@ public class ColumnaBool extends Columna<Boolean>{
         this.data = new ArrayList<>();
     }
 
+    public ColumnaBool(List<Boolean> otro){
+        this.data = new ArrayList<>(otro);
+    }
+
     @Override
     public Boolean getCelda(int indice) {
         return this.data.get(indice);  
@@ -64,8 +68,8 @@ public class ColumnaBool extends Columna<Boolean>{
     }
 
     @Override
-    //Tomasss chequea esto
     public void ordenar(boolean creciente) {
+        // Funciona bien. Pero, si algun valor es null, tira NullPointerException
         Comparator<Boolean> c;
         if (creciente){
             c = (a, b) -> a.compareTo(b);
@@ -76,6 +80,12 @@ public class ColumnaBool extends Columna<Boolean>{
         this.data.sort(c);
     }
 
+    @Override
+    public ColumnaBool clone(){
+        ColumnaBool copia = new ColumnaBool(this.data);
+        return copia;
+    }
+
     public int sumaAcumulada(){
         int suma = 0;
         for (Boolean valor : data) {
@@ -84,5 +94,10 @@ public class ColumnaBool extends Columna<Boolean>{
             }
         }
         return suma;
+    }
+
+    @Override
+    public String toString(){
+        return this.data.toString();
     }
 }
