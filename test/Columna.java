@@ -1,6 +1,6 @@
 package test;
 
-public abstract class Columna<T> implements Cloneable {
+public abstract class Columna<T> implements Cloneable, Filtrable<T> {
     public abstract T getCelda(int indice);
     public abstract void setCelda(int indice, T valor);
     public abstract void añadirCelda(int indice, T valor);
