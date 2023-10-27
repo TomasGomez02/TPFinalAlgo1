@@ -91,5 +91,11 @@ public class ColumnaString extends Columna<String> {
     public String toString() {
         return this.data.toString();
     }
+
+    @Override
+    public Columna<String> filtrar(String elemento, Filtro<String> filtro) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
+    }
     
 }
