@@ -59,8 +59,4 @@ public class DataFrame {
         return; //TODO
     }
 
-    public DataFrame clone(){
-        return; //TODO
-    }
-
 }
