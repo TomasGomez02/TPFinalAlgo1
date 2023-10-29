@@ -100,4 +100,10 @@ public class ColumnaBool extends Columna<Boolean>{
     public String toString(){
         return this.data.toString();
     }
+
+    @Override
+    public Columna<Boolean> filtrar(Boolean elemento, Filtro<Boolean> filtro) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
+    }
 }
