@@ -1,18 +1,29 @@
 package test;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
+import java.util.Map;
+import java.util.HashMap;
+
 public class ColumnaString extends Columna<String> {
-    private List<String> data;
+    private Map<Integer, String> data;
 
     public ColumnaString(){
-        this.data = new ArrayList<>();
+        this.data = new HashMap<>();
     }
 
-    public ColumnaString(List<String> otro){
-        this.data = new ArrayList<>(otro);
+    public ColumnaString(List<String> datos){
+        this();
+        for (int i=0; i < datos.size(); i++) {
+            this.data.put(i, datos.get(i));
+        }
+    }
+
+    public ColumnaString(String[] datos){
+        this();
+        for (int i=0; i < datos.length; i++) {
+            this.añadirCelda(datos[i]);
+        }
     }
 
     @Override
@@ -22,33 +33,38 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void setCelda(int indice, String valor) {
-        this.data.set(indice, valor);
+        this.data.put(indice, valor);
     }
 
     @Override
     public void añadirCelda(int indice, String valor) {
-        this.data.add(indice, valor);
+        // this.data.add(indice, valor);
+        // Hay que mover todos los valores debajo del 'indice' para abajo un numero
+        throw new UnsupportedOperationException("metodo no implementado 'añadirCelda'");
     }
 
     @Override
     public void añadirCelda(String valor) {
-        this.data.add(valor);
+        int indice = this.data.size();
+        this.data.put(indice, valor);
     }
 
     @Override
     public void eliminarCelda(int indice) {
-        this.data.remove(indice);
+        // this.data.remove(indice);
+        // Hay que mover todos los valores arriba del 'indice' para arriba un numero
+        throw new UnsupportedOperationException("metodo no implementado 'eliminarCelda'");
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        this.data.set(indice, null);
+        this.data.put(indice, null);
     }
 
     @Override
     public ColumnaString recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaString recorte = new ColumnaString();
-        for (int i = 0; i < this.length(); i++) {
+        for (int i=0; i < this.length(); i++) {
             if (i >= indiceInicio && i <= indiceFinal){
                 recorte.añadirCelda(this.getCelda(i));
             }
@@ -58,7 +74,7 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void concatenarColumna(Columna<String> otraColumna) {
-        for (int i = 0; i < otraColumna.length(); i++) {
+        for (int i=0; i < otraColumna.length(); i++) {
             this.añadirCelda(otraColumna.getCelda(i));
         }
     }
@@ -70,20 +86,15 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void ordenar(boolean creciente) {
-        // Funciona bien. Pero, si algun valor es null, tira NullPointerException
-        Comparator<String> c;
-        if (creciente){
-            c = (a, b) -> a.compareTo(b);
-        }
-        else{
-            c = (a, b) -> b.compareTo(a);
-        }
-        this.data.sort(c);
+       throw new UnsupportedOperationException("metodo no implementado 'ordenar'");
     }
 
     @Override
     public ColumnaString clone(){
-        ColumnaString copia = new ColumnaString(this.data);
+        ColumnaString copia = new ColumnaString();
+        for (int i=0; i < this.length(); i++){
+            copia.añadirCelda(this.getCelda(i));
+        }
         return copia;
     }
 
@@ -98,4 +109,12 @@ public class ColumnaString extends Columna<String> {
         throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
     }
     
+    // @Override
+    public ColumnaString filtarPorIndice(List<Integer> indices){
+        ColumnaString filtrada = new ColumnaString();
+        for (Integer indice : indices) {
+            filtrada.añadirCelda(this.getCelda(indice));
+        }
+        return filtrada;
+    }
 }
