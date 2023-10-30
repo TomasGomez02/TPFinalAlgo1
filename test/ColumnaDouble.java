@@ -53,26 +53,46 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public Double maximo() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'maximo'");
+        double max = this.getCelda(0);
+        for (int i=1; i < this.length(); i++) {
+            if (this.getCelda(i) > max) {
+                max = this.getCelda(i);
+            }
+        }
+        return max;
     }
 
     @Override
     public Double minimo() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'minimo'");
+        double min = this.getCelda(0);
+        for (int i=1; i < this.length();i++){
+            if (this.getCelda(0) < min){
+                min = this.getCelda(1);
+            }
+        }
+        return min;
     }
 
     @Override
     public Double desvioEstandar() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'desvioEstandar'");
+        double desvio = 0.0;
+        for (int i=0; i < this.length(); i++){
+            double diferencia = data.get(i) - this.media(); 
+            double cuadrado = Math.pow(diferencia, 2); 
+            double sumatoria =+ cuadrado; 
+            double division = sumatoria/ this.length();
+            desvio = Math.sqrt(division);
+        }
+        return desvio;
     }
 
     @Override
     public Double sumaAcumulada() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sumaAcumulada'");
+        double suma = 0/.;
+        for (int i=0; i < this.length(); i++){
+            suma =+ this.getCelda(i);
+        }
+        return suma;
     }
 
     @Override
