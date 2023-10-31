@@ -1,21 +1,36 @@
 package test;
-import java.util.ArrayList;
-import java.util.Arrays;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 public class ColumnaBool extends Columna<Boolean>{
-    private List<Boolean> data;
+    private Map<Integer, Boolean> data;
 
     public ColumnaBool(){
-        this.data = new ArrayList<>();
+        this.data = new HashMap<>();
+    }
+    
+    public ColumnaBool(List<Boolean> datos){
+        this();
+        for (int i=0; i < datos.size(); i++) {
+            this.data.put(i, datos.get(i));
+        }
+    }
+    
+    public ColumnaBool(Boolean[] datos){
+        this();
+        for (int i=0; i < datos.length; i++) {
+            this.data.put(i, datos[i]);
+        }
     }
 
-    public ColumnaBool(Boolean[] data){
-        this.data = Arrays.asList(data);
-    }
-
-    public ColumnaBool(List<Boolean> otro){
-        this.data = new ArrayList<>(otro);
+    public ColumnaBool(boolean[] datos){
+        this();
+        for (int i=0; i < datos.length; i++) {
+            this.data.put(i, datos[i]);
+        }
     }
 
     @Override
@@ -25,31 +40,38 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public void setCelda(int indice, Boolean valor) {
-        this.data.set(indice, valor);
+        this.data.put(indice, valor);
     }
 
     @Override
     public void añadirCelda(int indice, Boolean valor) {
-        this.data.add(indice, valor);
+        for (int i=0; i < this.length() - indice; i++) {
+            this.data.put(this.length() - i, this.getCelda(this.length() - i - 1));
+        }
+        this.setCelda(indice, valor);
     }
 
     @Override
     public void añadirCelda(Boolean valor) {
-        this.data.add(valor); 
+        int indice = this.length();
+        this.data.put(indice, valor);
     }
 
     @Override
     public void eliminarCelda(int indice) {
-        this.data.remove(indice);
+        for (int i=0; i < this.length() - indice - 1; i++){
+            this.setCelda(indice + i, this.getCelda(indice + i + 1));
+        }
+        this.data.remove(this.length() -1);
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        this.data.set(indice, null);
+        this.data.put(indice, null);
     }
 
     @Override
-    public Columna<Boolean> recortarColumna(int indiceInicio, int indiceFinal) {
+    public ColumnaBool recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaBool recorte = new ColumnaBool();
         for (int i = 0; i < this.length(); i++) {
             if (i >= indiceInicio && i <= indiceFinal){
@@ -75,6 +97,7 @@ public class ColumnaBool extends Columna<Boolean>{
     public void ordenar(boolean creciente) {
         // Usa el algoritmo de selection sort
         // Aviso: no ordena los nulos, solo los deja en el mismo lugar donde estaban
+        // Tengo que reparar esto. Necesito que devuelva un Map<Integer, Integer>
         int n = this.length();
         for (int i = 0; i < n - 1; i++) {
             int idxMinimo = i;
@@ -96,13 +119,16 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public ColumnaBool clone(){
-        ColumnaBool copia = new ColumnaBool(this.data);
+        ColumnaBool copia = new ColumnaBool();
+        for (int i=0; i < this.length(); i++) {
+            copia.añadirCelda(this.getCelda(i));
+        }
         return copia;
     }
 
     public int sumaAcumulada(){
         int suma = 0;
-        for (Boolean valor : data) {
+        for (Boolean valor : data.values()) {
             if (valor){
                 suma++;
             }
@@ -119,5 +145,18 @@ public class ColumnaBool extends Columna<Boolean>{
     public Columna<Boolean> filtrar(Boolean elemento, Filtro<Boolean> filtro) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
+    }
+
+    // @Override
+    public ColumnaBool filtarPorIndice(List<Integer> indices){
+        // Es muy importante que los indices esten ordenados
+        Comparator<Integer> c;
+        c = (a, b) -> (a.compareTo(b));
+        indices.sort(c);
+        ColumnaBool filtrada = new ColumnaBool();
+        for (Integer indice : indices) {
+            filtrada.añadirCelda(this.getCelda(indice));
+        }
+        return filtrada;
     }
 }

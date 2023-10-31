@@ -1,8 +1,8 @@
 package test;
 
 import java.util.List;
-
 import java.util.Map;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class ColumnaString extends Columna<String> {
@@ -38,22 +38,24 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void añadirCelda(int indice, String valor) {
-        // this.data.add(indice, valor);
-        // Hay que mover todos los valores debajo del 'indice' para abajo un numero
-        throw new UnsupportedOperationException("metodo no implementado 'añadirCelda'");
+        for (int i=0; i < this.length() - indice; i++) {
+            this.data.put(this.length() - i, this.getCelda(this.length() - i - 1));
+        }
+        this.setCelda(indice, valor);
     }
 
     @Override
     public void añadirCelda(String valor) {
-        int indice = this.data.size();
+        int indice = this.length();
         this.data.put(indice, valor);
     }
 
     @Override
     public void eliminarCelda(int indice) {
-        // this.data.remove(indice);
-        // Hay que mover todos los valores arriba del 'indice' para arriba un numero
-        throw new UnsupportedOperationException("metodo no implementado 'eliminarCelda'");
+        for (int i=0; i < this.length() - indice - 1; i++){
+            this.setCelda(indice + i, this.getCelda(indice + i + 1));
+        }
+        this.data.remove(this.length() -1);
     }
 
     @Override
@@ -111,6 +113,10 @@ public class ColumnaString extends Columna<String> {
     
     // @Override
     public ColumnaString filtarPorIndice(List<Integer> indices){
+        // Es muy importante que los indices esten ordenados
+        Comparator<Integer> c;
+        c = (a, b) -> (a.compareTo(b));
+        indices.sort(c);
         ColumnaString filtrada = new ColumnaString();
         for (Integer indice : indices) {
             filtrada.añadirCelda(this.getCelda(indice));
