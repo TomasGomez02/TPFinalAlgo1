@@ -1,36 +1,26 @@
 package test;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ColumnaBool extends Columna<Boolean>{
-    private Map<Integer, Boolean> data;
+    private List<Boolean> data;
 
     public ColumnaBool(){
-        this.data = new HashMap<>();
+        this.data = new ArrayList<>();
     }
-    
-    public ColumnaBool(List<Boolean> datos){
+
+    public ColumnaBool(Boolean[] data){
         this();
-        for (int i=0; i < datos.size(); i++) {
-            this.data.put(i, datos.get(i));
-        }
-    }
-    
-    public ColumnaBool(Boolean[] datos){
-        this();
-        for (int i=0; i < datos.length; i++) {
-            this.data.put(i, datos[i]);
+        for (Boolean element : data) {
+            this.añadirCelda(element);
         }
     }
 
-    public ColumnaBool(boolean[] datos){
-        this();
-        for (int i=0; i < datos.length; i++) {
-            this.data.put(i, datos[i]);
-        }
+    public ColumnaBool(List<Boolean> otro){
+        this.data = new ArrayList<>(otro);
     }
 
     @Override
@@ -40,38 +30,31 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public void setCelda(int indice, Boolean valor) {
-        this.data.put(indice, valor);
+        this.data.set(indice, valor);
     }
 
     @Override
     public void añadirCelda(int indice, Boolean valor) {
-        for (int i=0; i < this.length() - indice; i++) {
-            this.data.put(this.length() - i, this.getCelda(this.length() - i - 1));
-        }
-        this.setCelda(indice, valor);
+        this.data.add(indice, valor);
     }
 
     @Override
     public void añadirCelda(Boolean valor) {
-        int indice = this.length();
-        this.data.put(indice, valor);
+        this.data.add(valor); 
     }
 
     @Override
     public void eliminarCelda(int indice) {
-        for (int i=0; i < this.length() - indice - 1; i++){
-            this.setCelda(indice + i, this.getCelda(indice + i + 1));
-        }
-        this.data.remove(this.length() -1);
+        this.data.remove(indice);
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        this.data.put(indice, null);
+        this.data.set(indice, null);
     }
 
     @Override
-    public ColumnaBool recortarColumna(int indiceInicio, int indiceFinal) {
+    public Columna<Boolean> recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaBool recorte = new ColumnaBool();
         for (int i = 0; i < this.length(); i++) {
             if (i >= indiceInicio && i <= indiceFinal){
@@ -94,27 +77,39 @@ public class ColumnaBool extends Columna<Boolean>{
     }
 
     @Override
-    public void ordenar(boolean creciente) {
-        // Usa el algoritmo de selection sort
-        // Aviso: no ordena los nulos, solo los deja en el mismo lugar donde estaban
-        // Tengo que reparar esto. Necesito que devuelva un Map<Integer, Integer>
-        int n = this.length();
-        for (int i = 0; i < n - 1; i++) {
-            int idxMinimo = i;
-            System.out.println(idxMinimo +" "+ this.getCelda(idxMinimo));
-            if (this.getCelda(i) == null){
-                continue;
-            }
-            for (int j = i + 1; j < n; j++) {
-                if (this.getCelda(j) != null && this.getCelda(j).compareTo(this.getCelda(idxMinimo)) > 0) {
+    public Map<Integer, Integer> ordenar(boolean creciente) {
+        // Crear lista de indices para trasladar los valores
+        Map<Integer, Integer> trasladar = new HashMap<>();
+
+        // Crea una copia para poder eliminar elementos sin problemas
+        ColumnaBool copia = this.clone();
+
+        for (int i=0; i < this.length(); i++){
+            Integer idxMinimo = copia.getFirstIndex();
+            for (int j=0; j < this.length(); j++){
+                if (copia.getCelda(j) != null &&
+                this.getCelda(j).compareTo(this.getCelda(idxMinimo)) < 0){
                     idxMinimo = j;
                 }
             }
-            // Intercambia el mínimo encontrado con el elemento en la posición i
-            Boolean temp = this.getCelda(i);
-            this.setCelda(i, this.getCelda(idxMinimo));
-            this.setCelda(idxMinimo, temp);
+            if (creciente){
+                trasladar.put(idxMinimo, i);
+            }
+            else{
+                trasladar.put(idxMinimo, this.length() - i - 1);
+            }
+            copia.borrarValorCelda(idxMinimo);
         }
+        return trasladar;
+    }
+
+    private Integer getFirstIndex() {
+        for (int i=0; i < this.length(); i++){
+            if (this.getCelda(i) != null){
+                return i;
+            }
+        }
+        throw new IndexOutOfBoundsException("La columna esta vacia o solo tiene elementos nulos");
     }
 
     @Override
@@ -128,7 +123,7 @@ public class ColumnaBool extends Columna<Boolean>{
 
     public int sumaAcumulada(){
         int suma = 0;
-        for (Boolean valor : data.values()) {
+        for (Boolean valor : data) {
             if (valor){
                 suma++;
             }
@@ -147,12 +142,8 @@ public class ColumnaBool extends Columna<Boolean>{
         throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
     }
 
-    // @Override
-    public ColumnaBool filtarPorIndice(List<Integer> indices){
-        // Es muy importante que los indices esten ordenados
-        Comparator<Integer> c;
-        c = (a, b) -> (a.compareTo(b));
-        indices.sort(c);
+    @Override
+    public ColumnaBool filtrarPorIndice(List<Integer> indices){
         ColumnaBool filtrada = new ColumnaBool();
         for (Integer indice : indices) {
             filtrada.añadirCelda(this.getCelda(indice));

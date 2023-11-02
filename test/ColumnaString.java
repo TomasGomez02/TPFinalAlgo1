@@ -2,27 +2,24 @@ package test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ColumnaString extends Columna<String> {
-    private Map<Integer, String> data;
+    private List<String> data;
 
     public ColumnaString(){
-        this.data = new HashMap<>();
+        this.data = new ArrayList<>();
     }
 
     public ColumnaString(List<String> datos){
-        this();
-        for (int i=0; i < datos.size(); i++) {
-            this.data.put(i, datos.get(i));
-        }
+        this.data = new ArrayList<>(datos);
     }
 
     public ColumnaString(String[] datos){
         this();
-        for (int i=0; i < datos.length; i++) {
-            this.añadirCelda(datos[i]);
+        for (String elemento : datos) {
+            this.añadirCelda(elemento);
         }
     }
 
@@ -33,34 +30,27 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void setCelda(int indice, String valor) {
-        this.data.put(indice, valor);
+        this.data.set(indice, valor);
     }
 
     @Override
     public void añadirCelda(int indice, String valor) {
-        for (int i=0; i < this.length() - indice; i++) {
-            this.data.put(this.length() - i, this.getCelda(this.length() - i - 1));
-        }
-        this.setCelda(indice, valor);
+        this.data.add(indice, valor);
     }
 
     @Override
     public void añadirCelda(String valor) {
-        int indice = this.length();
-        this.data.put(indice, valor);
+        this.data.add(valor);
     }
 
     @Override
     public void eliminarCelda(int indice) {
-        for (int i=0; i < this.length() - indice - 1; i++){
-            this.setCelda(indice + i, this.getCelda(indice + i + 1));
-        }
-        this.data.remove(this.length() -1);
+        this.data.remove(indice);
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        this.data.put(indice, null);
+        this.setCelda(indice, null);
     }
 
     @Override
@@ -85,12 +75,7 @@ public class ColumnaString extends Columna<String> {
     public int length() {
         return this.data.size();
     }
-
-    @Override
-    public void ordenar(boolean creciente) {
-       throw new UnsupportedOperationException("metodo no implementado 'ordenar'");
-    }
-
+    
     @Override
     public ColumnaString clone(){
         ColumnaString copia = new ColumnaString();
@@ -99,28 +84,61 @@ public class ColumnaString extends Columna<String> {
         }
         return copia;
     }
-
+    
     @Override
     public String toString() {
         return this.data.toString();
     }
-
+    
     @Override
     public Columna<String> filtrar(String elemento, Filtro<String> filtro) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
     }
     
-    // @Override
-    public ColumnaString filtarPorIndice(List<Integer> indices){
-        // Es muy importante que los indices esten ordenados
-        Comparator<Integer> c;
-        c = (a, b) -> (a.compareTo(b));
-        indices.sort(c);
+    @Override
+    public ColumnaString filtrarPorIndice(List<Integer> indices) {
         ColumnaString filtrada = new ColumnaString();
         for (Integer indice : indices) {
             filtrada.añadirCelda(this.getCelda(indice));
         }
         return filtrada;
+    }
+    
+    public int getFirstIndex() throws IndexOutOfBoundsException{
+        // Lo uso para obtener el indice del primer elemento no null
+        for (int i=0; i < this.length(); i++){
+            if (this.getCelda(i) != null){
+                return i;
+            }
+        }
+        throw new IndexOutOfBoundsException("La columna esta vacia o solo tiene elementos nulos");
+    }
+    
+    @Override
+    public Map<Integer, Integer> ordenar(boolean creciente) {
+        // Crear lista de indices para trasladar los valores
+        Map<Integer, Integer> trasladar = new HashMap<>();
+
+        // Crea una copia para poder eliminar elementos sin problemas
+        ColumnaString copia = this.clone();
+
+        for (int i=0; i < this.length(); i++){
+            Integer idxMinimo = copia.getFirstIndex();
+            for (int j=0; j < this.length(); j++){
+                if (copia.getCelda(j) != null &&
+                this.getCelda(j).compareTo(this.getCelda(idxMinimo)) < 0){
+                    idxMinimo = j;
+                }
+            }
+            if (creciente){
+                trasladar.put(idxMinimo, i);
+            }
+            else{
+                trasladar.put(idxMinimo, this.length() - i - 1);
+            }
+            copia.borrarValorCelda(idxMinimo);
+        }
+        return trasladar;
     }
 }

@@ -1,19 +1,27 @@
 package test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ColumnaInt extends ColumnaNum<Integer> {
-    
-    
+        
     private List<Integer> data;
+
+    public ColumnaInt() {
+        this.data = new ArrayList<>();
+    }
 
     public ColumnaInt(List<Integer> data) {
         this.data = data;
     }
 
-    public ColumnaInt() {
-        this.data = new ArrayList<>();
+    public ColumnaInt(Integer[] data){
+        this();
+        for (Integer num : data) {
+            this.añadirCelda(num);
+        }
     }
 
     @Override
@@ -27,7 +35,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
 
     @Override
     public Integer mediana() {
-        return; //TODO
+        throw new UnsupportedOperationException("Unimplemented method 'mediana'");
     }
 
     @Override
@@ -125,9 +133,67 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public void ordenar(boolean creciente) {
-        return;
+    public Columna<Integer> filtrar(Integer elemento, Filtro<Integer> filtro) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
     }
 
-    
+    @Override
+    public ColumnaInt filtrarPorIndice(List<Integer> indices) {
+        ColumnaInt filtrada = new ColumnaInt();
+        for (Integer indice : indices) {
+            filtrada.añadirCelda(this.getCelda(indice));
+        }
+        return filtrada;
+    }
+
+    public ColumnaInt clone(){
+        ColumnaInt copia = new ColumnaInt();
+        for (Integer num : data) {
+            copia.añadirCelda(num);
+        }
+        return copia;
+    }
+
+    @Override
+    public String toString() {
+        return this.data.toString();
+    }
+
+    public int getFirstIndex() throws IndexOutOfBoundsException{
+        // Lo uso para obtener el indice del primer elemento no null
+        for (int i=0; i < this.length(); i++){
+            if (this.getCelda(i) != null){
+                return i;
+            }
+        }
+        throw new IndexOutOfBoundsException("La columna esta vacia o solo tiene elementos nulos");
+    }
+
+    @Override
+    public Map<Integer, Integer> ordenar(boolean creciente) {
+        // Crear lista de indices para trasladar los valores
+        Map<Integer, Integer> trasladar = new HashMap<>();
+
+        // Crea una copia para poder eliminar elementos sin problemas
+        ColumnaInt copia = this.clone();
+
+        for (int i=0; i < this.length(); i++){
+            Integer idxMinimo = copia.getFirstIndex();
+            for (int j=0; j < this.length(); j++){
+                if (copia.getCelda(j) != null &&
+                this.getCelda(j).compareTo(this.getCelda(idxMinimo)) < 0){
+                    idxMinimo = j;
+                }
+            }
+            if (creciente){
+                trasladar.put(idxMinimo, i);
+            }
+            else{
+                trasladar.put(idxMinimo, this.length() - i - 1);
+            }
+            copia.borrarValorCelda(idxMinimo);
+        }
+        return trasladar;
+    }
 }

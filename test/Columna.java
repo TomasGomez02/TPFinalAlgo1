@@ -1,4 +1,6 @@
 package test;
+import java.util.List;
+import java.util.Map;
 
 public abstract class Columna<T> implements Cloneable, Filtrable<T> {
     public abstract T getCelda(int indice);
@@ -10,9 +12,9 @@ public abstract class Columna<T> implements Cloneable, Filtrable<T> {
     public abstract Columna<T> recortarColumna(int indiceInicio, int indiceFinal);
     public abstract void concatenarColumna(Columna<T> otraColumna);
     public abstract int length();
-    public abstract void ordenar(boolean creciente);
+    public abstract Map<Integer, Integer> ordenar(boolean creciente);
     // public abstract Map<Integer, Integer> ordenar(boolean creciente);
     // public abstract void ordenarPorIndice(Map<Integer, Integer> orden);
     // public abstract List<Integer> filtrar(T elemento, Filtro<T> filtro);
-    // public abstract void filtrarPorIndice(List<Integer> indices);
+    public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
 }
