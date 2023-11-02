@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class ColumnaInt extends ColumnaNum<Integer> {
     
+    
     private List<Integer> data;
 
     public ColumnaInt(List<Integer> data) {
