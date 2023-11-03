@@ -120,13 +120,25 @@ public class ColumnaString extends Columna<String> {
         // Crear lista de indices para trasladar los valores
         Map<Integer, Integer> trasladar = new HashMap<>();
 
-        // Crea una copia para poder eliminar elementos sin problemas
-        ColumnaString copia = this.clone();
+        // Crea un array con todos sus elementos en false, para saber si ya se ordenaron los elementos
+        // dentro de la columna. Si el elemento en la posicion x en la Columna ya esta ordenado, entonces
+        // el valor en la posicion x del array va a ser true.
+        boolean[] yaSeOrdeno = new boolean[this.length()];
 
         for (int i=0; i < this.length(); i++){
-            Integer idxMinimo = copia.getFirstIndex();
+            Integer idxMinimo = -1;
+            // Uso esto para tomar el primer indice no nulo y no ordenado
+            for (int k=0; k < this.length(); k++){
+                if (this.getCelda(k) != null && !yaSeOrdeno[k]){
+                    idxMinimo = k;
+                    break;
+                }
+            }
+            if (idxMinimo < 0){
+                continue;
+            }
             for (int j=0; j < this.length(); j++){
-                if (copia.getCelda(j) != null &&
+                if (!yaSeOrdeno[j] && this.getCelda(j) != null &&
                 this.getCelda(j).compareTo(this.getCelda(idxMinimo)) < 0){
                     idxMinimo = j;
                 }
@@ -137,7 +149,15 @@ public class ColumnaString extends Columna<String> {
             else{
                 trasladar.put(idxMinimo, this.length() - i - 1);
             }
-            copia.borrarValorCelda(idxMinimo);
+            yaSeOrdeno[idxMinimo] = true;
+        }
+        // Esta parte manda los null al final de la lista
+        Integer distanciaDesdeUltimo = 0;
+        for (int i=0; i < this.length(); i++){
+            if (this.getCelda(i) == null){
+                trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
+                distanciaDesdeUltimo += 1;
+            }
         }
         return trasladar;
     }
