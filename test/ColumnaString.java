@@ -65,13 +65,6 @@ public class ColumnaString extends Columna<String> {
     }
 
     @Override
-    public void concatenarColumna(Columna<String> otraColumna) {
-        for (int i=0; i < otraColumna.length(); i++) {
-            this.añadirCelda(otraColumna.getCelda(i));
-        }
-    }
-
-    @Override
     public int length() {
         return this.data.size();
     }
@@ -104,17 +97,7 @@ public class ColumnaString extends Columna<String> {
         }
         return filtrada;
     }
-    
-    public int getFirstIndex() throws IndexOutOfBoundsException{
-        // Lo uso para obtener el indice del primer elemento no null
-        for (int i=0; i < this.length(); i++){
-            if (this.getCelda(i) != null){
-                return i;
-            }
-        }
-        throw new IndexOutOfBoundsException("La columna esta vacia o solo tiene elementos nulos");
-    }
-    
+
     @Override
     public Map<Integer, Integer> ordenar(boolean creciente) {
         // Crear lista de indices para trasladar los valores
@@ -155,10 +138,16 @@ public class ColumnaString extends Columna<String> {
         Integer distanciaDesdeUltimo = 0;
         for (int i=0; i < this.length(); i++){
             if (this.getCelda(i) == null){
-                trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
+                if (creciente){
+                    trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
+                }
+                else{
+                    trasladar.put(i, distanciaDesdeUltimo);
+                }
                 distanciaDesdeUltimo += 1;
             }
         }
         return trasladar;
     }
+
 }
