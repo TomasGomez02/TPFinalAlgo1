@@ -3,7 +3,7 @@ package test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.function.Predicate;
 
 public abstract class Columna<T> implements Cloneable {
@@ -41,7 +41,7 @@ public abstract class Columna<T> implements Cloneable {
         return indices;
     }
     public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
-    public void transformar(Function<T, T> transformacion){
+    public void transformar(UnaryOperator<T> transformacion){
         for (int i=0; i < length(); i++){
             if (getCelda(i) != null){
                 setCelda(i, transformacion.apply(getCelda(i)));
