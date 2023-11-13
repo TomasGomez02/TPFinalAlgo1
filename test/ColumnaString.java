@@ -84,12 +84,6 @@ public class ColumnaString extends Columna<String> {
     }
     
     @Override
-    public Columna<String> filtrar(String elemento, Filtro<String> filtro) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
-    }
-    
-    @Override
     public ColumnaString filtrarPorIndice(List<Integer> indices) {
         ColumnaString filtrada = new ColumnaString();
         for (Integer indice : indices) {

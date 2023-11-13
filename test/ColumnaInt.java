@@ -24,6 +24,13 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         }
     }
 
+    public ColumnaInt(int[] data){
+        this();
+        for (int elem : data) {
+            this.añadirCelda(elem);
+        }
+    }
+
     @Override
     public Double media() {
         Double suma = 0.0;
@@ -34,8 +41,22 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public Integer mediana() {
-        throw new UnsupportedOperationException("Unimplemented method 'mediana'");
+    public Double mediana() {
+        ColumnaInt copia = this.clone();
+        copia.ordenarPorIndice(copia.ordenar(true));
+        System.out.println(copia);
+        
+        Double mediana;
+        if (length() % 2 == 0){
+            int mitad = copia.length()/2 - 1;
+            System.out.println(mitad);
+            mediana = (copia.getCelda(mitad) + copia.getCelda(mitad+1)) / 2.0;
+        }
+        else{
+            int mitad = copia.length() / 2;
+            mediana = copia.getCelda(mitad) * 1.0;
+        }
+        return mediana;
     }
 
     @Override
@@ -53,8 +74,8 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     public Integer minimo() {
         int min = data.get(0);
         for (int i=1; i<data.size(); i++) {
-            if (data.get(i) < min) {
-                min = data.get(i);
+            if (getCelda(i) != null && getCelda(i) < min) {
+                min = getCelda(i);
             }
         }
         return min;
@@ -63,8 +84,12 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     @Override
     public Double desvioEstandar() {
         Double suma = 0.0;
+        Double media = this.media();
         for (int i=0; i<data.size(); i++) {
-            suma = suma + ((media() - data.get(i)) * (media() - data.get(i)));
+            Integer elem = getCelda(i);
+            if (elem != null){
+                suma = suma + ((media - elem) * (media - elem));
+            }
         }
         Double desvio = suma / data.size();
         return Math.sqrt(desvio);
@@ -123,12 +148,6 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     @Override
     public int length() {
         return this.data.size();
-    }
-
-    @Override
-    public Columna<Integer> filtrar(Integer elemento, Filtro<Integer> filtro) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
     }
 
     @Override

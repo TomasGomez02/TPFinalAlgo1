@@ -2,20 +2,27 @@ package test;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
 
 public class DataFrame {
     
+    @SuppressWarnings("rawtypes")   // Literalmente es lo que dice
     private Map<String, Columna> data;
-    private List<String> etiquetas;
+    private Set<String> etiquetas;
     private Map<String, String> tiposColumna;
 
     public DataFrame(){
         this.data = new HashMap<>();
     }
 
-    public List<String> nombreColumnas(){
+    @SuppressWarnings("rawtypes")
+    public DataFrame(Map<String, Columna> data, Map<String, String> tiposColumna){
+        this.data = data;
+        this.tiposColumna = tiposColumna;
+        this.etiquetas = data.keySet();
+    }
+
+    public Set<String> nombreColumnas(){
         return this.etiquetas;
     }
 
@@ -32,35 +39,35 @@ public class DataFrame {
     }
 
     public DataFrame head(int cantidadFilas){
-        return; 
+        throw new UnsupportedOperationException("Metodo no implementado 'head'");
     }
 
     public DataFrame head(){
-        return; 
+        throw new UnsupportedOperationException("Metodo no implementado 'head'");
     }
 
     public DataFrame tail(int cantidadFilas){
-        return; 
+        throw new UnsupportedOperationException("Metodo no implementado 'tail'");
     }
 
     public DataFrame tail(){
-        return; 
+        throw new UnsupportedOperationException("Metodo no implementado 'tail'");
     }
 
     public <T> void setCelda(String etiqueta, int indice, T valor){
-        //TODO
+        throw new UnsupportedOperationException("Metodo no implementado 'setCelda'");
     }
 
     public Object getCelda(String etiqueta, int indice){
-        return; //TODO
+        throw new UnsupportedOperationException("Metodo no implementado 'getCelda'");
     }
 
     public <T> T getCelda(String etiqueta, int indice, Class<T> tipoDato){
-        return; //TODO
+        throw new UnsupportedOperationException("Metodo no implementado 'getCelda'");
     }
 
     public DataFrame clone(){
-        return; //TODO
+        throw new UnsupportedOperationException("Metodo no implementado 'clone'");
     }
 
 }

@@ -94,12 +94,6 @@ public class ColumnaBool extends Columna<Boolean>{
     }
 
     @Override
-    public Columna<Boolean> filtrar(Boolean elemento, Filtro<Boolean> filtro) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
-    }
-
-    @Override
     public ColumnaBool filtrarPorIndice(List<Integer> indices){
         ColumnaBool filtrada = new ColumnaBool();
         for (Integer indice : indices) {

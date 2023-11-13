@@ -3,8 +3,10 @@ package test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public abstract class Columna<T> implements Cloneable, Filtrable<T> {
+public abstract class Columna<T> implements Cloneable {
     public abstract T getCelda(int indice);
     public abstract void setCelda(int indice, T valor);
     public abstract void añadirCelda(int indice, T valor);
@@ -29,6 +31,21 @@ public abstract class Columna<T> implements Cloneable, Filtrable<T> {
             this.setCelda(moveTo, copia.get(i));
         }
     }
-    // public abstract List<Integer> filtrar(T elemento, Filtro<T> filtro);
+    public List<Integer> filtrar(Predicate<T> filtro){
+        List<Integer> indices = new ArrayList<>();
+        for (int i=0; i < this.length(); i++){
+            if (this.getCelda(i) != null && filtro.test(this.getCelda(i))){
+                indices.add(i);
+            }
+        }
+        return indices;
+    }
     public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
+    public void transformar(Function<T, T> transformacion){
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null){
+                setCelda(i, transformacion.apply(getCelda(i)));
+            }
+        }
+    }
 }

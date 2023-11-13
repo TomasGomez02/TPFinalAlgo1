@@ -16,16 +16,14 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     public ColumnaDouble(List<Double> lista)
     {
-        data = new ArrayList<>();
-
+        this();
         for(Double num: lista)
             data.add(num);
     }
 
     public ColumnaDouble(double[] array)
     {
-        data = new ArrayList<>();
-
+        this();
         for(double num: array)
             data.add(num);
     }
@@ -35,12 +33,6 @@ public class ColumnaDouble extends ColumnaNum<Double>
         for (Double num : array) {
             this.añadirCelda(num);
         }
-    }
-
-    @Override
-    public Columna<Double> filtrar(Double elemento, Filtro<Double> filtro) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
     }
 
     @Override
@@ -56,20 +48,41 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public Double mediana() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'mediana'");
+        ColumnaDouble copia = clone();
+        copia.ordenarPorIndice(copia.ordenar(true));
+
+        Double mediana;
+        if (length() % 2 == 0){
+            int mitad = copia.length() / 2;
+            mediana = copia.getCelda(mitad) + copia.getCelda(mitad+1) / 2.0;
+        }
+        else{
+            int mitad = copia.length() / 2;
+            mediana = copia.getCelda(mitad);
+        }
+        return mediana;
     }
 
     @Override
     public Double maximo() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'maximo'");
+        Double max = getCelda(0);
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null && getCelda(i) > max){
+                max = getCelda(i);
+            }
+        }
+        return max;
     }
 
     @Override
     public Double minimo() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'minimo'");
+        Double min = getCelda(0);
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null && getCelda(i) < min){
+                min = getCelda(i);
+            }
+        }
+        return min;
     }
 
     @Override
@@ -80,50 +93,52 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public Double sumaAcumulada() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'sumaAcumulada'");
+        Double suma = 0.0;
+        for (int i=0; i < length(); i++){
+            suma += getCelda(i);
+        }
+        return suma;
     }
 
     @Override
     public Double getCelda(int indice) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCelda'");
+        return this.data.get(indice);
     }
 
     @Override
     public void setCelda(int indice, Double valor) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCelda'");
+        this.data.set(indice, valor);
     }
 
     @Override
     public void añadirCelda(int indice, Double valor) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'añadirCelda'");
+        this.data.add(indice, valor);
     }
 
     @Override
     public void añadirCelda(Double valor) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'añadirCelda'");
+        this.data.add(valor);
     }
 
     @Override
     public void eliminarCelda(int indice) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eliminarCelda'");
+        this.data.remove(indice);
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'borrarValorCelda'");
+        this.setCelda(indice, null);
     }
 
     @Override
     public Columna<Double> recortarColumna(int indiceInicio, int indiceFinal) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'recortarColumna'");
+        ColumnaDouble recorte = new ColumnaDouble();
+        for (int i=0; i < length(); i++){
+            if (i >= indiceInicio && i <= indiceFinal){
+                recorte.añadirCelda(getCelda(i));
+            }
+        }
+        return recorte;
     }
 
     @Override
@@ -131,6 +146,12 @@ public class ColumnaDouble extends ColumnaNum<Double>
         return data.size();
     }
 
+    @Override
+    public String toString(){
+        return this.data.toString();
+    }
+
+    @Override
     public ColumnaDouble clone(){
         ColumnaDouble copia = new ColumnaDouble();
         for (Double elem : data) {
