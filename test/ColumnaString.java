@@ -1,8 +1,9 @@
 package test;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ColumnaString extends Columna<String> {
     private List<String> data;
@@ -11,8 +12,15 @@ public class ColumnaString extends Columna<String> {
         this.data = new ArrayList<>();
     }
 
-    public ColumnaString(List<String> otro){
-        this.data = new ArrayList<>(otro);
+    public ColumnaString(List<String> datos){
+        this.data = new ArrayList<>(datos);
+    }
+
+    public ColumnaString(String[] datos){
+        this();
+        for (String elemento : datos) {
+            this.añadirCelda(elemento);
+        }
     }
 
     @Override
@@ -42,13 +50,13 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void borrarValorCelda(int indice) {
-        this.data.set(indice, null);
+        this.setCelda(indice, null);
     }
 
     @Override
     public ColumnaString recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaString recorte = new ColumnaString();
-        for (int i = 0; i < this.length(); i++) {
+        for (int i=0; i < this.length(); i++) {
             if (i >= indiceInicio && i <= indiceFinal){
                 recorte.añadirCelda(this.getCelda(i));
             }
@@ -57,45 +65,83 @@ public class ColumnaString extends Columna<String> {
     }
 
     @Override
-    public void concatenarColumna(Columna<String> otraColumna) {
-        for (int i = 0; i < otraColumna.length(); i++) {
-            this.añadirCelda(otraColumna.getCelda(i));
-        }
-    }
-
-    @Override
     public int length() {
         return this.data.size();
     }
-
-    @Override
-    public void ordenar(boolean creciente) {
-        // Funciona bien. Pero, si algun valor es null, tira NullPointerException
-        Comparator<String> c;
-        if (creciente){
-            c = (a, b) -> a.compareTo(b);
-        }
-        else{
-            c = (a, b) -> b.compareTo(a);
-        }
-        this.data.sort(c);
-    }
-
+    
     @Override
     public ColumnaString clone(){
-        ColumnaString copia = new ColumnaString(this.data);
+        ColumnaString copia = new ColumnaString();
+        for (int i=0; i < this.length(); i++){
+            copia.añadirCelda(this.getCelda(i));
+        }
         return copia;
     }
-
+    
     @Override
     public String toString() {
         return this.data.toString();
     }
+    
+    @Override
+    public ColumnaString filtrarPorIndice(List<Integer> indices) {
+        ColumnaString filtrada = new ColumnaString();
+        for (Integer indice : indices) {
+            filtrada.añadirCelda(this.getCelda(indice));
+        }
+        return filtrada;
+    }
 
     @Override
-    public Columna<String> filtrar(String elemento, Filtro<String> filtro) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
+    public Map<Integer, Integer> ordenar(boolean creciente) {
+        // Crear lista de indices para trasladar los valores
+        Map<Integer, Integer> trasladar = new HashMap<>();
+
+        // Crea un array con todos sus elementos en false, para saber si ya se ordenaron los elementos
+        // dentro de la columna. Si el elemento en la posicion x en la Columna ya esta ordenado, entonces
+        // el valor en la posicion x del array va a ser true.
+        boolean[] yaSeOrdeno = new boolean[this.length()];
+
+        for (int i=0; i < this.length(); i++){
+            Integer idxMinimo = -1;
+            // Uso esto para tomar el primer indice no nulo y no ordenado
+            for (int k=0; k < this.length(); k++){
+                if (this.getCelda(k) != null && !yaSeOrdeno[k]){
+                    idxMinimo = k;
+                    break;
+                }
+            }
+            if (idxMinimo < 0){
+                continue;
+            }
+            for (int j=0; j < this.length(); j++){
+                if (!yaSeOrdeno[j] && this.getCelda(j) != null &&
+                this.getCelda(j).compareTo(this.getCelda(idxMinimo)) < 0){
+                    idxMinimo = j;
+                }
+            }
+            if (creciente){
+                trasladar.put(idxMinimo, i);
+            }
+            else{
+                trasladar.put(idxMinimo, this.length() - i - 1);
+            }
+            yaSeOrdeno[idxMinimo] = true;
+        }
+        // Esta parte manda los null al final de la lista
+        Integer distanciaDesdeUltimo = 0;
+        for (int i=0; i < this.length(); i++){
+            if (this.getCelda(i) == null){
+                if (creciente){
+                    trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
+                }
+                else{
+                    trasladar.put(i, distanciaDesdeUltimo);
+                }
+                distanciaDesdeUltimo += 1;
+            }
+        }
+        return trasladar;
     }
-    
+
 }
