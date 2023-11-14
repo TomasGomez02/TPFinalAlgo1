@@ -52,13 +52,14 @@ public class ColumnaDouble extends ColumnaNum<Double>
         copia.ordenarPorIndice(copia.ordenar(true));
 
         Double mediana;
+        int indiceMitad;
         if (length() % 2 == 0){
-            int mitad = copia.length() / 2;
-            mediana = copia.getCelda(mitad) + copia.getCelda(mitad+1) / 2.0;
+            indiceMitad = copia.length() / 2;
+            mediana = (copia.getCelda(indiceMitad) + copia.getCelda(indiceMitad-1))/ 2.0;
         }
         else{
-            int mitad = copia.length() / 2;
-            mediana = copia.getCelda(mitad);
+            indiceMitad = copia.length() / 2;
+            mediana = copia.getCelda(indiceMitad);
         }
         return mediana;
     }
@@ -87,8 +88,12 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public Double desvioEstandar() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'desvioEstandar'");
+        double sumatoria = 0.0;
+        final double media = this.media();
+        for (int i=0; i < this.length(); i++){
+            sumatoria += Math.pow(getCelda(i) - media, 2);
+        }
+        return Math.sqrt(sumatoria / this.length());
     }
 
     @Override
@@ -133,10 +138,8 @@ public class ColumnaDouble extends ColumnaNum<Double>
     @Override
     public Columna<Double> recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaDouble recorte = new ColumnaDouble();
-        for (int i=0; i < length(); i++){
-            if (i >= indiceInicio && i <= indiceFinal){
-                recorte.añadirCelda(getCelda(i));
-            }
+        for (int i=indiceInicio; i <= indiceFinal; i++){
+            recorte.añadirCelda(getCelda(i));
         }
         return recorte;
     }

@@ -48,4 +48,5 @@ public abstract class Columna<T> implements Cloneable {
             }
         }
     }
+    public abstract Columna<T> clone();
 }

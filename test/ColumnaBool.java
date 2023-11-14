@@ -56,10 +56,8 @@ public class ColumnaBool extends Columna<Boolean>{
     @Override
     public Columna<Boolean> recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaBool recorte = new ColumnaBool();
-        for (int i = 0; i < this.length(); i++) {
-            if (i >= indiceInicio && i <= indiceFinal){
-                recorte.añadirCelda(this.getCelda(i));
-            }
+        for (int i=indiceInicio; i <= indiceFinal; i++) {
+            recorte.añadirCelda(this.getCelda(i));
         }
         return recorte;
     }

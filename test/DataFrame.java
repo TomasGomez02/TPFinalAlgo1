@@ -3,6 +3,7 @@ package test;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,7 +22,12 @@ public class DataFrame {
     public DataFrame(Map<String, Columna> data, Map<String, String> tiposColumna){
         this.data = data;
         this.tiposColumna = tiposColumna;
-        this.etiquetas = data.keySet().stream().toList();
+        // this.etiquetas = data.keySet().stream().toList();
+        // Esto es porque el .toList() no funciona en la compu de la unsam
+        this.etiquetas = new ArrayList<>();
+        for (String etiqueta : data.keySet()) {
+            this.etiquetas.add(etiqueta);
+        }
     }
 
     public List<String> nombreColumnas(){
@@ -44,7 +50,11 @@ public class DataFrame {
         return this.data.toString();
     }
 
-    private void printDesde(int indiceInicio, int indiceFinal){
+    public void printDesdeHasta(int indiceInicio, int indiceFinal){
+        if (indiceInicio < -1 || indiceFinal > cantidadFilas()){
+            indiceInicio = 0;
+            indiceFinal = cantidadFilas();
+        }
         String fila = "";
         String sep = "|";
         int center = 6;
@@ -99,7 +109,7 @@ public class DataFrame {
         if (cantidadFilas > this.cantidadFilas()){
             cantidadFilas = this.cantidadFilas();
         }
-        printDesde(0, cantidadFilas);
+        printDesdeHasta(0, cantidadFilas);
     }
 
     public void head(){
@@ -110,7 +120,7 @@ public class DataFrame {
         if (cantidadFilas > this.cantidadFilas()){
             cantidadFilas = this.cantidadFilas();
         }
-        printDesde(this.cantidadFilas() - cantidadFilas, this.cantidadFilas());
+        printDesdeHasta(this.cantidadFilas() - cantidadFilas, this.cantidadFilas());
     }
 
     public void tail(){
@@ -129,32 +139,100 @@ public class DataFrame {
         return tipoDato.cast(data.get(etiqueta).getCelda(indice));
     }
 
-    public DataFrame clone(){
-        throw new UnsupportedOperationException("Metodo no implementado 'clone'");
+    public <T> void añadirCelda(String etiqueta, T valor){
+        this.data.get(etiqueta).añadirCelda(valor);
     }
 
-    public <T> void añadirColumna(Columna<T> columna){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public DataFrame clone(){
+        Map<String, Columna> columnas = new HashMap<>();
+        Map<String, String> dataTypes = new HashMap<>();
+        for (String colName : this.etiquetas){
+            columnas.put(colName, this.getColumna(colName).clone());
+            dataTypes.put(colName, this.tiposColumna.get(colName));
+        }
+        return new DataFrame(columnas, dataTypes);
+    }
+
+    public <T> void añadirColumna(String etiqueta, Columna<T> columna){
+        this.data.put(etiqueta, columna);
     }
 
     public Columna getColumna(String etiqueta){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        return this.data.get(etiqueta);
     }
 
     public DataFrame getColumna(String[] etiqueta){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        Map<String, Columna> columnas = new HashMap<>();
+        Map<String, String> tiposCol = new HashMap<>();
+        for (String colName : etiqueta){
+            columnas.put(colName, this.getColumna(colName));
+            tiposCol.put(colName, this.tiposColumna.get(colName));
+        }
+        return new DataFrame(columnas, tiposCol);
     }
 
-    public DataFrame getColumna(List<Integer> etiqueta){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public DataFrame getColumna(List<String> etiqueta){
+        Map<String, Columna> columnas = new HashMap<>();
+        Map<String, String> tiposCol = new HashMap<>();
+        for (String colName : etiqueta){
+            columnas.put(colName, this.getColumna(colName));
+            tiposCol.put(colName, this.tiposColumna.get(colName));
+        }
+        return new DataFrame(columnas, tiposCol);
     }
 
     public void añadirFila(DataFrame fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        for (String colName : this.etiquetas){
+            switch (this.tiposColumna.get(colName)) {
+                case "String":
+                    this.añadirCelda(colName, fila.getCelda(colName, 0, String.class));
+                    break;
+                case "Integer":
+                    this.añadirCelda(colName, fila.getCelda(colName, 0, Integer.class));
+                    break;
+                case "Double":
+                    this.añadirCelda(colName, fila.getCelda(colName, 0, Double.class));
+                    break;
+                case "Boolean":
+                    this.añadirCelda(colName, fila.getCelda(colName, 0, Boolean.class));
+                    break;
+                default:
+                    System.out.println("Si esto se ejecuta, paso algo raro");
+                    break;
+            }
+        }
+    }
+
+    public void concatDataFrame(DataFrame otro){
+        for (int i=0; i < cantidadFilas(); i++){
+            this.añadirFila(otro.getFila(i));
+        }
     }
 
     public DataFrame getFila(int fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        // TODO: Hay que resolver esto
+        Map<String, Columna> otro = new HashMap<>();
+        for (String colName : this.etiquetas){
+            switch (this.tiposColumna.get(colName)){
+                case "String":
+                    otro.put(colName, new ColumnaString());
+                    otro.get(colName).añadirCelda(getCelda(colName, fila, String.class));
+                    break;
+                case "Integer":
+                    otro.put(colName, new ColumnaInt());
+                    otro.get(colName).añadirCelda(getCelda(colName, fila, Integer.class));
+                    break;
+                case "Double":
+                    otro.put(colName, new ColumnaDouble());
+                    otro.get(colName).añadirCelda(getCelda(colName, fila, Double.class));
+                    break;
+                case "Boolean":
+                    otro.put(colName, new ColumnaBool());
+                    otro.get(colName).añadirCelda(getCelda(colName, fila, Boolean.class));
+                    break;
+            }
+        }
+        return new DataFrame(otro, this.tiposColumna);
     }
     
     public DataFrame getFila(int[] fila){
