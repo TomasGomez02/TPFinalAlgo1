@@ -56,10 +56,8 @@ public class ColumnaString extends Columna<String> {
     @Override
     public ColumnaString recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaString recorte = new ColumnaString();
-        for (int i=0; i < this.length(); i++) {
-            if (i >= indiceInicio && i <= indiceFinal){
-                recorte.añadirCelda(this.getCelda(i));
-            }
+        for (int i=indiceInicio; i <= indiceFinal; i++) {
+            recorte.añadirCelda(this.getCelda(i));
         }
         return recorte;
     }

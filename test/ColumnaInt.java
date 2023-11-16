@@ -49,8 +49,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         Double mediana;
         if (length() % 2 == 0){
             int mitad = copia.length()/2 - 1;
-            System.out.println(mitad);
-            mediana = (copia.getCelda(mitad) + copia.getCelda(mitad+1)) / 2.0;
+            mediana = (copia.getCelda(mitad) + copia.getCelda(mitad-1)) / 2.0;
         }
         else{
             int mitad = copia.length() / 2;
@@ -137,10 +136,8 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     @Override
     public Columna<Integer> recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaInt recorte = new ColumnaInt();
-        for (int i = 0; i < this.length(); i++) {
-            if (i >= indiceInicio && i <= indiceFinal){
-                recorte.añadirCelda(this.getCelda(i));
-            }
+        for (int i=indiceInicio; i <= indiceFinal; i++) {
+            recorte.añadirCelda(this.getCelda(i));
         }
         return recorte;
     }
