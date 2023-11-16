@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class DataFrame {
+public class DataFrame implements Cloneable {
     
     @SuppressWarnings("rawtypes")   // Literalmente es lo que dice
     private Map<String, Columna> data;
@@ -41,6 +41,9 @@ public class DataFrame {
     }
 
     public int cantidadFilas(){
+        if (this.data.isEmpty()){
+            return 0;
+        }
         return this.data.get(etiquetas.get(0)).length();
     }
 
@@ -49,7 +52,8 @@ public class DataFrame {
     }
 
     public String toString(){
-        return this.data.toString();
+        this.head();
+        return "";
     }
 
     public void printDesdeHasta(int indiceInicio, int indiceFinal){
@@ -146,7 +150,7 @@ public class DataFrame {
     private <T> void añadirCelda(String etiqueta, T valor){
         this.data.get(etiqueta).añadirCelda(valor);
     }
-
+    @Override
     public DataFrame clone(){
         Map<String, Columna> columnas = new HashMap<>();
         Map<String, String> dataTypes = new HashMap<>();
@@ -157,10 +161,23 @@ public class DataFrame {
         return new DataFrame(columnas, dataTypes);
     }
 
-    public <T> void añadirColumna(String etiqueta, Columna<T> columna){
+    public <T> void addColumna(String etiqueta, Columna<T> columna){
         this.data.put(etiqueta, columna);
         if (!this.etiquetas.contains(etiqueta)){
             this.etiquetas.add(etiqueta);
+            String dataType;
+            if (columna.getClass() == ColumnaString.class){
+                dataType = "String";
+            } else if (columna.getClass() == ColumnaInt.class){
+                dataType = "Integer";
+            } else if (columna.getClass() == ColumnaDouble.class){
+                dataType = "Double";
+            } else if (columna.getClass() == ColumnaBool.class){
+                dataType = "Integer";
+            } else {
+                throw new RuntimeException("Error en addColumna. Esto no deberia ocurrir");
+            }
+            this.tiposColumna.put(etiqueta, dataType);
         }
     }
 
@@ -188,8 +205,9 @@ public class DataFrame {
         return new DataFrame(columnas, tiposCol);
     }
 
-    public void añadirFila(DataFrame fila){
+    public void addFila(DataFrame fila){
         for (String colName : this.etiquetas){
+            // this.añadirCelda(colName, fila.getCelda(colName, 0));
             switch (this.tiposColumna.get(colName)) {
                 case "String":
                     this.añadirCelda(colName, fila.getCelda(colName, 0, String.class));
@@ -211,9 +229,15 @@ public class DataFrame {
         }
     }
 
+    public void addFila(Map<String, Object> fila){
+        for (String colName : fila.keySet()){
+            this.data.get(colName).añadirCelda(fila.get(colName));
+        }
+    }
+
     public void concatDataFrame(DataFrame otro){
         for (int i=0; i < otro.cantidadFilas(); i++){
-            this.añadirFila(otro.getFila(i));
+            this.addFila(otro.getFila(i));
         }
     }
 
