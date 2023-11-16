@@ -16,6 +16,8 @@ public class DataFrame {
 
     public DataFrame(){
         this.data = new HashMap<>();
+        this.etiquetas = new ArrayList<>();
+        this.tiposColumna = new HashMap<>();
     }
 
     @SuppressWarnings("rawtypes")
@@ -51,8 +53,10 @@ public class DataFrame {
     }
 
     public void printDesdeHasta(int indiceInicio, int indiceFinal){
-        if (indiceInicio < -1 || indiceFinal > cantidadFilas()){
+        if (indiceInicio < -1){
             indiceInicio = 0;
+        }
+        if (indiceFinal > cantidadFilas()){
             indiceFinal = cantidadFilas();
         }
         String fila = "";
@@ -139,7 +143,7 @@ public class DataFrame {
         return tipoDato.cast(data.get(etiqueta).getCelda(indice));
     }
 
-    public <T> void añadirCelda(String etiqueta, T valor){
+    private <T> void añadirCelda(String etiqueta, T valor){
         this.data.get(etiqueta).añadirCelda(valor);
     }
 
@@ -155,6 +159,9 @@ public class DataFrame {
 
     public <T> void añadirColumna(String etiqueta, Columna<T> columna){
         this.data.put(etiqueta, columna);
+        if (!this.etiquetas.contains(etiqueta)){
+            this.etiquetas.add(etiqueta);
+        }
     }
 
     public Columna getColumna(String etiqueta){
@@ -197,21 +204,22 @@ public class DataFrame {
                     this.añadirCelda(colName, fila.getCelda(colName, 0, Boolean.class));
                     break;
                 default:
-                    System.out.println("Si esto se ejecuta, paso algo raro");
+                    System.out.println("Error en DataFrame.añadirFila");
+                    System.out.println("Falta un tipo de dato para la columna: "+colName);
                     break;
             }
         }
     }
 
     public void concatDataFrame(DataFrame otro){
-        for (int i=0; i < cantidadFilas(); i++){
+        for (int i=0; i < otro.cantidadFilas(); i++){
             this.añadirFila(otro.getFila(i));
         }
     }
 
     public DataFrame getFila(int fila){
-        // TODO: Hay que resolver esto
         Map<String, Columna> otro = new HashMap<>();
+        DataFrame otro2 = new DataFrame();
         for (String colName : this.etiquetas){
             switch (this.tiposColumna.get(colName)){
                 case "String":
@@ -232,7 +240,7 @@ public class DataFrame {
                     break;
             }
         }
-        return new DataFrame(otro, this.tiposColumna);
+        return otro2;
     }
     
     public DataFrame getFila(int[] fila){
