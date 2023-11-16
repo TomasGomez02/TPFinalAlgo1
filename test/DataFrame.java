@@ -207,7 +207,6 @@ public class DataFrame implements Cloneable {
 
     public void addFila(DataFrame fila){
         for (String colName : this.etiquetas){
-            // this.añadirCelda(colName, fila.getCelda(colName, 0));
             switch (this.tiposColumna.get(colName)) {
                 case "String":
                     this.añadirCelda(colName, fila.getCelda(colName, 0, String.class));
@@ -243,7 +242,6 @@ public class DataFrame implements Cloneable {
 
     public DataFrame getFila(int fila){
         Map<String, Columna> otro = new HashMap<>();
-        DataFrame otro2 = new DataFrame();
         for (String colName : this.etiquetas){
             switch (this.tiposColumna.get(colName)){
                 case "String":
@@ -264,19 +262,34 @@ public class DataFrame implements Cloneable {
                     break;
             }
         }
-        return otro2;
+        return new DataFrame(otro, tiposColumna);
     }
     
     public DataFrame getFila(int[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        DataFrame copia = this.getFila(fila[0]);
+        for (int indice : fila){
+            if (indice == fila[0]){ continue; }
+            copia.addFila(this.getFila(indice));
+        }
+        return copia;
     }
 
     public DataFrame getFila(Integer[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        DataFrame copia = this.getFila(fila[0]);
+        for (Integer indice : fila){
+            if (indice == fila[0]){ continue; }
+            copia.addFila(this.getFila(indice));
+        }
+        return copia;
     }
 
-    public DataFrame getFila(List<Integer>[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public DataFrame getFila(List<Integer> fila){
+        DataFrame copia = this.getFila(fila.get(0));
+        for (Integer indice : fila){
+            if (indice == fila.get(0)){ continue; }
+            copia.addFila(this.getFila(indice));
+        }
+        return copia;
     }
 
     public void eliminarCol(String etiqueta){
