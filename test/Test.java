@@ -12,6 +12,8 @@ public class Test
         String[] datatypes = "String,".repeat(28).split(",");
         DataFrame df = IOCSV.fromCSV(nombreArchivo, datatypes);
 
-        df.printDesdeHasta(150, 170);;
+        df.ordenar("track_number", true);
+        df.head();
+        
     }
 }

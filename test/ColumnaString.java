@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class ColumnaString extends Columna<String> {
     private List<String> data;
-
+    
     public ColumnaString(){
         this.data = new ArrayList<>();
     }
