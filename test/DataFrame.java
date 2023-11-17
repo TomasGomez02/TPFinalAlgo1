@@ -55,54 +55,92 @@ public class DataFrame {
             indiceInicio = 0;
             indiceFinal = cantidadFilas();
         }
+
+        final int COLUMNASMAX = 10;
+        final int OFFSETMINIMO = 6;
+        final String OVERFLOWSTRING = "...|";
+
+        final boolean COLUMNASOVERFLOW = (cantidadColumnas() > COLUMNASMAX);
+        int cantColumnas = COLUMNASOVERFLOW ? COLUMNASMAX : cantidadColumnas();
+
         String fila = "";
         String sep = "|";
-        int center = 6;
+        int[] tamaño = new int[cantColumnas];
 
         int espacioIzq;
         int espacioDer;
 
         // Esta parte ajusta el center por si la etiqueta es muy larga
-        for (String colName : etiquetas){
-            if (colName.length()-2 > center){
-                center = colName.length();
+        for (int i = 0; i < cantColumnas; i++){
+            tamaño[i] = OFFSETMINIMO * 2;
+            if (etiquetas.get(i).length() + OFFSETMINIMO > tamaño[i]){
+                tamaño[i] = etiquetas.get(i).length() + OFFSETMINIMO;
             }
         }
 
         // Esta parte es para escribir los nombres de las columnas
-        for (String colName : etiquetas){
-            espacioIzq = ((center - colName.length()) / 2) + 1;
-            if (colName.length()%2==0){
+        for (int i = 0; i < cantColumnas; i++){
+            int diff = tamaño[i] - etiquetas.get(i).length();
+            espacioIzq = diff / 2;
+            if (diff % 2 == 0){
                 espacioDer = espacioIzq;
             } else {
                 espacioDer = espacioIzq+1;
             }
-            fila += " ".repeat(espacioIzq)+colName+" ".repeat(espacioDer)+sep;
+            fila += " ".repeat(espacioIzq)+etiquetas.get(i)+" ".repeat(espacioDer)+sep;
         }
+        if(COLUMNASOVERFLOW)
+            fila += OVERFLOWSTRING;
         System.out.println(fila);
-        System.out.println("-".repeat(etiquetas.size() * (center + 2) + etiquetas.size()));
+        int cantidadSepHeader = 0;
+        for(int tam: tamaño)
+            cantidadSepHeader += tam + 1;
+        System.out.println("-".repeat(cantidadSepHeader));
         fila = "";
         // Esta parte es para escribir los valores
         for (int row=indiceInicio; row < indiceFinal; row++){
-            for (String colName : etiquetas) {
+            for (int i = 0; i < cantColumnas; i++) {
                 String elem;
-                if (getCelda(colName, row) != null){
-                    elem = this.getCelda(colName, row).toString();
+                if (getCelda(etiquetas.get(i), row) != null){
+                    elem = this.getCelda(etiquetas.get(i), row).toString();
                 } else {
                     elem = "null";
                 }
-                espacioIzq = ((center - elem.length()) / 2) + 1;
-                if (elem.length()%2==0){
+
+                if(elem.length() > tamaño[i])
+                {
+                    elem = stringRecortado(elem, tamaño[i]);
+                }
+
+                int diff = tamaño[i] - elem.length();
+                espacioIzq = diff / 2;
+                if (diff % 2 == 0){
                     espacioDer = espacioIzq;
                 } else{
                     espacioDer = espacioIzq+1;
                 }
                 
+                //System.out.println(elem.length() + " - " + espacioIzq);
+
                 fila += " ".repeat(espacioIzq)+elem+" ".repeat(espacioDer)+sep;
             }
+            if(COLUMNASOVERFLOW)
+                fila += OVERFLOWSTRING;
             System.out.println(fila);
             fila = "";
         }
+    }
+
+    private String stringRecortado(String stringOriginal, int tamaño)
+    {
+        String stringNuevo = "";
+        char[] charArr = stringOriginal.toCharArray();
+        for(int i = 0; i < tamaño - 3; i++)
+        {
+            stringNuevo += charArr[i];
+        }
+
+        return stringNuevo + "...";
     }
 
     public void head(int cantidadFilas){

@@ -5,9 +5,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 public final class IOCSV 
 {
@@ -30,19 +33,19 @@ public final class IOCSV
             
             // Genero las columnas para cada etiqueta
             // Y el tipo de dato para cada etiqueta
-            header = linea.replaceAll("\n", "")
-                            .replaceAll(" ", "")
-                            .split(",");
+            header = procesarFila(linea);
+            //System.out.println(header.length);
             columnas = crearColumnas(header, dataTypes);
             for (int i=0; i < header.length; i++){
                 tiposEtiqueta.put(header[i], dataTypes[i]);
             }
 
+            
+
             // Asigno los valores a cada columna
             while ((linea = br.readLine()) != null) {
-                String[] valores = linea.replaceAll("\n", "")
-                                        .replaceAll(" ", "")
-                                        .split(",");
+                String[] valores = procesarFila(linea);
+                //System.out.println(valores.length);
                 for (int i=0; i < valores.length; i++) {
                     addElemToDataFrame(columnas, header[i], valores[i], tiposEtiqueta.get(header[i]));
                 }
@@ -92,10 +95,10 @@ public final class IOCSV
     private static Map<String, Columna> crearColumnas(String[] headers, String[] dataTypes) throws Exception {
         if (headers.length > dataTypes.length){
             // TODO: Hay que crear una excepcion para eso?
-            throw new Exception("Faltam especificar "+(headers.length-dataTypes.length)+" tipos de datos");
+            throw new Exception("Faltan especificar "+(headers.length-dataTypes.length)+" tipos de datos");
         }
 
-        Map<String, Columna> columnas = new HashMap<>();
+        Map<String, Columna> columnas = new LinkedHashMap<>();
 
         for (int i=0; i < headers.length; i++){
             switch (dataTypes[i].strip()) {
@@ -118,6 +121,31 @@ public final class IOCSV
             }
         }
         return columnas;
+    }
+
+    private static String[] procesarFila(String fila)
+    {
+        String[] filaComillas = fila.split("\"");
+        List<String> filaProcesada = new ArrayList<>();
+
+        for(int i = 0; i < filaComillas.length; i++)
+        {
+            if(i % 2 == 0 && !filaComillas[i].equals(",") && !filaComillas[i].equals(""))
+            {
+                if(i > 0)
+                {
+                    filaComillas[i] = filaComillas[i].replaceFirst(",", "");
+                }
+                filaProcesada.addAll(Arrays.asList(filaComillas[i].replaceAll("\n", "")
+                                            .split(",")));
+            }
+            else if(i % 2 == 1)
+            {
+                filaProcesada.add(filaComillas[i]);
+            }
+        }
+
+        return filaProcesada.toArray(String[] ::new);
     }
 
     public static void toCSV(DataFrame data)
