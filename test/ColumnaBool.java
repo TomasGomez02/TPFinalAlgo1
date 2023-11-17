@@ -25,16 +25,25 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public Boolean getCelda(int indice) {
-        return this.data.get(indice);  
+        if (contieneIndice(indice)){
+            return this.data.get(indice);
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override
     public void setCelda(int indice, Boolean valor) {
-        this.data.set(indice, valor);
+        if (contieneIndice(indice)){
+            this.data.set(indice, valor);
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override
     public void añadirCelda(int indice, Boolean valor) {
+        if (!contieneIndice(indice) && indice != 0){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        }
         this.data.add(indice, valor);
     }
 
@@ -45,12 +54,18 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public void eliminarCelda(int indice) {
-        this.data.remove(indice);
+        if (contieneIndice(indice)){
+            this.data.remove(indice);
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        this.data.set(indice, null);
+        if (contieneIndice(indice)){
+            this.data.set(indice, null);
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override

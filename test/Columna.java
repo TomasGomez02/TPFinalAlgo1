@@ -11,6 +11,9 @@ public abstract class Columna<T> implements Cloneable {
     public abstract void setCelda(int indice, T valor);
     public abstract void añadirCelda(int indice, T valor);
     public abstract void añadirCelda(T valor);
+    public boolean contieneIndice(int indice){
+        return 0 <= indice && indice <= length()-1;
+    }
     public abstract void eliminarCelda(int indice);
     public abstract void borrarValorCelda(int indice);
     public abstract Columna<T> recortarColumna(int indiceInicio, int indiceFinal);
