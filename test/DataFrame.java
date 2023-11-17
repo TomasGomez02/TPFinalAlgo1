@@ -50,14 +50,18 @@ public class DataFrame {
         return this.data.toString();
     }
 
-    public void printDesdeHasta(int indiceInicio, int indiceFinal){
+    public void printDesdeHasta(int indiceInicio, int indiceFinal)
+    {
+        printDesdeHasta(indiceInicio, indiceFinal, 4);
+    }
+
+    public void printDesdeHasta(int indiceInicio, int indiceFinal, final int OFFSETMINIMO){
         if (indiceInicio < -1 || indiceFinal > cantidadFilas()){
             indiceInicio = 0;
             indiceFinal = cantidadFilas();
         }
 
         final int COLUMNASMAX = 10;
-        final int OFFSETMINIMO = 6;
         final String OVERFLOWSTRING = "...|";
 
         final boolean COLUMNASOVERFLOW = (cantidadColumnas() > COLUMNASMAX);

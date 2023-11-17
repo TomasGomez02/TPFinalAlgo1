@@ -2,6 +2,9 @@ package test;
 
 import java.util.List;
 import java.util.Map;
+
+import test.ColumnType.DataTypes;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -219,5 +222,11 @@ public class ColumnaInt extends ColumnaNum<Integer> {
             }
         }
         return trasladar;
+    }
+
+    @Override
+    public <K> Columna<K> castearATipo(DataTypes tipo) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'castearATipo'");
     }
 }

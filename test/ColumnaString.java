@@ -142,4 +142,45 @@ public class ColumnaString extends Columna<String> {
         return trasladar;
     }
 
+    private <K> List<K> casteoCol(Class<K> clase)
+    {
+        List<K> lista = new ArrayList<>();
+        try
+        {
+            for(String elem: data)
+            {
+                lista.add(clase.cast(elem));
+            }
+        }
+        catch(ClassCastException e)
+        {
+            return null;
+        }
+        return lista;
+    }
+
+    private <K> K castearElemento(Class<K>)
+
+    @Override
+    public Columna<?> castearATipo(ColumnType.DataTypes tipo)
+    {   List<Object> lis = new ArrayList<>(); 
+        
+        for(String char: data)
+        {
+            switch(tipo)
+            {
+                case BOOL:
+                    return new ColumnaBool(casteoCol(ColumnType.evaluarTipo(tipo)));
+                case DOUBLE:
+                    return new ColumnaDouble(casteoCol(ColumnType.evaluarTipo(tipo)));
+                case INT:
+                    return new ColumnaInt(casteoCol(Integer.class));
+                default:
+                    return this;
+                
+            }
+        }
+        
+    }   
+
 }

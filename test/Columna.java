@@ -49,4 +49,7 @@ public abstract class Columna<T> implements Cloneable {
         }
     }
     public abstract Columna<T> clone();
+
+    public abstract <K> Columna<K> castearATipo(ColumnType.DataTypes tipo);
+
 }
