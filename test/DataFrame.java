@@ -3,6 +3,9 @@ package test;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+
+import DataFrameExceptions.ColumnaInexistente;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +33,10 @@ public class DataFrame implements Cloneable {
         for (String etiqueta : data.keySet()) {
             this.etiquetas.add(etiqueta);
         }
+    }
+
+    public boolean contieneEtiqueta(String etiqueta){
+        return this.etiquetas.contains(etiqueta);
     }
 
     public List<String> nombreColumnas(){
@@ -136,18 +143,30 @@ public class DataFrame implements Cloneable {
     }
 
     public <T> void setCelda(String etiqueta, int indice, T valor){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
         this.data.get(etiqueta).setCelda(indice, valor);
     }
 
     public Object getCelda(String etiqueta, int indice){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
         return this.data.get(etiqueta).getCelda(indice);
     }
 
     public <T> T getCelda(String etiqueta, int indice, Class<T> tipoDato){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
         return tipoDato.cast(data.get(etiqueta).getCelda(indice));
     }
 
     private <T> void añadirCelda(String etiqueta, T valor){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente();
+        }
         this.data.get(etiqueta).añadirCelda(valor);
     }
     @Override
@@ -163,7 +182,7 @@ public class DataFrame implements Cloneable {
 
     public <T> void addColumna(String etiqueta, Columna<T> columna){
         this.data.put(etiqueta, columna);
-        if (!this.etiquetas.contains(etiqueta)){
+        if (!this.contieneEtiqueta(etiqueta)){
             this.etiquetas.add(etiqueta);
             String dataType;
             if (columna.getClass() == ColumnaString.class){
@@ -182,6 +201,9 @@ public class DataFrame implements Cloneable {
     }
 
     public Columna getColumna(String etiqueta){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
         return this.data.get(etiqueta);
     }
 
@@ -241,28 +263,31 @@ public class DataFrame implements Cloneable {
     }
 
     public DataFrame getFila(int fila){
-        Map<String, Columna> otro = new HashMap<>();
-        for (String colName : this.etiquetas){
-            switch (this.tiposColumna.get(colName)){
-                case "String":
-                    otro.put(colName, new ColumnaString());
-                    otro.get(colName).añadirCelda(getCelda(colName, fila, String.class));
-                    break;
-                case "Integer":
-                    otro.put(colName, new ColumnaInt());
-                    otro.get(colName).añadirCelda(getCelda(colName, fila, Integer.class));
-                    break;
-                case "Double":
-                    otro.put(colName, new ColumnaDouble());
-                    otro.get(colName).añadirCelda(getCelda(colName, fila, Double.class));
-                    break;
-                case "Boolean":
-                    otro.put(colName, new ColumnaBool());
-                    otro.get(colName).añadirCelda(getCelda(colName, fila, Boolean.class));
-                    break;
+        if (0 <= fila && fila <= this.cantidadFilas()-1){
+            Map<String, Columna> otro = new HashMap<>();
+            for (String colName : this.etiquetas){
+                switch (this.tiposColumna.get(colName)){
+                    case "String":
+                        otro.put(colName, new ColumnaString());
+                        otro.get(colName).añadirCelda(getCelda(colName, fila, String.class));
+                        break;
+                    case "Integer":
+                        otro.put(colName, new ColumnaInt());
+                        otro.get(colName).añadirCelda(getCelda(colName, fila, Integer.class));
+                        break;
+                    case "Double":
+                        otro.put(colName, new ColumnaDouble());
+                        otro.get(colName).añadirCelda(getCelda(colName, fila, Double.class));
+                        break;
+                    case "Boolean":
+                        otro.put(colName, new ColumnaBool());
+                        otro.get(colName).añadirCelda(getCelda(colName, fila, Boolean.class));
+                        break;
+                }
             }
+            return new DataFrame(otro, tiposColumna);
         }
-        return new DataFrame(otro, tiposColumna);
+        throw new RuntimeException("El DataFrame no contiene la fila: "+fila);
     }
     
     public DataFrame getFila(int[] fila){
@@ -293,15 +318,29 @@ public class DataFrame implements Cloneable {
     }
 
     public void eliminarCol(String etiqueta){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        if (this.contieneEtiqueta(etiqueta)){
+            this.data.remove(etiqueta);
+            this.etiquetas.remove(this.etiquetas.indexOf(etiqueta));
+            return;
+        }
+        throw new ColumnaInexistente(etiqueta);
     }
 
-    public void eliminarFila(String fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public void eliminarFila(int fila){
+        if (0 <= fila && fila <= this.cantidadFilas()-1){
+            for (String colName : this.etiquetas){
+                this.getColumna(colName).eliminarCelda(fila);
+            }
+        }
+        throw new RuntimeException("La fila debe estar en el rango [0, n)");
     }
 
     public DataFrame recortar(int indiceInicio, int indiceFinal){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        DataFrame copia = this.getFila(indiceInicio);
+        for (int i=indiceInicio+1; i <= indiceFinal; i++){
+            copia.addFila(this.getFila(i));
+        }
+        return copia;
     }
 
     public void ordenar(String etiqueta, boolean creciente){
@@ -312,8 +351,11 @@ public class DataFrame implements Cloneable {
         throw new UnsupportedOperationException("Metodo no implementado");
     }
 
-    public <T> void transformCol(String etiqueta, UnaryOperator<T> filtro){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public <T> void transformCol(String etiqueta, UnaryOperator<T> transformacion){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
+        this.getColumna(etiqueta).transformar(transformacion);
     }
 
 }
