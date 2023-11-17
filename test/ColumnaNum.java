@@ -1,7 +1,6 @@
 package test;
 
 public abstract class ColumnaNum<T extends Number> extends Columna<T> {
-
     public abstract Double media();
     public abstract Number mediana();
     public abstract Number maximo();
