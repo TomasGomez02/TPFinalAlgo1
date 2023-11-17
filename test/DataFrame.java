@@ -3,6 +3,9 @@ package test;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+
+import javax.xml.crypto.Data;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -273,24 +276,52 @@ public class DataFrame {
         return new DataFrame(otro, this.tiposColumna);
     }
     
-    public DataFrame getFila(int[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public DataFrame getFila(int[] filas){
+        DataFrame df = new DataFrame();
+
+        for (int fila: filas) {
+            df.concatDataFrame(getFila(fila));
+        }
+
+        return df;
     }
 
-    public DataFrame getFila(Integer[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public DataFrame getFila(Integer[] filas){
+        DataFrame df = new DataFrame();
+
+        for (Integer fila: filas) {
+            df.concatDataFrame(getFila(fila));
+        }
+
+        return df;
     }
 
-    public DataFrame getFila(List<Integer>[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public DataFrame getFila(List<Integer> filas){
+        DataFrame df = new DataFrame();
+
+        for (Integer fila: filas) {
+            df.concatDataFrame(getFila(fila));
+        }
+
+        return df;
     }
 
     public void eliminarCol(String etiqueta){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        if (this.data.containsKey(etiqueta)) {
+            this.data.remove(etiqueta);
+            this.etiquetas.remove(etiqueta);
+            this.tiposColumna.remove(etiqueta);
+        }
+        else {
+            throw new Error("Columna " + etiqueta + " no encontrada");
+        }
+        
     }
 
-    public void eliminarFila(String fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public void eliminarFila(int fila){
+        for (Map.Entry<String, Columna> entry : this.data.entrySet()) {
+
+        }
     }
 
     public DataFrame recortar(int indiceInicio, int indiceFinal){
@@ -298,7 +329,11 @@ public class DataFrame {
     }
 
     public void ordenar(String etiqueta, boolean creciente){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        Map<Integer, Integer> orden = getColumna(etiqueta).ordenar(creciente);
+        
+        for (Map.Entry<String, Columna> entry : this.data.entrySet()) {
+            entry.getValue().ordenarPorIndice(orden);
+        }
     }
 
     public <T> DataFrame filtrar(String etiqueta, Predicate<T> filtro){
