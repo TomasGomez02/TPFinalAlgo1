@@ -646,15 +646,16 @@ public class DataFrame implements Cloneable {
         return filtrado;
     }
 
-    public <T> DataFrame transformCol(String etiqueta, UnaryOperator<T> transformacion){
     /**
      * Aplica una transformacion a los valores de la columna utilizando el operador proporcionado.
      * 
      * @param <T> tipo de datos de la columna a transformar
      * @param etiqueta etiqueta de la columna a transformar
      * @param transformacion operador que define la transformacion a aplicar 
+     * @return devuelve un nuevo DataFrame con la transformacion aplicada
      * @throws ColumnaInexistenteException Si la columna con la etiqueta especificada no existe en el DataFrame
      */
+    public <T> DataFrame transformCol(String etiqueta, UnaryOperator<T> transformacion){
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException(etiqueta);
         }
