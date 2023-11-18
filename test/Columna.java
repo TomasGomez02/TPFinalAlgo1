@@ -43,6 +43,9 @@ public abstract class Columna<T> implements Cloneable {
      * 
      * @param indice indice del elemento a eliminar
      */
+    public boolean contieneIndice(int indice){
+        return 0 <= indice && indice <= length()-1;
+    }
     public abstract void eliminarCelda(int indice);
     /**
      * Elimina el valor de la celda indicada. La celda pasa a tener valor nulo.
