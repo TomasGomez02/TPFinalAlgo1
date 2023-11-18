@@ -61,16 +61,37 @@ public abstract class Columna<T> implements Cloneable {
 
     public abstract Columna<T> recortarColumna(int indiceInicio, int indiceFinal);
 
-    
+    /**
+     * Concatena los elementos de la columna especificada a la columna actual
+     * 
+     * @param otraColumna columna de tipo Columna que se va a concatenar a la columna actual 
+     */
     public void concatenarColumna(Columna<T> otraColumna){
         for (int i=0; i < otraColumna.length(); i++){
             this.añadirCelda(otraColumna.getCelda(i));
         }
     }
 
-    
+    /**
+     * Devuelve la cantidad de elementos en la columna
+     
+     * @return cantidad de elementos en la columna
+     */
     public abstract int length();
+
+    /**
+     * Ordena la columna de manera ascendente o descendente segun lo indicado y devuelve un mapa que asocia los indices originales con los nuevos indices despues del ordenamiento
+     
+     * @param creciente indica si la ordenamiento debe ser ascendente (true) o descendente (false)
+     * @return mapa que asocia los indices originales con los nuevos indices obtenidos despues del ordenamiento 
+     */
     public abstract Map<Integer, Integer> ordenar(boolean creciente);
+
+    /**
+     * Reorganiza los elementos de la columna segun un mapa de orden que contiene los indices originales   
+     
+     * @param orden mapa que contiene como claves los indices originales y como valores los nuevos indices obtenidos despues del ordenamiento 
+     */
     public void ordenarPorIndice(Map<Integer, Integer> orden){
         List<T> copia = new ArrayList<>();
         for (int i=0; i < this.length(); i++){
@@ -81,6 +102,13 @@ public abstract class Columna<T> implements Cloneable {
             this.setCelda(moveTo, copia.get(i));
         }
     }
+
+    /**
+     * Filtra los elementos de la columna segun el predicado proporcionado y devuelve una lista de los indices de los elementos que cumplen con el criterio de filtrado.
+     
+     * @param filtro predicado que define el criterio de filtrado
+     * @return lista de los indices de los elementos que cumplen con el criterio de filtrado
+     */
     public List<Integer> filtrar(Predicate<T> filtro){
         List<Integer> indices = new ArrayList<>();
         for (int i=0; i < this.length(); i++){
@@ -90,7 +118,19 @@ public abstract class Columna<T> implements Cloneable {
         }
         return indices;
     }
+
+    /**
+     * Toma los elementos correspondientes a los indices de la lista indices y crea una nueva columna con estos elementos
+ 
+     * @param indices lista de indices que especifica que elementos se incluiran en la nueva columna
+     * @return nueva columna con los elementos correspondientes a los indices proporcionados
+     */
     public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
+
+    /**
+     * Aplica una transformacion a cada elemento no nulo de la columna utilizando el operador proporcionado
+     * @param transformacion operador que define la transformacion a aplicar a cada elemento no nulo de la columna
+     */
     public void transformar(UnaryOperator<T> transformacion){
         for (int i=0; i < length(); i++){
             if (getCelda(i) != null){
@@ -98,5 +138,9 @@ public abstract class Columna<T> implements Cloneable {
             }
         }
     }
+
+    /**
+     * Crea y devuelve una copia profunda de la columna actual, incluyendo todos sus elementos
+     */
     public abstract Columna<T> clone();
 }
