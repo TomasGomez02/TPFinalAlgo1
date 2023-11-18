@@ -2,6 +2,9 @@ package test;
 
 import java.util.List;
 import java.util.Map;
+
+import test.ColumnType.DataTypes;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -219,5 +222,17 @@ public class ColumnaInt extends ColumnaNum<Integer> {
             }
         }
         return trasladar;
+    }
+
+    public static ColumnaInt fromColumnaString (Columna<String> col) throws NumberFormatException
+    {
+        List<Integer> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            datos.add(Integer.parseInt(col.getCelda(i)));
+        }
+
+        return new ColumnaInt(datos);
     }
 }

@@ -141,5 +141,4 @@ public class ColumnaString extends Columna<String> {
         }
         return trasladar;
     }
-
 }

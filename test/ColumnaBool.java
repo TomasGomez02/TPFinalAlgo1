@@ -2,6 +2,9 @@ package test;
 
 import java.util.List;
 import java.util.Map;
+
+import test.ColumnType.DataTypes;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -150,5 +153,17 @@ public class ColumnaBool extends Columna<Boolean>{
             }
         }
         return trasladar;
+    }
+
+    public static ColumnaBool fromColumnaString (Columna<String> col)
+    {
+        List<Boolean> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            datos.add(Boolean.parseBoolean(col.getCelda(i)));
+        }
+
+        return new ColumnaBool(datos);
     }
 }

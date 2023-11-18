@@ -2,6 +2,9 @@ package test;
 
 import java.util.List;
 import java.util.Map;
+
+import test.ColumnType.DataTypes;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -224,4 +227,15 @@ public class ColumnaDouble extends ColumnaNum<Double>
         return trasladar;
     }
     
+    public static ColumnaDouble fromColumnaString (Columna<String> col) throws NumberFormatException
+    {
+        List<Double> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            datos.add(Double.parseDouble(col.getCelda(i)));
+        }
+
+        return new ColumnaDouble(datos);
+    }
 }
