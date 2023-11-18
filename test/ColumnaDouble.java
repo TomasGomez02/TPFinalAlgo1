@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import utils.CasteoIlegal;
+import utils.Types;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -252,8 +253,13 @@ public class ColumnaDouble extends ColumnaNum<Double>
         }
         return copia;
     }
-    
+
     public static ColumnaDouble fromColumnaString (Columna<String> col) throws CasteoIlegal
+    {
+        return fromColumnaString(col, false);
+    }
+    
+    public static ColumnaDouble fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegal
     {
         List<Double> datos = new ArrayList<>();
 
@@ -273,7 +279,50 @@ public class ColumnaDouble extends ColumnaNum<Double>
             }
             catch(NumberFormatException e)
             {
-                throw new CasteoIlegal(col.getCelda(i), String.class.toString(), Double.class.toString());
+                if(!forzar)
+                    throw new CasteoIlegal(col.getCelda(i), String.class.toString(), Double.class.toString());
+                else
+                    datos.add(null);
+            }
+        }
+
+        return new ColumnaDouble(datos);
+    }
+
+    public static ColumnaDouble fromColumnaInt(Columna<Integer> col)
+    {
+        List<Double> datos = new ArrayList<>();
+        
+        for(int i = 0; i < col.length(); i++)
+        {
+            Integer elemento = col.getCelda(i);
+            if(elemento != null)
+            {
+                datos.add(Double.valueOf(elemento));
+            }
+            else
+            {
+                datos.add(null);
+            }
+        }
+
+        return new ColumnaDouble(datos);
+    }
+
+    public static ColumnaDouble fromColumnaBool(Columna<Boolean> col)
+    {
+        List<Double> datos = new ArrayList<>();
+        
+        for(int i = 0; i < col.length(); i++)
+        {
+            Boolean elemento = col.getCelda(i);
+            if(elemento != null)
+            {
+                datos.add(Types.castBoolToDoule(elemento));
+            }
+            else
+            {
+                datos.add(null);
             }
         }
 

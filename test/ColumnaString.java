@@ -167,4 +167,24 @@ public class ColumnaString extends Columna<String> {
         }
         return copia;
     }
+
+    public static <T> ColumnaString toColumnaString(Columna<T> col)
+    {
+        List<String> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            T elemento = col.getCelda(i);
+            if(elemento != null)
+            {
+                datos.add(elemento.toString());
+            }
+            else
+            {
+                datos.add(null);
+            }
+        }
+
+        return new ColumnaString(datos);
+    }
 }

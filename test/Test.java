@@ -7,16 +7,22 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import utils.DataTypes;
+import utils.Types;
 
 public class Test 
 {
     public static void main(String[] args) 
     {
-        String path = "datasets/taylor_all_songs.csv";
+        String path = "datasets/tiny.csv";
+        // String path = "datasets/taylor_all_songs.csv";
         // String path2 = "datasets/taylor_albums.csv";
         // String path3 = "datasets/taylor_album_songs.csv";
 
-        DataFrame df = IOCSV.fromCSV(path);
+        DataFrame df = IOCSV.fromCSV(path, new DataTypes[]{DataTypes.BOOL, 
+                                                            DataTypes.INT,
+                                                            DataTypes.INT,
+                                                            DataTypes.DOUBLE,
+                                                            DataTypes.INT});
         // DataFrame df2 = IOCSV.fromCSV(path2);
         // DataFrame df3 = IOCSV.fromCSV(path3);
 
@@ -30,6 +36,7 @@ public class Test
         // df3.head();
         // System.out.println(df3.tiposColumna());
 
-        System.out.println(df.getCelda("danceability", 0).getClass());
+        Integer d = 0;
+        System.out.println(Types.numberToBool(6.755));
     }
 }

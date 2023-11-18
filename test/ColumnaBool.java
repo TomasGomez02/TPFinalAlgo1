@@ -183,6 +183,11 @@ public class ColumnaBool extends Columna<Boolean>{
 
     public static ColumnaBool fromColumnaString (Columna<String> col) throws CasteoIlegal
     {
+        return fromColumnaString(col, false);
+    }
+
+    public static ColumnaBool fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegal
+    {
         List<Boolean> datos = new ArrayList<>();
 
         for(int i = 0; i < col.length(); i++)
@@ -201,7 +206,80 @@ public class ColumnaBool extends Columna<Boolean>{
             }
             catch(NumberFormatException e)
             {
-                throw new CasteoIlegal(col.getCelda(i), String.class.toString(), Integer.class.toString());
+                if(!forzar)
+                    throw new CasteoIlegal(col.getCelda(i), String.class.toString(), Boolean.class.toString());
+                else
+                    datos.add(null);
+            }
+        }
+
+        return new ColumnaBool(datos);
+    }
+
+    public static ColumnaBool fromColumnaInt(Columna<Integer> col) throws CasteoIlegal
+    {
+        return fromColumnaInt(col, false);
+    }
+
+    public static ColumnaBool fromColumnaInt(Columna<Integer> col, boolean forzar) throws CasteoIlegal
+    {
+        List<Boolean> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            Integer elemento = col.getCelda(i);
+            try
+            {
+                if(elemento != null)
+                {
+                    datos.add(Types.numberToBool(col.getCelda(i)));
+                }
+                else
+                {
+                    datos.add(null);
+                }
+            }
+            catch(CasteoIlegal e)
+            {
+                if(!forzar)
+                    throw new CasteoIlegal(col.getCelda(i).toString(), Integer.class.toString(), Boolean.class.toString());
+                else
+                    datos.add(null);
+            }
+        }
+
+        return new ColumnaBool(datos);
+    }
+
+    public static ColumnaBool fromColumnaDouble(Columna<Double> col) throws CasteoIlegal
+    {
+        return fromColumnaDouble(col, false);
+    }
+
+    public static ColumnaBool fromColumnaDouble(Columna<Double> col, boolean forzar) throws CasteoIlegal
+    {
+        List<Boolean> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            Double elemento = col.getCelda(i);
+            try
+            {
+                if(elemento != null)
+                {
+                    datos.add(Types.numberToBool(elemento));
+                }
+                else
+                {
+                    datos.add(null);
+                }
+            }
+            catch(CasteoIlegal e)
+            {
+                if(!forzar)
+                    throw new CasteoIlegal(col.getCelda(i).toString(), Double.class.toString(), Boolean.class.toString());
+                else
+                    datos.add(null);
             }
         }
 

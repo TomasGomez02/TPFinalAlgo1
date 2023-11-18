@@ -40,4 +40,26 @@ public class Types
                 throw new NumberFormatException("No se puede convertir " + texto + " en " + Boolean.class);
         }
     }
+
+    public static int castBoolToInt(boolean bool)
+    {
+        return bool ? 1 : 0;
+    }
+
+    public static double castBoolToDoule(boolean bool)
+    {
+        return bool ? 1.0 : 0.0;
+    }
+
+    public static <T extends Number> boolean numberToBool(T n)
+    {
+        if(n.intValue() == 1.0)
+            return true;
+        if(n.intValue() == 0.0)
+            return false;
+
+        throw new CasteoIlegal(n.toString(), Number.class.toString(), Boolean.class.toString());
+    }
+
+
 }

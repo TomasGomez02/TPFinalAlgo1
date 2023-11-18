@@ -7,10 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.LinkedHashMap;
 
 import utils.CasteoIlegal;
@@ -139,11 +137,11 @@ public final class IOCSV
     {
         switch (dataType) {
             case INT:
-                return ColumnaInt.fromColumnaString(col);
+                return ColumnaInt.fromColumnaString(col, true);
             case DOUBLE:
-                return ColumnaDouble.fromColumnaString(col);
+                return ColumnaDouble.fromColumnaString(col, true);
             case BOOL:
-                return ColumnaBool.fromColumnaString(col);
+                return ColumnaBool.fromColumnaString(col, true);
             default:
                 return col;
         }
