@@ -226,11 +226,16 @@ public class ColumnaDouble extends ColumnaNum<Double>
         }
         return trasladar;
     }
-
-    @Override
-    public <K> Columna<K> castearATipo(DataTypes tipo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'castearATipo'");
-    }
     
+    public static ColumnaDouble fromColumnaString (Columna<String> col) throws NumberFormatException
+    {
+        List<Double> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            datos.add(Double.parseDouble(col.getCelda(i)));
+        }
+
+        return new ColumnaDouble(datos);
+    }
 }

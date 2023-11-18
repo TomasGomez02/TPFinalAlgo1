@@ -224,9 +224,15 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         return trasladar;
     }
 
-    @Override
-    public <K> Columna<K> castearATipo(DataTypes tipo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'castearATipo'");
+    public static ColumnaInt fromColumnaString (Columna<String> col) throws NumberFormatException
+    {
+        List<Integer> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            datos.add(Integer.parseInt(col.getCelda(i)));
+        }
+
+        return new ColumnaInt(datos);
     }
 }

@@ -155,9 +155,15 @@ public class ColumnaBool extends Columna<Boolean>{
         return trasladar;
     }
 
-    @Override
-    public <K> Columna<K> castearATipo(DataTypes tipo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'castearATipo'");
+    public static ColumnaBool fromColumnaString (Columna<String> col)
+    {
+        List<Boolean> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            datos.add(Boolean.parseBoolean(col.getCelda(i)));
+        }
+
+        return new ColumnaBool(datos);
     }
 }
