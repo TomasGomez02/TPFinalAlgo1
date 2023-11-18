@@ -253,6 +253,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     public static ColumnaInt fromColumnaString (Columna<String> col) throws CasteoIlegal
     {
         List<Integer> datos = new ArrayList<>();
+        
         for(int i = 0; i < col.length(); i++)
         {
             String elemento = col.getCelda(i);

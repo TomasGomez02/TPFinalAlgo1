@@ -185,6 +185,7 @@ public final class IOCSV
                 case 2:
                     colCasteada = ColumnaDouble.fromColumnaString(col);
                     tiposEtiqueta.put(keys.get(index), DataTypes.DOUBLE);
+                    break;
                 default:
                     colCasteada = col;
             }
