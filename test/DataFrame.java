@@ -126,6 +126,7 @@ public class DataFrame implements Cloneable {
         String fila = "";
         String sep = "|";
         int[] tamaño = new int[cantColumnas];
+        int tamañoIndice = String.valueOf(indiceFinal).length();
 
         int espacioIzq;
         int espacioDer;
@@ -138,6 +139,7 @@ public class DataFrame implements Cloneable {
             }
         }
 
+        fila += " ".repeat(tamañoIndice) + sep;
         // Esta parte es para escribir los nombres de las columnas
         for (int i = 0; i < cantColumnas; i++){
             int diff = tamaño[i] - etiquetas.get(i).length();
@@ -158,7 +160,9 @@ public class DataFrame implements Cloneable {
         System.out.println("-".repeat(cantidadSepHeader));
         fila = "";
         // Esta parte es para escribir los valores
-        for (int row=indiceInicio; row < indiceFinal; row++){
+        for (int row=indiceInicio; row <= indiceFinal; row++){
+            int diffTamañoIndice = tamañoIndice - String.valueOf(row).length();
+            fila += row + " ".repeat(diffTamañoIndice) + sep;
             for (int i = 0; i < cantColumnas; i++) {
                 String elem;
                 if (getCelda(etiquetas.get(i), row) != null){
@@ -217,7 +221,7 @@ public class DataFrame implements Cloneable {
         if (cantidadFilas > this.cantidadFilas()){
             cantidadFilas = this.cantidadFilas();
         }
-        printDesdeHasta(0, cantidadFilas);
+        printDesdeHasta(0, cantidadFilas - 1);
     }
 
     /**
@@ -236,7 +240,7 @@ public class DataFrame implements Cloneable {
         if (cantidadFilas > this.cantidadFilas()){
             cantidadFilas = this.cantidadFilas();
         }
-        printDesdeHasta(this.cantidadFilas() - cantidadFilas, this.cantidadFilas());
+        printDesdeHasta(this.cantidadFilas() - cantidadFilas - 1, this.cantidadFilas() - 1);
     }
     /**
      * Imprime las ultimas cinco filas del dataframe.
