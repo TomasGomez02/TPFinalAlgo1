@@ -14,13 +14,17 @@ public abstract class Columna<T> implements Cloneable {
     public abstract void eliminarCelda(int indice);
     public abstract void borrarValorCelda(int indice);
     public abstract Columna<T> recortarColumna(int indiceInicio, int indiceFinal);
+    
     public void concatenarColumna(Columna<T> otraColumna){
         for (int i=0; i < otraColumna.length(); i++){
             this.añadirCelda(otraColumna.getCelda(i));
         }
     }
+
     public abstract int length();
+
     public abstract Map<Integer, Integer> ordenar(boolean creciente);
+
     public void ordenarPorIndice(Map<Integer, Integer> orden){
         List<T> copia = new ArrayList<>();
         for (int i=0; i < this.length(); i++){
@@ -31,6 +35,7 @@ public abstract class Columna<T> implements Cloneable {
             this.setCelda(moveTo, copia.get(i));
         }
     }
+
     public List<Integer> filtrar(Predicate<T> filtro){
         List<Integer> indices = new ArrayList<>();
         for (int i=0; i < this.length(); i++){
@@ -40,7 +45,9 @@ public abstract class Columna<T> implements Cloneable {
         }
         return indices;
     }
+
     public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
+
     public void transformar(UnaryOperator<T> transformacion){
         for (int i=0; i < length(); i++){
             if (getCelda(i) != null){
@@ -48,5 +55,6 @@ public abstract class Columna<T> implements Cloneable {
             }
         }
     }
+
     public abstract Columna<T> clone();
 }

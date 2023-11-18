@@ -4,7 +4,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import DataFrameExceptions.ColumnaInexistente;
+import utils.ColumnaInexistente;
+import utils.DataTypes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ public class DataFrame implements Cloneable {
     @SuppressWarnings("rawtypes")   // Literalmente es lo que dice
     private Map<String, Columna> data;
     private List<String> etiquetas;
-    private Map<String, String> tiposColumna;
+    private Map<String, DataTypes> tiposColumna;
 
     public DataFrame(){
         this.data = new HashMap<>();
@@ -24,7 +25,7 @@ public class DataFrame implements Cloneable {
     }
 
     @SuppressWarnings("rawtypes")
-    public DataFrame(Map<String, Columna> data, Map<String, String> tiposColumna){
+    public DataFrame(Map<String, Columna> data, Map<String, DataTypes> tiposColumna){
         this.data = data;
         this.tiposColumna = tiposColumna;
         // this.etiquetas = data.keySet().stream().toList();
@@ -54,7 +55,7 @@ public class DataFrame implements Cloneable {
         return this.data.get(etiquetas.get(0)).length();
     }
 
-    public Map<String, String> tiposColumna(){
+    public Map<String, DataTypes> tiposColumna(){
         return this.tiposColumna;
     }
 
@@ -214,7 +215,7 @@ public class DataFrame implements Cloneable {
     @Override
     public DataFrame clone(){
         Map<String, Columna> columnas = new HashMap<>();
-        Map<String, String> dataTypes = new HashMap<>();
+        Map<String, DataTypes> dataTypes = new HashMap<>();
         for (String colName : this.etiquetas){
             columnas.put(colName, this.getColumna(colName).clone());
             dataTypes.put(colName, this.tiposColumna.get(colName));
@@ -226,15 +227,15 @@ public class DataFrame implements Cloneable {
         this.data.put(etiqueta, columna);
         if (!this.contieneEtiqueta(etiqueta)){
             this.etiquetas.add(etiqueta);
-            String dataType;
+            DataTypes dataType;
             if (columna.getClass() == ColumnaString.class){
-                dataType = "String";
+                dataType = DataTypes.STRING;
             } else if (columna.getClass() == ColumnaInt.class){
-                dataType = "Integer";
+                dataType = DataTypes.INT;
             } else if (columna.getClass() == ColumnaDouble.class){
-                dataType = "Double";
+                dataType = DataTypes.DOUBLE;
             } else if (columna.getClass() == ColumnaBool.class){
-                dataType = "Integer";
+                dataType = DataTypes.BOOL;
             } else {
                 throw new RuntimeException("Error en addColumna. Esto no deberia ocurrir");
             }
@@ -251,7 +252,7 @@ public class DataFrame implements Cloneable {
 
     public DataFrame getColumna(String[] etiqueta){
         Map<String, Columna> columnas = new HashMap<>();
-        Map<String, String> tiposCol = new HashMap<>();
+        Map<String, DataTypes> tiposCol = new HashMap<>();
         for (String colName : etiqueta){
             columnas.put(colName, this.getColumna(colName));
             tiposCol.put(colName, this.tiposColumna.get(colName));
@@ -261,7 +262,7 @@ public class DataFrame implements Cloneable {
 
     public DataFrame getColumna(List<String> etiqueta){
         Map<String, Columna> columnas = new HashMap<>();
-        Map<String, String> tiposCol = new HashMap<>();
+        Map<String, DataTypes> tiposCol = new HashMap<>();
         for (String colName : etiqueta){
             columnas.put(colName, this.getColumna(colName));
             tiposCol.put(colName, this.tiposColumna.get(colName));
@@ -272,16 +273,16 @@ public class DataFrame implements Cloneable {
     public void addFila(DataFrame fila){
         for (String colName : this.etiquetas){
             switch (this.tiposColumna.get(colName)) {
-                case "String":
+                case STRING:
                     this.añadirCelda(colName, fila.getCelda(colName, 0, String.class));
                     break;
-                case "Integer":
+                case INT:
                     this.añadirCelda(colName, fila.getCelda(colName, 0, Integer.class));
                     break;
-                case "Double":
+                case DOUBLE:
                     this.añadirCelda(colName, fila.getCelda(colName, 0, Double.class));
                     break;
-                case "Boolean":
+                case BOOL:
                     this.añadirCelda(colName, fila.getCelda(colName, 0, Boolean.class));
                     break;
                 default:
@@ -309,19 +310,19 @@ public class DataFrame implements Cloneable {
             Map<String, Columna> otro = new HashMap<>();
             for (String colName : this.etiquetas){
                 switch (this.tiposColumna.get(colName)){
-                    case "String":
+                    case STRING:
                         otro.put(colName, new ColumnaString());
                         otro.get(colName).añadirCelda(getCelda(colName, fila, String.class));
                         break;
-                    case "Integer":
+                    case INT:
                         otro.put(colName, new ColumnaInt());
                         otro.get(colName).añadirCelda(getCelda(colName, fila, Integer.class));
                         break;
-                    case "Double":
+                    case DOUBLE:
                         otro.put(colName, new ColumnaDouble());
                         otro.get(colName).añadirCelda(getCelda(colName, fila, Double.class));
                         break;
-                    case "Boolean":
+                    case BOOL:
                         otro.put(colName, new ColumnaBool());
                         otro.get(colName).añadirCelda(getCelda(colName, fila, Boolean.class));
                         break;

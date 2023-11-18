@@ -3,7 +3,7 @@ package test;
 import java.util.List;
 import java.util.Map;
 
-import test.ColumnType.DataTypes;
+import utils.CasteoIlegal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,13 +227,28 @@ public class ColumnaDouble extends ColumnaNum<Double>
         return trasladar;
     }
     
-    public static ColumnaDouble fromColumnaString (Columna<String> col) throws NumberFormatException
+    public static ColumnaDouble fromColumnaString (Columna<String> col) throws CasteoIlegal
     {
         List<Double> datos = new ArrayList<>();
 
         for(int i = 0; i < col.length(); i++)
         {
-            datos.add(Double.parseDouble(col.getCelda(i)));
+            String elemento = col.getCelda(i);
+            try
+            {
+                if(elemento != null && !elemento.equals("") && !elemento.toLowerCase().strip().equals("na"))
+                {
+                    datos.add(Double.parseDouble(col.getCelda(i)));
+                }
+                else
+                {
+                    datos.add(null);
+                }
+            }
+            catch(NumberFormatException e)
+            {
+                throw new CasteoIlegal(col.getCelda(i), String.class.toString(), Double.class.toString());
+            }
         }
 
         return new ColumnaDouble(datos);
