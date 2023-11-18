@@ -2,6 +2,7 @@ package test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -168,6 +169,17 @@ public class ColumnaString extends Columna<String> {
         return copia;
     }
 
+    @Override
+    public ColumnaString transformar(UnaryOperator<String> transformacion) {
+        ColumnaString copia = new ColumnaString();
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null){
+                copia.añadirCelda(transformacion.apply(getCelda(i)));
+            }
+        }
+        return copia;
+     }
+        
     public static <T> ColumnaString toColumnaString(Columna<T> col)
     {
         List<String> datos = new ArrayList<>();

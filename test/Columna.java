@@ -133,13 +133,7 @@ public abstract class Columna<T> implements Cloneable {
      * 
      * @param transformacion operador que define la transformacion a aplicar a cada elemento no nulo de la columna
      */
-    public void transformar(UnaryOperator<T> transformacion){
-        for (int i=0; i < length(); i++){
-            if (getCelda(i) != null){
-                setCelda(i, transformacion.apply(getCelda(i)));
-            }
-        }
-    }
+    public abstract Columna<T> transformar(UnaryOperator<T> transformacion);
 
     /**
      * Crea y devuelve una copia profunda de la columna actual, incluyendo todos sus elementos
