@@ -97,22 +97,6 @@ public abstract class Columna<T> implements Cloneable {
     public abstract Map<Integer, Integer> ordenar(boolean creciente);
 
     /**
-     * Reorganiza los elementos de la columna segun un mapa de orden que contiene los indices originales   
-     
-     * @param orden mapa que contiene como claves los indices originales y como valores los nuevos indices obtenidos despues del ordenamiento 
-     */
-    public void ordenarPorIndice(Map<Integer, Integer> orden){
-        List<T> copia = new ArrayList<>();
-        for (int i=0; i < this.length(); i++){
-            copia.add(this.getCelda(i));
-        }
-        for (int i=0; i < this.length(); i++){
-            Integer moveTo = orden.get(i);
-            this.setCelda(moveTo, copia.get(i));
-        }
-    }
-
-    /**
      * Filtra los elementos de la columna segun el predicado proporcionado y devuelve una lista de los indices de los elementos que cumplen con el criterio de filtrado.
      
      * @param filtro predicado que define el criterio de filtrado
@@ -128,13 +112,21 @@ public abstract class Columna<T> implements Cloneable {
         return indices;
     }
 
+    
+
+     /**
+     * Reorganiza los elementos de la columna segun un mapa de orden que contiene los indices originales   
+     
+     * @param orden mapa que contiene como claves los indices originales y como valores los nuevos indices obtenidos despues del ordenamiento 
+     */
+    public abstract Columna<T> ordenarPorIndice(Map<Integer, Integer> orden);
+
     /**
      * Toma los elementos correspondientes a los indices de la lista indices y crea una nueva columna con estos elementos
  
      * @param indices lista de indices que especifica que elementos se incluiran en la nueva columna
      * @return nueva columna con los elementos correspondientes a los indices proporcionados
      */
-    public abstract Columna<T> ordenarPorIndice(Map<Integer, Integer> orden);
     public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
 
     /**

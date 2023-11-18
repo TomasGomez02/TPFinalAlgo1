@@ -24,9 +24,12 @@ public class Test
         System.out.println(df.tiposColumna());
 
         df2.head();
+        df2.ordenar("user_score", false);
         System.out.println(df2.tiposColumna());
 
         df3.head();
         System.out.println(df3.tiposColumna());
+
+
     }
 }

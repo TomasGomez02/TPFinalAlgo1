@@ -228,7 +228,7 @@ public class DataFrame implements Cloneable {
             throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
         this.data.put(etiqueta, columna);
-        this.tiposColumna.put(etiqueta, "String");
+        this.tiposColumna.put(etiqueta, DataTypes.STRING);
         this.etiquetas.add(etiqueta);
     }
 
@@ -237,7 +237,7 @@ public class DataFrame implements Cloneable {
             throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
         this.data.put(etiqueta, columna);
-        this.tiposColumna.put(etiqueta, "Integer");
+        this.tiposColumna.put(etiqueta, DataTypes.INT);
         this.etiquetas.add(etiqueta);
     }
 
@@ -246,7 +246,7 @@ public class DataFrame implements Cloneable {
             throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
         this.data.put(etiqueta, columna);
-        this.tiposColumna.put(etiqueta, "Double");
+        this.tiposColumna.put(etiqueta, DataTypes.DOUBLE);
         this.etiquetas.add(etiqueta);
     }
 
@@ -255,7 +255,7 @@ public class DataFrame implements Cloneable {
             throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
         this.data.put(etiqueta, columna);
-        this.tiposColumna.put(etiqueta, "Boolean");
+        this.tiposColumna.put(etiqueta, DataTypes.BOOL);
         this.etiquetas.add(etiqueta);
     }
 
@@ -406,7 +406,7 @@ public class DataFrame implements Cloneable {
         Map<Integer, Integer> orden = getColumna(etiqueta).ordenar(creciente);
         
         for (Map.Entry<String, Columna> entry : this.data.entrySet()) {
-            entry.getValue().ordenarPorIndice(orden);
+            this.data.put(entry.getKey(), entry.getValue().ordenarPorIndice(orden));
         }
     }
 
