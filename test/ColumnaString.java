@@ -25,26 +25,26 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public String getCelda(int indice) {
-        if (contieneIndice(indice)){
-            return this.data.get(indice);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        return this.data.get(indice);
     }
 
     @Override
     public void setCelda(int indice, String valor) {
-        if (contieneIndice(indice)){
-            this.data.set(indice, valor);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.data.set(indice, valor);
     }
 
     @Override
     public void añadirCelda(int indice, String valor) {
-        if (contieneIndice(indice)){    
-            this.data.add(indice, valor);
+        if (!contieneIndice(indice)){    
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.data.add(indice, valor);
     }
 
     @Override
@@ -54,18 +54,18 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void eliminarCelda(int indice) {
-        if (contieneIndice(indice)){
-            this.data.remove(indice);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.data.remove(indice);
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        if (contieneIndice(indice)){
-            this.setCelda(indice, null);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.setCelda(indice, null);
     }
 
     @Override
@@ -155,5 +155,16 @@ public class ColumnaString extends Columna<String> {
             }
         }
         return trasladar;
+    }
+
+    @Override
+    public ColumnaString ordenarPorIndice(Map<Integer, Integer> orden){
+        ColumnaString copia = this.clone();
+
+        for (int i=0; i < copia.length(); i++){
+            Integer newIdx = orden.get(i);
+            copia.setCelda(newIdx, getCelda(i));
+        }
+        return copia;
     }
 }

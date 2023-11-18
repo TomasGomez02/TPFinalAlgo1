@@ -3,8 +3,6 @@ package test;
 import java.util.List;
 import java.util.Map;
 
-import test.ColumnType.DataTypes;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -110,18 +108,18 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public Double getCelda(int indice) {
-        if (contieneIndice(indice)){
-            return this.data.get(indice);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        return this.data.get(indice);
     }
 
     @Override
     public void setCelda(int indice, Double valor) {
-        if (contieneIndice(indice)){
-            this.data.set(indice, valor);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.data.set(indice, valor);
     }
 
     @Override
@@ -139,18 +137,18 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public void eliminarCelda(int indice) {
-        if (contieneIndice(indice)){
-            this.data.remove(indice);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.data.remove(indice);
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        if (contieneIndice(indice)){
-            this.setCelda(indice, null);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.setCelda(indice, null);
     }
 
     @Override
@@ -240,6 +238,17 @@ public class ColumnaDouble extends ColumnaNum<Double>
             }
         }
         return trasladar;
+    }
+    
+    @Override
+    public ColumnaDouble ordenarPorIndice(Map<Integer, Integer> orden){
+        ColumnaDouble copia = this.clone();
+
+        for (int i=0; i < copia.length(); i++){
+            Integer newIdx = orden.get(i);
+            copia.setCelda(newIdx, getCelda(i));
+        }
+        return copia;
     }
     
     public static ColumnaDouble fromColumnaString (Columna<String> col) throws NumberFormatException

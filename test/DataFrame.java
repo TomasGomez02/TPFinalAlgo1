@@ -222,24 +222,40 @@ public class DataFrame implements Cloneable {
         return new DataFrame(columnas, dataTypes);
     }
 
-    public <T> void addColumna(String etiqueta, Columna<T> columna){
-        this.data.put(etiqueta, columna);
-        if (!this.contieneEtiqueta(etiqueta)){
-            this.etiquetas.add(etiqueta);
-            String dataType;
-            if (columna.getClass() == ColumnaString.class){
-                dataType = "String";
-            } else if (columna.getClass() == ColumnaInt.class){
-                dataType = "Integer";
-            } else if (columna.getClass() == ColumnaDouble.class){
-                dataType = "Double";
-            } else if (columna.getClass() == ColumnaBool.class){
-                dataType = "Integer";
-            } else {
-                throw new RuntimeException("Error en addColumna. Esto no deberia ocurrir");
-            }
-            this.tiposColumna.put(etiqueta, dataType);
+    public void addColumna(String etiqueta, ColumnaString columna){
+        if (contieneEtiqueta(etiqueta)){
+            throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
+        this.data.put(etiqueta, columna);
+        this.tiposColumna.put(etiqueta, "String");
+        this.etiquetas.add(etiqueta);
+    }
+
+    public void addColumna(String etiqueta, ColumnaInt columna){
+        if (contieneEtiqueta(etiqueta)){
+            throw new RuntimeException("la columna "+etiqueta+" ya existe");
+        }
+        this.data.put(etiqueta, columna);
+        this.tiposColumna.put(etiqueta, "Integer");
+        this.etiquetas.add(etiqueta);
+    }
+
+    public void addColumna(String etiqueta, ColumnaDouble columna){
+        if (contieneEtiqueta(etiqueta)){
+            throw new RuntimeException("la columna "+etiqueta+" ya existe");
+        }
+        this.data.put(etiqueta, columna);
+        this.tiposColumna.put(etiqueta, "Double");
+        this.etiquetas.add(etiqueta);
+    }
+
+    public void addColumna(String etiqueta, ColumnaBool columna){
+        if (contieneEtiqueta(etiqueta)){
+            throw new RuntimeException("la columna "+etiqueta+" ya existe");
+        }
+        this.data.put(etiqueta, columna);
+        this.tiposColumna.put(etiqueta, "Boolean");
+        this.etiquetas.add(etiqueta);
     }
 
     public Columna getColumna(String etiqueta){

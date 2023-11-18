@@ -79,25 +79,7 @@ public abstract class Columna<T> implements Cloneable {
     
     public abstract int length();
     public abstract Map<Integer, Integer> ordenar(boolean creciente);
-    public void ordenarPorIndice(Map<Integer, Integer> orden){
-        List<T> copia = new ArrayList<>();
-        for (int i=0; i < this.length(); i++){
-            copia.add(this.getCelda(i));
-        }
-        for (int i=0; i < this.length(); i++){
-            Integer moveTo = orden.get(i);
-            this.setCelda(moveTo, copia.get(i));
-        }
-    }
-    public List<Integer> filtrar(Predicate<T> filtro){
-        List<Integer> indices = new ArrayList<>();
-        for (int i=0; i < this.length(); i++){
-            if (this.getCelda(i) != null && filtro.test(this.getCelda(i))){
-                indices.add(i);
-            }
-        }
-        return indices;
-    }
+    public abstract Columna<T> ordenarPorIndice(Map<Integer, Integer> orden);
     public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
     public void transformar(UnaryOperator<T> transformacion){
         for (int i=0; i < length(); i++){
