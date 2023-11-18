@@ -2,6 +2,7 @@ package test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import utils.CasteoIlegal;
 
@@ -47,7 +48,6 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     public Double mediana() {
         ColumnaInt copia = this.clone();
         copia.ordenarPorIndice(copia.ordenar(true));
-        System.out.println(copia);
         
         Double mediana;
         if (length() % 2 == 0){
@@ -274,5 +274,16 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         }
 
         return new ColumnaInt(datos);
+    }
+
+    @Override
+    public ColumnaInt transformar(UnaryOperator<Integer> transformacion) {
+        ColumnaInt copia = new ColumnaInt();
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null){
+                copia.añadirCelda(transformacion.apply(getCelda(i)));
+            }
+        }
+        return copia;
     }
 }

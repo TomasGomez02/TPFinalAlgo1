@@ -9,6 +9,7 @@ import utils.DataTypes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class DataFrame implements Cloneable {
@@ -70,7 +71,7 @@ public class DataFrame implements Cloneable {
     }
 
     public void printDesdeHasta(int indiceInicio, int indiceFinal, final int OFFSETMINIMO){
-        if (indiceInicio < -1 || indiceFinal > cantidadFilas()){
+        if (indiceInicio < -1){
             indiceInicio = 0;
         }
         if (indiceFinal > cantidadFilas()){
@@ -214,8 +215,8 @@ public class DataFrame implements Cloneable {
     }
     @Override
     public DataFrame clone(){
-        Map<String, Columna> columnas = new HashMap<>();
-        Map<String, DataTypes> dataTypes = new HashMap<>();
+        Map<String, Columna> columnas = new LinkedHashMap<>();
+        Map<String, DataTypes> dataTypes = new LinkedHashMap<>();
         for (String colName : this.etiquetas){
             columnas.put(colName, this.getColumna(colName).clone());
             dataTypes.put(colName, this.tiposColumna.get(colName));
@@ -277,8 +278,8 @@ public class DataFrame implements Cloneable {
     }
 
     public DataFrame getColumna(List<String> etiqueta){
-        Map<String, Columna> columnas = new HashMap<>();
-        Map<String, DataTypes> tiposCol = new HashMap<>();
+        Map<String, Columna> columnas = new LinkedHashMap<>();
+        Map<String, DataTypes> tiposCol = new LinkedHashMap<>();
         for (String colName : etiqueta){
             columnas.put(colName, this.getColumna(colName));
             tiposCol.put(colName, this.tiposColumna.get(colName));
@@ -323,7 +324,7 @@ public class DataFrame implements Cloneable {
 
     public DataFrame getFila(int fila){
         if (0 <= fila && fila <= this.cantidadFilas()-1){
-            Map<String, Columna> otro = new HashMap<>();
+            Map<String, Columna> otro = new LinkedHashMap<>();
             for (String colName : this.etiquetas){
                 switch (this.tiposColumna.get(colName)){
                     case STRING:
@@ -351,27 +352,24 @@ public class DataFrame implements Cloneable {
     
     public DataFrame getFila(int[] fila){
         DataFrame copia = this.getFila(fila[0]);
-        for (int indice : fila){
-            if (indice == fila[0]){ continue; }
-            copia.addFila(this.getFila(indice));
+        for (int i=1; i < fila.length; i++){
+            copia.addFila(this.getFila(fila[i]));
         }
         return copia;
     }
 
     public DataFrame getFila(Integer[] fila){
         DataFrame copia = this.getFila(fila[0]);
-        for (Integer indice : fila){
-            if (indice == fila[0]){ continue; }
-            copia.addFila(this.getFila(indice));
+        for (int i=1; i < fila.length; i++){
+            copia.addFila(this.getFila(fila[i]));
         }
         return copia;
     }
 
     public DataFrame getFila(List<Integer> fila){
         DataFrame copia = this.getFila(fila.get(0));
-        for (Integer indice : fila){
-            if (indice == fila.get(0)){ continue; }
-            copia.addFila(this.getFila(indice));
+        for (int i=1; i < fila.size(); i++){
+            copia.addFila(this.getFila(fila.get(i)));
         }
         return copia;
     }
@@ -411,14 +409,41 @@ public class DataFrame implements Cloneable {
     }
 
     public <T> DataFrame filtrar(String etiqueta, Predicate<T> filtro){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        if (!contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistenteException(etiqueta);
+        }
+
+        List<Integer> indices = this.getColumna(etiqueta).filtrar(filtro);
+        DataFrame filtrado = new DataFrame();
+
+        for (String colName : this.etiquetas){
+            DataTypes type = this.tiposColumna.get(colName);
+            switch (tiposColumna.get(colName)) {
+                case BOOL:
+                    filtrado.addColumna(colName, (ColumnaBool) getColumna(colName).filtrarPorIndice(indices));
+                    break;
+                case INT:
+                    filtrado.addColumna(colName, (ColumnaInt) getColumna(colName).filtrarPorIndice(indices));
+                    break;
+                case DOUBLE:
+                    filtrado.addColumna(colName, (ColumnaDouble) getColumna(colName).filtrarPorIndice(indices));
+                    break;
+                default:
+                    // STRING
+                    filtrado.addColumna(colName, (ColumnaString) getColumna(colName).filtrarPorIndice(indices));
+                    break;
+            }
+        }
+        return filtrado;
     }
 
-    public <T> void transformCol(String etiqueta, UnaryOperator<T> transformacion){
+    public <T> DataFrame transformCol(String etiqueta, UnaryOperator<T> transformacion){
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException(etiqueta);
         }
-        this.getColumna(etiqueta).transformar(transformacion);
+        DataFrame copia = this.clone();
+        copia.data.put(etiqueta, this.getColumna(etiqueta).transformar(transformacion));
+        return copia;
     }
 
 }

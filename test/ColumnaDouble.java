@@ -2,6 +2,7 @@ package test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import utils.CasteoIlegal;
 
@@ -278,5 +279,16 @@ public class ColumnaDouble extends ColumnaNum<Double>
         }
 
         return new ColumnaDouble(datos);
+    }
+
+    @Override
+    public ColumnaDouble transformar(UnaryOperator<Double> transformacion) {
+        ColumnaDouble copia = new ColumnaDouble();
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null){
+                copia.añadirCelda(transformacion.apply(getCelda(i)));
+            }
+        }
+        return copia;
     }
 }

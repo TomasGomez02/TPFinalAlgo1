@@ -2,6 +2,7 @@ package test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import utils.CasteoIlegal;
 import utils.Types;
@@ -206,5 +207,16 @@ public class ColumnaBool extends Columna<Boolean>{
         }
 
         return new ColumnaBool(datos);
+    }
+
+    @Override
+    public ColumnaBool transformar(UnaryOperator<Boolean> transformacion) {
+        ColumnaBool copia = new ColumnaBool();
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null){
+                copia.añadirCelda(transformacion.apply(getCelda(i)));
+            }
+        }
+        return copia;
     }
 }
