@@ -1,7 +1,12 @@
 package test;
 
 import java.util.List;
+import java.util.Map;
+
+import test.ColumnType.DataTypes;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ColumnaDouble extends ColumnaNum<Double>
 {
@@ -14,24 +19,23 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     public ColumnaDouble(List<Double> lista)
     {
-        data = new ArrayList<>();
-
+        this();
         for(Double num: lista)
             data.add(num);
     }
 
     public ColumnaDouble(double[] array)
     {
-        data = new ArrayList<>();
-
+        this();
         for(double num: array)
             data.add(num);
     }
 
-    @Override
-    public Columna<Double> filtrar(Double elemento, Filtro<Double> filtro) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filtrar'");
+    public ColumnaDouble(Double[] array){
+        this();
+        for (Double num : array) {
+            this.añadirCelda(num);
+        }
     }
 
     @Override
@@ -47,16 +51,28 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public Double mediana() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'mediana'");
+        ColumnaDouble copia = clone();
+        copia.ordenarPorIndice(copia.ordenar(true));
+
+        Double mediana;
+        int indiceMitad;
+        if (length() % 2 == 0){
+            indiceMitad = copia.length() / 2;
+            mediana = (copia.getCelda(indiceMitad) + copia.getCelda(indiceMitad-1))/ 2.0;
+        }
+        else{
+            indiceMitad = copia.length() / 2;
+            mediana = copia.getCelda(indiceMitad);
+        }
+        return mediana;
     }
 
     @Override
     public Double maximo() {
-        double max = this.getCelda(0);
-        for (int i=1; i < this.length(); i++) {
-            if (this.getCelda(i) > max) {
-                max = this.getCelda(i);
+        Double max = getCelda(0);
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null && getCelda(i) > max){
+                max = getCelda(i);
             }
         }
         return max;
@@ -64,10 +80,10 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public Double minimo() {
-        double min = this.getCelda(0);
-        for (int i=1; i < this.length();i++){
-            if (this.getCelda(0) < min){
-                min = this.getCelda(1);
+        Double min = getCelda(0);
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) != null && getCelda(i) < min){
+                min = getCelda(i);
             }
         }
         return min;
@@ -75,72 +91,60 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public Double desvioEstandar() {
-        double desvio = 0.0;
+        double sumatoria = 0.0;
+        final double media = this.media();
         for (int i=0; i < this.length(); i++){
-            double diferencia = data.get(i) - this.media(); 
-            double cuadrado = Math.pow(diferencia, 2); 
-            double sumatoria =+ cuadrado; 
-            double division = sumatoria/ this.length();
-            desvio = Math.sqrt(division);
+            sumatoria += Math.pow(getCelda(i) - media, 2);
         }
-        return desvio;
+        return Math.sqrt(sumatoria / this.length());
     }
 
     @Override
     public Double sumaAcumulada() {
-        double suma = 0/.;
-        for (int i=0; i < this.length(); i++){
-            suma =+ this.getCelda(i);
+        Double suma = 0.0;
+        for (int i=0; i < length(); i++){
+            suma += getCelda(i);
         }
         return suma;
     }
 
     @Override
     public Double getCelda(int indice) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCelda'");
+        return this.data.get(indice);
     }
 
     @Override
     public void setCelda(int indice, Double valor) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCelda'");
+        this.data.set(indice, valor);
     }
 
     @Override
     public void añadirCelda(int indice, Double valor) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'añadirCelda'");
+        this.data.add(indice, valor);
     }
 
     @Override
     public void añadirCelda(Double valor) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'añadirCelda'");
+        this.data.add(valor);
     }
 
     @Override
     public void eliminarCelda(int indice) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'eliminarCelda'");
+        this.data.remove(indice);
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'borrarValorCelda'");
+        this.setCelda(indice, null);
     }
 
     @Override
     public Columna<Double> recortarColumna(int indiceInicio, int indiceFinal) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'recortarColumna'");
-    }
-
-    @Override
-    public void concatenarColumna(Columna<Double> otraColumna) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'concatenarColumna'");
+        ColumnaDouble recorte = new ColumnaDouble();
+        for (int i=indiceInicio; i <= indiceFinal; i++){
+            recorte.añadirCelda(getCelda(i));
+        }
+        return recorte;
     }
 
     @Override
@@ -149,9 +153,89 @@ public class ColumnaDouble extends ColumnaNum<Double>
     }
 
     @Override
-    public void ordenar(boolean creciente) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'ordenar'");
+    public String toString(){
+        return this.data.toString();
+    }
+
+    @Override
+    public ColumnaDouble clone(){
+        ColumnaDouble copia = new ColumnaDouble();
+        for (Double elem : data) {
+            copia.añadirCelda(elem);
+        }
+        return copia;
+    }
+
+    @Override
+    public ColumnaDouble filtrarPorIndice(List<Integer> indices) {
+        ColumnaDouble filtrada = new ColumnaDouble();
+        for (Integer indice : indices) {
+            filtrada.añadirCelda(this.getCelda(indice));
+        }
+        return filtrada;
+    }
+
+    @Override
+    public Map<Integer, Integer> ordenar(boolean creciente) {
+        // Crear lista de indices para trasladar los valores
+        Map<Integer, Integer> trasladar = new HashMap<>();
+
+        // Crea un array con todos sus elementos en false, para saber si ya se ordenaron los elementos
+        // dentro de la columna. Si el elemento en la posicion x en la Columna ya esta ordenado, entonces
+        // el valor en la posicion x del array va a ser true.
+        boolean[] yaSeOrdeno = new boolean[this.length()];
+
+        for (int i=0; i < this.length(); i++){
+            Integer idxMinimo = -1;
+            // Uso esto para tomar el primer indice no nulo y no ordenado
+            for (int k=0; k < this.length(); k++){
+                if (this.getCelda(k) != null && !yaSeOrdeno[k]){
+                    idxMinimo = k;
+                    break;
+                }
+            }
+            if (idxMinimo < 0){
+                continue;
+            }
+            for (int j=0; j < this.length(); j++){
+                if (!yaSeOrdeno[j] && this.getCelda(j) != null &&
+                this.getCelda(j).compareTo(this.getCelda(idxMinimo)) < 0){
+                    idxMinimo = j;
+                }
+            }
+            if (creciente){
+                trasladar.put(idxMinimo, i);
+            }
+            else{
+                trasladar.put(idxMinimo, this.length() - i - 1);
+            }
+            yaSeOrdeno[idxMinimo] = true;
+        }
+        // Esta parte manda los null al final de la lista
+        Integer distanciaDesdeUltimo = 0;
+        for (int i=0; i < this.length(); i++){
+            if (this.getCelda(i) == null){
+                if (creciente){
+                    trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
+                }
+                else{
+                    trasladar.put(i, distanciaDesdeUltimo);
+                }
+                distanciaDesdeUltimo += 1;
+            }
+        }
+        return trasladar;
     }
     
+    public static ColumnaDouble fromColumnaString (Columna<String> col) throws NumberFormatException
+    {
+        List<Double> datos = new ArrayList<>();
+
+        for(int i = 0; i < col.length(); i++)
+        {
+            datos.add(Double.parseDouble(col.getCelda(i)));
+        }
+
+        return new ColumnaDouble(datos);
+    }
 }
