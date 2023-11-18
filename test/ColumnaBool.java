@@ -1,6 +1,6 @@
 package test;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
 
 public class ColumnaBool extends Columna<Boolean>{
@@ -8,6 +8,10 @@ public class ColumnaBool extends Columna<Boolean>{
 
     public ColumnaBool(){
         this.data = new ArrayList<>();
+    }
+
+    public ColumnaBool(Boolean[] data){
+        this.data = Arrays.asList(data);
     }
 
     public ColumnaBool(List<Boolean> otro){
@@ -69,15 +73,25 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public void ordenar(boolean creciente) {
-        // Funciona bien. Pero, si algun valor es null, tira NullPointerException
-        Comparator<Boolean> c;
-        if (creciente){
-            c = (a, b) -> a.compareTo(b);
+        // Usa el algoritmo de selection sort
+        // Aviso: no ordena los nulos, solo los deja en el mismo lugar donde estaban
+        int n = this.length();
+        for (int i = 0; i < n - 1; i++) {
+            int idxMinimo = i;
+            System.out.println(idxMinimo +" "+ this.getCelda(idxMinimo));
+            if (this.getCelda(i) == null){
+                continue;
+            }
+            for (int j = i + 1; j < n; j++) {
+                if (this.getCelda(j) != null && this.getCelda(j).compareTo(this.getCelda(idxMinimo)) > 0) {
+                    idxMinimo = j;
+                }
+            }
+            // Intercambia el mínimo encontrado con el elemento en la posición i
+            Boolean temp = this.getCelda(i);
+            this.setCelda(i, this.getCelda(idxMinimo));
+            this.setCelda(idxMinimo, temp);
         }
-        else{
-            c = (a, b) -> b.compareTo(a);
-        }
-        this.data.sort(c);
     }
 
     @Override
