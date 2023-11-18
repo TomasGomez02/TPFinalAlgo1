@@ -3,11 +3,14 @@ package test;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+
+import DataFrameExceptions.ColumnaInexistente;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class DataFrame {
+public class DataFrame implements Cloneable {
     
     @SuppressWarnings("rawtypes")   // Literalmente es lo que dice
     private Map<String, Columna> data;
@@ -16,6 +19,8 @@ public class DataFrame {
 
     public DataFrame(){
         this.data = new HashMap<>();
+        this.etiquetas = new ArrayList<>();
+        this.tiposColumna = new HashMap<>();
     }
 
     @SuppressWarnings("rawtypes")
@@ -30,6 +35,10 @@ public class DataFrame {
         }
     }
 
+    public boolean contieneEtiqueta(String etiqueta){
+        return this.etiquetas.contains(etiqueta);
+    }
+
     public List<String> nombreColumnas(){
         return this.etiquetas;
     }
@@ -39,6 +48,9 @@ public class DataFrame {
     }
 
     public int cantidadFilas(){
+        if (this.data.isEmpty()){
+            return 0;
+        }
         return this.data.get(etiquetas.get(0)).length();
     }
 
@@ -47,7 +59,8 @@ public class DataFrame {
     }
 
     public String toString(){
-        return this.data.toString();
+        this.head();
+        return "";
     }
 
     public void printDesdeHasta(int indiceInicio, int indiceFinal)
@@ -58,6 +71,8 @@ public class DataFrame {
     public void printDesdeHasta(int indiceInicio, int indiceFinal, final int OFFSETMINIMO){
         if (indiceInicio < -1 || indiceFinal > cantidadFilas()){
             indiceInicio = 0;
+        }
+        if (indiceFinal > cantidadFilas()){
             indiceFinal = cantidadFilas();
         }
 
@@ -170,21 +185,33 @@ public class DataFrame {
     }
 
     public <T> void setCelda(String etiqueta, int indice, T valor){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
         this.data.get(etiqueta).setCelda(indice, valor);
     }
 
     public Object getCelda(String etiqueta, int indice){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
         return this.data.get(etiqueta).getCelda(indice);
     }
 
     public <T> T getCelda(String etiqueta, int indice, Class<T> tipoDato){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
         return tipoDato.cast(data.get(etiqueta).getCelda(indice));
     }
 
-    public <T> void añadirCelda(String etiqueta, T valor){
+    private <T> void añadirCelda(String etiqueta, T valor){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente();
+        }
         this.data.get(etiqueta).añadirCelda(valor);
     }
-
+    @Override
     public DataFrame clone(){
         Map<String, Columna> columnas = new HashMap<>();
         Map<String, String> dataTypes = new HashMap<>();
@@ -195,11 +222,30 @@ public class DataFrame {
         return new DataFrame(columnas, dataTypes);
     }
 
-    public <T> void añadirColumna(String etiqueta, Columna<T> columna){
+    public <T> void addColumna(String etiqueta, Columna<T> columna){
         this.data.put(etiqueta, columna);
+        if (!this.contieneEtiqueta(etiqueta)){
+            this.etiquetas.add(etiqueta);
+            String dataType;
+            if (columna.getClass() == ColumnaString.class){
+                dataType = "String";
+            } else if (columna.getClass() == ColumnaInt.class){
+                dataType = "Integer";
+            } else if (columna.getClass() == ColumnaDouble.class){
+                dataType = "Double";
+            } else if (columna.getClass() == ColumnaBool.class){
+                dataType = "Integer";
+            } else {
+                throw new RuntimeException("Error en addColumna. Esto no deberia ocurrir");
+            }
+            this.tiposColumna.put(etiqueta, dataType);
+        }
     }
 
     public Columna getColumna(String etiqueta){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
         return this.data.get(etiqueta);
     }
 
@@ -223,7 +269,7 @@ public class DataFrame {
         return new DataFrame(columnas, tiposCol);
     }
 
-    public void añadirFila(DataFrame fila){
+    public void addFila(DataFrame fila){
         for (String colName : this.etiquetas){
             switch (this.tiposColumna.get(colName)) {
                 case "String":
@@ -239,66 +285,104 @@ public class DataFrame {
                     this.añadirCelda(colName, fila.getCelda(colName, 0, Boolean.class));
                     break;
                 default:
-                    System.out.println("Si esto se ejecuta, paso algo raro");
+                    System.out.println("Error en DataFrame.añadirFila");
+                    System.out.println("Falta un tipo de dato para la columna: "+colName);
                     break;
             }
+        }
+    }
+
+    public void addFila(Map<String, Object> fila){
+        for (String colName : fila.keySet()){
+            this.data.get(colName).añadirCelda(fila.get(colName));
         }
     }
 
     public void concatDataFrame(DataFrame otro){
-        for (int i=0; i < cantidadFilas(); i++){
-            this.añadirFila(otro.getFila(i));
+        for (int i=0; i < otro.cantidadFilas(); i++){
+            this.addFila(otro.getFila(i));
         }
     }
 
     public DataFrame getFila(int fila){
-        // TODO: Hay que resolver esto
-        Map<String, Columna> otro = new HashMap<>();
-        for (String colName : this.etiquetas){
-            switch (this.tiposColumna.get(colName)){
-                case "String":
-                    otro.put(colName, new ColumnaString());
-                    otro.get(colName).añadirCelda(getCelda(colName, fila, String.class));
-                    break;
-                case "Integer":
-                    otro.put(colName, new ColumnaInt());
-                    otro.get(colName).añadirCelda(getCelda(colName, fila, Integer.class));
-                    break;
-                case "Double":
-                    otro.put(colName, new ColumnaDouble());
-                    otro.get(colName).añadirCelda(getCelda(colName, fila, Double.class));
-                    break;
-                case "Boolean":
-                    otro.put(colName, new ColumnaBool());
-                    otro.get(colName).añadirCelda(getCelda(colName, fila, Boolean.class));
-                    break;
+        if (0 <= fila && fila <= this.cantidadFilas()-1){
+            Map<String, Columna> otro = new HashMap<>();
+            for (String colName : this.etiquetas){
+                switch (this.tiposColumna.get(colName)){
+                    case "String":
+                        otro.put(colName, new ColumnaString());
+                        otro.get(colName).añadirCelda(getCelda(colName, fila, String.class));
+                        break;
+                    case "Integer":
+                        otro.put(colName, new ColumnaInt());
+                        otro.get(colName).añadirCelda(getCelda(colName, fila, Integer.class));
+                        break;
+                    case "Double":
+                        otro.put(colName, new ColumnaDouble());
+                        otro.get(colName).añadirCelda(getCelda(colName, fila, Double.class));
+                        break;
+                    case "Boolean":
+                        otro.put(colName, new ColumnaBool());
+                        otro.get(colName).añadirCelda(getCelda(colName, fila, Boolean.class));
+                        break;
+                }
             }
+            return new DataFrame(otro, tiposColumna);
         }
-        return new DataFrame(otro, this.tiposColumna);
+        throw new RuntimeException("El DataFrame no contiene la fila: "+fila);
     }
     
     public DataFrame getFila(int[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        DataFrame copia = this.getFila(fila[0]);
+        for (int indice : fila){
+            if (indice == fila[0]){ continue; }
+            copia.addFila(this.getFila(indice));
+        }
+        return copia;
     }
 
     public DataFrame getFila(Integer[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        DataFrame copia = this.getFila(fila[0]);
+        for (Integer indice : fila){
+            if (indice == fila[0]){ continue; }
+            copia.addFila(this.getFila(indice));
+        }
+        return copia;
     }
 
-    public DataFrame getFila(List<Integer>[] fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public DataFrame getFila(List<Integer> fila){
+        DataFrame copia = this.getFila(fila.get(0));
+        for (Integer indice : fila){
+            if (indice == fila.get(0)){ continue; }
+            copia.addFila(this.getFila(indice));
+        }
+        return copia;
     }
 
     public void eliminarCol(String etiqueta){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        if (this.contieneEtiqueta(etiqueta)){
+            this.data.remove(etiqueta);
+            this.etiquetas.remove(this.etiquetas.indexOf(etiqueta));
+            return;
+        }
+        throw new ColumnaInexistente(etiqueta);
     }
 
-    public void eliminarFila(String fila){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public void eliminarFila(int fila){
+        if (0 <= fila && fila <= this.cantidadFilas()-1){
+            for (String colName : this.etiquetas){
+                this.getColumna(colName).eliminarCelda(fila);
+            }
+        }
+        throw new RuntimeException("La fila debe estar en el rango [0, n)");
     }
 
     public DataFrame recortar(int indiceInicio, int indiceFinal){
-        throw new UnsupportedOperationException("Metodo no implementado");
+        DataFrame copia = this.getFila(indiceInicio);
+        for (int i=indiceInicio+1; i <= indiceFinal; i++){
+            copia.addFila(this.getFila(i));
+        }
+        return copia;
     }
 
     public void ordenar(String etiqueta, boolean creciente){
@@ -309,8 +393,11 @@ public class DataFrame {
         throw new UnsupportedOperationException("Metodo no implementado");
     }
 
-    public <T> void transformCol(String etiqueta, UnaryOperator<T> filtro){
-        throw new UnsupportedOperationException("Metodo no implementado");
+    public <T> void transformCol(String etiqueta, UnaryOperator<T> transformacion){
+        if (!this.contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistente(etiqueta);
+        }
+        this.getColumna(etiqueta).transformar(transformacion);
     }
 
 }
