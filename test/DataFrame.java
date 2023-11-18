@@ -4,8 +4,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import DataFrameExceptions.ColumnaInexistente;
-import javax.xml.crypto.Data;
+import utils.ColumnaInexistenteException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -187,28 +186,28 @@ public class DataFrame implements Cloneable {
 
     public <T> void setCelda(String etiqueta, int indice, T valor){
         if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistente(etiqueta);
+            throw new ColumnaInexistenteException(etiqueta);
         }
         this.data.get(etiqueta).setCelda(indice, valor);
     }
 
     public Object getCelda(String etiqueta, int indice){
         if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistente(etiqueta);
+            throw new ColumnaInexistenteException(etiqueta);
         }
         return this.data.get(etiqueta).getCelda(indice);
     }
 
     public <T> T getCelda(String etiqueta, int indice, Class<T> tipoDato){
         if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistente(etiqueta);
+            throw new ColumnaInexistenteException(etiqueta);
         }
         return tipoDato.cast(data.get(etiqueta).getCelda(indice));
     }
 
     private <T> void añadirCelda(String etiqueta, T valor){
         if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistente();
+            throw new ColumnaInexistenteException();
         }
         this.data.get(etiqueta).añadirCelda(valor);
     }
@@ -245,7 +244,7 @@ public class DataFrame implements Cloneable {
 
     public Columna getColumna(String etiqueta){
         if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistente(etiqueta);
+            throw new ColumnaInexistenteException(etiqueta);
         }
         return this.data.get(etiqueta);
     }
@@ -366,7 +365,7 @@ public class DataFrame implements Cloneable {
             this.etiquetas.remove(this.etiquetas.indexOf(etiqueta));
             return;
         }
-        throw new ColumnaInexistente(etiqueta);
+        throw new ColumnaInexistenteException(etiqueta);
     }
 
     public void eliminarFila(int fila){
@@ -400,7 +399,7 @@ public class DataFrame implements Cloneable {
 
     public <T> void transformCol(String etiqueta, UnaryOperator<T> transformacion){
         if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistente(etiqueta);
+            throw new ColumnaInexistenteException(etiqueta);
         }
         this.getColumna(etiqueta).transformar(transformacion);
     }

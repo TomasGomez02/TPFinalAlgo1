@@ -38,6 +38,14 @@ public abstract class Columna<T> implements Cloneable {
      */
     public abstract void añadirCelda(T valor);
     /**
+     * Verifica si el indice esta dentro del rango de la Columna
+     * @param indice indice a verificar
+     * @return verdadero si el indice se encuentra en el rango
+     */
+    public boolean contieneIndice(int indice){
+        return 0 <= indice && indice <= length()-1;
+    }
+    /**
      * Elimina el elemento encontrado en la posicion indicada.
      * Desplaza cualquier elemento posterior hacia la izquierda (resta uno de sus indices).
      * 

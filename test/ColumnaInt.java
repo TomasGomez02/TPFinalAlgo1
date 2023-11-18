@@ -108,17 +108,26 @@ public class ColumnaInt extends ColumnaNum<Integer> {
 
     @Override
     public Integer getCelda(int indice) {
-        return this.data.get(indice); 
+        if (contieneIndice(indice)){
+            return this.data.get(indice); 
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override
     public void setCelda(int indice, Integer valor) {
-        this.data.set(indice, valor);
+        if (contieneIndice(indice)){
+            this.data.set(indice, valor);
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override
     public void añadirCelda(int indice, Integer valor) {
-        this.data.add(indice, valor);
+        if (!contieneIndice(indice) && indice != 0){
+            this.data.add(indice, valor);
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override
@@ -128,12 +137,18 @@ public class ColumnaInt extends ColumnaNum<Integer> {
 
     @Override
     public void eliminarCelda(int indice) {
-        this.data.remove(indice);
+        if (contieneIndice(indice)){
+            this.data.remove(indice);
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        this.data.set(indice, null);
+        if (contieneIndice(indice)){
+            this.data.set(indice, null);
+        }
+        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
     }
 
     @Override
