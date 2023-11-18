@@ -3,6 +3,9 @@ package test;
 import java.util.List;
 import java.util.Map;
 
+import utils.CasteoIlegal;
+import utils.Types;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -178,13 +181,28 @@ public class ColumnaBool extends Columna<Boolean>{
         return copia;
     }
 
-    public static ColumnaBool fromColumnaString (Columna<String> col)
+    public static ColumnaBool fromColumnaString (Columna<String> col) throws CasteoIlegal
     {
         List<Boolean> datos = new ArrayList<>();
 
         for(int i = 0; i < col.length(); i++)
         {
-            datos.add(Boolean.parseBoolean(col.getCelda(i)));
+            String elemento = col.getCelda(i);
+            try
+            {
+                if(elemento != null && !elemento.equals("") && !elemento.toLowerCase().strip().equals("na"))
+                {
+                    datos.add(Types.parseBoolean(col.getCelda(i)));
+                }
+                else
+                {
+                    datos.add(null);
+                }
+            }
+            catch(NumberFormatException e)
+            {
+                throw new CasteoIlegal(col.getCelda(i), String.class.toString(), Integer.class.toString());
+            }
         }
 
         return new ColumnaBool(datos);

@@ -10,21 +10,35 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.LinkedHashMap;
+
+import utils.CasteoIlegal;
+import utils.DataTypes;
 
 public final class IOCSV 
 {
     private IOCSV(){}
 
-    public static DataFrame fromCSV(String path, String[] dataTypes) {
-        return fromCSV(new File(path),dataTypes);
+    public static DataFrame fromCSV(String path)
+    {
+        return fromCSV(path, null);
     }
 
-    public static DataFrame fromCSV(File file, String[] dataTypes){
-        Map<String, String> tiposEtiqueta = new HashMap<>();
+    public static DataFrame fromCSV(String path, DataTypes[] dataTypes) {
+        return fromCSV(new File(path), dataTypes);
+    }
+
+    public static DataFrame fromCSV(File file)
+    {
+        return fromCSV(file, null);
+    }
+
+    public static DataFrame fromCSV(File file, DataTypes[] dataTypes){
+        Map<String, DataTypes> tiposEtiqueta = new LinkedHashMap<>();
         String[] header;
         @SuppressWarnings("rawtypes")
-        Map<String, Columna> columnas = new HashMap<>();
+        Map<String, Columna> columnas = new LinkedHashMap<>();
 
         
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -35,19 +49,21 @@ public final class IOCSV
             // Y el tipo de dato para cada etiqueta
             header = procesarFila(linea);
             //System.out.println(header.length);
-            columnas = crearColumnas(header, dataTypes);
-            for (int i=0; i < header.length; i++){
-                tiposEtiqueta.put(header[i], dataTypes[i]);
-            }
+            columnas = crearColumnas(header);
 
-            
+            for (int i=0; i < header.length; i++){
+                if(dataTypes != null)
+                    tiposEtiqueta.put(header[i], dataTypes[i]);
+                else
+                    tiposEtiqueta.put(header[i], DataTypes.STRING);
+            }  
 
             // Asigno los valores a cada columna
             while ((linea = br.readLine()) != null) {
                 String[] valores = procesarFila(linea);
                 //System.out.println(valores.length);
                 for (int i=0; i < valores.length; i++) {
-                    addElemToDataFrame(columnas, header[i], valores[i], tiposEtiqueta.get(header[i]));
+                    columnas.get(header[i]).añadirCelda(valores[i]);
                 }
             }
             
@@ -61,64 +77,21 @@ public final class IOCSV
             System.out.println(e.getClass());
             System.out.println(e.getMessage());
         }
-        return new DataFrame(columnas, tiposEtiqueta);
-    }
-    @SuppressWarnings("rawtypes")
-    private static void addElemToDataFrame(Map<String, Columna> columnas, String etiqueta, 
-                            String elem, String dataType) {
-        try {
-            switch (dataType) {
-                case "String":
-                    columnas.get(etiqueta).añadirCelda(elem);
-                    break;
-                case "Integer":
-                    columnas.get(etiqueta).añadirCelda(Integer.valueOf(elem));
-                    break;
-                case "Double":
-                    columnas.get(etiqueta).añadirCelda(Double.valueOf(elem));
-                    break;
-                case "Boolean":
-                    columnas.get(etiqueta).añadirCelda(Boolean.valueOf(elem));
-                    break;
-                default:
-                    System.out.println("Tipo desconocido: "+dataType);
-                    break;
-            }
-        } catch (NumberFormatException e){
-            System.out.println(e);
-            System.out.println("El elemento: "+elem+" es de tipo incorrecto para la columna");
-            columnas.get(etiqueta).añadirCelda(null);
+
+        if(dataTypes != null)
+        {
+            return crearDataFrame(columnas, tiposEtiqueta, dataTypes);
         }
+
+        return autogenerarDataFrame(columnas, tiposEtiqueta);
     }
 
     @SuppressWarnings("rawtypes")
-    private static Map<String, Columna> crearColumnas(String[] headers, String[] dataTypes) throws Exception {
-        if (headers.length > dataTypes.length){
-            // TODO: Hay que crear una excepcion para eso?
-            throw new Exception("Faltan especificar "+(headers.length-dataTypes.length)+" tipos de datos");
-        }
-
+    private static Map<String, Columna> crearColumnas(String[] headers) throws Exception {
         Map<String, Columna> columnas = new LinkedHashMap<>();
 
         for (int i=0; i < headers.length; i++){
-            switch (dataTypes[i].strip()) {
-                case "String":
-                    columnas.put(headers[i], new ColumnaString());
-                    break;
-                case "Integer":
-                    columnas.put(headers[i], new ColumnaInt());
-                    break;
-                case "Double":
-                    columnas.put(headers[i], new ColumnaDouble());
-                    break;
-                case "Boolean":
-                    columnas.put(headers[i], new ColumnaBool());
-                    break;
-                default:
-                    System.out.println("Tipo de dato desconocido: "+dataTypes[i]);
-                    // TODO: Deberia tirar un error?
-                    break;
-            }
+                columnas.put(headers[i], new ColumnaString());
         }
         return columnas;
     }
@@ -146,6 +119,81 @@ public final class IOCSV
         }
 
         return filaProcesada.toArray(String[] ::new);
+    }
+
+    private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataTypes> tiposEtiqueta, DataTypes[] datatypes)
+    {
+        List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
+
+        for(int i = 0; i < keys.size(); i++)
+        {
+            Columna col = columnas.get(keys.get(i));
+            columnas.put(keys.get(i), castearColumna(col, datatypes[i]));
+            tiposEtiqueta.put(keys.get(i), datatypes[i]);
+        }
+
+        return new DataFrame(columnas, tiposEtiqueta);
+    }
+
+    private static Columna castearColumna(Columna col, DataTypes dataType)
+    {
+        switch (dataType) {
+            case INT:
+                return ColumnaInt.fromColumnaString(col);
+            case DOUBLE:
+                return ColumnaDouble.fromColumnaString(col);
+            case BOOL:
+                return ColumnaBool.fromColumnaString(col);
+            default:
+                return col;
+        }
+    }
+
+    private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataTypes> tiposEtiqueta)
+    {
+        List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
+
+        for(int i = 0; i < keys.size(); i++)
+        {
+            Columna col = columnas.get(keys.get(i));
+            columnas.put(keys.get(i), autodetectarColumna(col, tiposEtiqueta, i));
+        }
+
+        return new DataFrame(columnas, tiposEtiqueta);
+    }
+
+    private static Columna autodetectarColumna(Columna col, Map<String, DataTypes> tiposEtiqueta, int index)
+    {
+        return autodetectarColumna(col, tiposEtiqueta, index, 0);
+    }
+
+    private static Columna autodetectarColumna(Columna col, Map<String, DataTypes> tiposEtiqueta, int index, int count)
+    {
+        Columna colCasteada;
+        List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
+        try
+        {
+            switch (count) {
+                case 0:
+                    colCasteada = ColumnaBool.fromColumnaString(col);
+                    tiposEtiqueta.put(keys.get(index), DataTypes.BOOL);
+                    break;
+                case 1:
+                    colCasteada = ColumnaInt.fromColumnaString(col);
+                    tiposEtiqueta.put(keys.get(index), DataTypes.INT);
+                    break;
+                case 2:
+                    colCasteada = ColumnaDouble.fromColumnaString(col);
+                    tiposEtiqueta.put(keys.get(index), DataTypes.DOUBLE);
+                default:
+                    colCasteada = col;
+            }
+        }
+        catch(CasteoIlegal e)
+        {
+            colCasteada = autodetectarColumna(col, tiposEtiqueta, index, count + 1);
+        }
+        return colCasteada;
     }
 
     public static void toCSV(DataFrame data)
