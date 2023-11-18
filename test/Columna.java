@@ -133,6 +133,7 @@ public abstract class Columna<T> implements Cloneable {
      * @param indices lista de indices que especifica que elementos se incluiran en la nueva columna
      * @return nueva columna con los elementos correspondientes a los indices proporcionados
      */
+    public abstract Columna<T> ordenarPorIndice(Map<Integer, Integer> orden);
     public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
 
     /**

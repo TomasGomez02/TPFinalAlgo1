@@ -3,8 +3,6 @@ package test;
 import java.util.List;
 import java.util.Map;
 
-import test.ColumnType.DataTypes;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -28,18 +26,18 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public Boolean getCelda(int indice) {
-        if (contieneIndice(indice)){
-            return this.data.get(indice);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        return this.data.get(indice);
     }
 
     @Override
     public void setCelda(int indice, Boolean valor) {
-        if (contieneIndice(indice)){
-            this.data.set(indice, valor);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.data.set(indice, valor);
     }
 
     @Override
@@ -57,18 +55,18 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public void eliminarCelda(int indice) {
-        if (contieneIndice(indice)){
-            this.data.remove(indice);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.data.remove(indice);
     }
 
     @Override
     public void borrarValorCelda(int indice) {
-        if (contieneIndice(indice)){
-            this.data.set(indice, null);
+        if (!contieneIndice(indice)){
+            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        this.data.set(indice, null);
     }
 
     @Override
@@ -168,6 +166,16 @@ public class ColumnaBool extends Columna<Boolean>{
             }
         }
         return trasladar;
+    }
+    @Override
+    public ColumnaBool ordenarPorIndice(Map<Integer, Integer> orden){
+        ColumnaBool copia = this.clone();
+
+        for (int i=0; i < copia.length(); i++){
+            Integer newIdx = orden.get(i);
+            copia.setCelda(newIdx, getCelda(i));
+        }
+        return copia;
     }
 
     public static ColumnaBool fromColumnaString (Columna<String> col)
