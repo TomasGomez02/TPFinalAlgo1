@@ -98,6 +98,20 @@ public abstract class Columna<T> implements Cloneable {
     public abstract Map<Integer, Integer> ordenar(boolean creciente);
 
     /**
+     * Devuelve la cantidad de nulos en la columna
+     * @return cantidad de nulos
+     */
+    public int cantNull(){
+        int count = 0;
+        for (int i=0; i < length(); i++){
+            if (getCelda(i) == null){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
      * Filtra los elementos de la columna segun el predicado proporcionado y devuelve una lista de los indices de los elementos que cumplen con el criterio de filtrado.
      * 
      * @param filtro predicado que define el criterio de filtrado

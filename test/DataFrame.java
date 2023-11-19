@@ -158,7 +158,7 @@ public class DataFrame implements Cloneable {
         int cantidadSepHeader = 0;
         for(int tam: tamaño)
             cantidadSepHeader += tam + 1;
-        System.out.println("-".repeat(cantidadSepHeader));
+        System.out.println("-".repeat(cantidadSepHeader+2));
         fila = "";
         // Esta parte es para escribir los valores
         for (int row=indiceInicio; row <= indiceFinal; row++){
@@ -248,6 +248,39 @@ public class DataFrame implements Cloneable {
      */
     public void tail(){
         this.tail(5);
+    }
+
+    public void info(){
+        System.out.println("<"+this.getClass()+">");
+        System.out.println("Indices: 0 hasta "+(cantidadFilas()-1));
+        System.out.println("Data de columnas (total "+cantidadColumnas()+" columnas): ");
+        
+        int espacioColName = 12;
+        for (String colname : this.etiquetas){
+            if (colname.length() > espacioColName){
+                espacioColName = colname.length() +2;
+            }
+        }
+        final int ESPACIOTITULO = 12;
+        String fila = "";
+        fila += "Columna" + " ".repeat(espacioColName - 7);
+        fila += "non-null" + " ".repeat(ESPACIOTITULO - 8);
+        fila += "DataType" + " ".repeat(ESPACIOTITULO - 7);
+        System.out.println(fila);
+        fila = "";
+        System.out.println("-".repeat(espacioColName + ESPACIOTITULO*2));
+
+        for (String colName : this.etiquetas){
+            int nonNull = getColumna(colName).length() - getColumna(colName).cantNull();
+            int espacioNum = ESPACIOTITULO - String.valueOf(nonNull).length();
+            fila += colName;
+            fila += " ".repeat(espacioColName - colName.length());
+            fila += getColumna(colName).length() - getColumna(colName).cantNull();
+            fila += " ".repeat(espacioNum);
+            fila += this.tiposColumna.get(colName);
+            System.out.println(fila);
+            fila = "";
+        }
     }
 
     /**
@@ -579,8 +612,9 @@ public class DataFrame implements Cloneable {
             for (String colName : this.etiquetas){
                 this.getColumna(colName).eliminarCelda(fila);
             }
+            return;
         }
-        throw new RuntimeException("La fila debe estar en el rango [0, n)");
+        throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
     }
 
     /**
@@ -604,12 +638,18 @@ public class DataFrame implements Cloneable {
      * @param etiqueta etiqueta de la columna a ordenar
      * @param creciente indica si la ordenamiento debe ser ascendente (true) o descendente (false)
      */
-    public void ordenar(String etiqueta, boolean creciente){
-        Map<Integer, Integer> orden = getColumna(etiqueta).ordenar(creciente);
-        
-        for (Map.Entry<String, Columna> entry : this.data.entrySet()) {
-            this.data.put(entry.getKey(), entry.getValue().ordenarPorIndice(orden));
+    public DataFrame ordenar(String etiqueta, boolean creciente){
+        if (!contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistenteException(etiqueta);
         }
+
+        Map<Integer, Integer> orden = getColumna(etiqueta).ordenar(creciente);
+        DataFrame copia = this.clone();
+        
+        for (String colName : this.etiquetas){
+            copia.data.put(colName, getColumna(colName).ordenarPorIndice(orden));
+        }
+        return copia;
     }
 
     /**
@@ -627,25 +667,10 @@ public class DataFrame implements Cloneable {
         }
 
         List<Integer> indices = this.getColumna(etiqueta).filtrar(filtro);
-        DataFrame filtrado = new DataFrame();
+        DataFrame filtrado = this.clone();
 
         for (String colName : this.etiquetas){
-            DataTypes type = this.tiposColumna.get(colName);
-            switch (tiposColumna.get(colName)) {
-                case BOOL:
-                    filtrado.addColumna(colName, (ColumnaBool) getColumna(colName).filtrarPorIndice(indices));
-                    break;
-                case INT:
-                    filtrado.addColumna(colName, (ColumnaInt) getColumna(colName).filtrarPorIndice(indices));
-                    break;
-                case DOUBLE:
-                    filtrado.addColumna(colName, (ColumnaDouble) getColumna(colName).filtrarPorIndice(indices));
-                    break;
-                default:
-                    // STRING
-                    filtrado.addColumna(colName, (ColumnaString) getColumna(colName).filtrarPorIndice(indices));
-                    break;
-            }
+            filtrado.data.put(colName, getColumna(colName).filtrarPorIndice(indices));
         }
         return filtrado;
     }
