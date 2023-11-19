@@ -1,9 +1,11 @@
 package test;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -195,8 +197,50 @@ public final class IOCSV
         return colCasteada;
     }
 
-    public static void toCSV(DataFrame data)
+    private static String getHeaderLine(DataFrame df)
     {
-        // TODO: agregar esto algun dia
+        String linea = "";
+        for(String etiqueta: df.nombreColumnas())
+        {
+            linea += etiqueta + ",";
+        }
+
+        return linea;
+    }
+
+    private static String getRowLine(DataFrame df)
+    {
+        String linea = "";
+        List<String> headers = df.nombreColumnas();
+        for(String header: headers)
+        {
+            String celda = String.valueOf(df.getCelda(header, 0));
+            if(celda.contains(","))
+                celda = "\"" + celda + "\"";
+            else if(celda.equals("null"))
+                celda = "";
+            linea += celda + ",";
+        }
+
+        return linea;
+    }
+
+    public static void toCSV(DataFrame data, String path)
+    {
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(path)))
+        {
+            bw.write(getHeaderLine(data));
+            bw.newLine();
+
+            for(int i = 0; i < data.cantidadFilas(); i++)
+            {
+                bw.write(getRowLine(data.getFila(i)));
+                bw.newLine();
+            }
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

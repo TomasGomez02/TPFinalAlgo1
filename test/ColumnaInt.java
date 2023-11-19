@@ -265,7 +265,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
             String elemento = col.getCelda(i);
             try
             {
-                if(elemento != null && !elemento.equals("") && !elemento.toLowerCase().strip().equals("na"))
+                if(elemento != null && !elemento.equals("")  && !elemento.toLowerCase().strip().equals("na"))
                 {
                     datos.add(Integer.parseInt(elemento));
                 }
