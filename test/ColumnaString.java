@@ -178,7 +178,7 @@ public class ColumnaString extends Columna<String> {
             }
         }
         return copia;
-     }
+    }
         
     public static <T> ColumnaString toColumnaString(Columna<T> col)
     {
