@@ -10,25 +10,25 @@ import utils.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ColumnaBool extends Columna<Boolean>{
+public class BooleanColumn extends Column<Boolean>{
     private List<Boolean> data;
 
-    public ColumnaBool(){
+    public BooleanColumn(){
         this.data = new ArrayList<>();
     }
 
-    public ColumnaBool(Boolean[] data){
+    public BooleanColumn(Boolean[] data){
         this();
         for (Boolean element : data) {
             this.add(element);
         }
     }
 
-    public ColumnaBool(List<Boolean> otro){
+    public BooleanColumn(List<Boolean> otro){
         this.data = new ArrayList<>(otro);
     }
 
-    public ColumnaBool(int size)
+    public BooleanColumn(int size)
     {
         this();
         for(int i = 0; i < size; i++)
@@ -39,7 +39,7 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public Boolean get(int indice) {
-        if (!contieneIndice(indice)){
+        if (!containsIndex(indice)){
             throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
         return this.data.get(indice);
@@ -47,7 +47,7 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public void set(int index, Boolean value) {
-        if (!contieneIndice(index)){
+        if (!containsIndex(index)){
             throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
         this.data.set(index, value);
@@ -55,37 +55,37 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public void add(int index, Boolean value) {
-        if (!contieneIndice(index) && index != 0){
+        if (!containsIndex(index) && index != 0){
             throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
         this.data.add(index, value);
     }
 
     @Override
-    public void add(Boolean valor) {
-        this.data.add(valor); 
+    public void add(Boolean value) {
+        this.data.add(value); 
     }
 
     @Override
-    public void eliminarCelda(int indice) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void remove(int index) {
+        if (!containsIndex(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.remove(indice);
+        this.data.remove(index);
     }
 
     @Override
-    public void borrarValorCelda(int indice) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void erase(int index) {
+        if (!containsIndex(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.set(indice, null);
+        this.data.set(index, null);
     }
 
     @Override
-    public Columna<Boolean> recortarColumna(int indiceInicio, int indiceFinal) {
-        ColumnaBool recorte = new ColumnaBool();
-        for (int i=indiceInicio; i <= indiceFinal; i++) {
+    public Column<Boolean> slice(int startIndex, int endIndex) {
+        BooleanColumn recorte = new BooleanColumn();
+        for (int i=startIndex; i <= endIndex; i++) {
             recorte.add(this.get(i));
         }
         return recorte;
@@ -97,15 +97,15 @@ public class ColumnaBool extends Columna<Boolean>{
     }
 
     @Override
-    public ColumnaBool clone(){
-        ColumnaBool copia = new ColumnaBool();
+    public BooleanColumn clone(){
+        BooleanColumn copia = new BooleanColumn();
         for (int i=0; i < this.length(); i++) {
             copia.add(this.get(i));
         }
         return copia;
     }
 
-    public int sumaAcumulada(){
+    public int sum(){
         int suma = 0;
         for (Boolean valor : data) {
             if (valor){
@@ -121,17 +121,17 @@ public class ColumnaBool extends Columna<Boolean>{
     }
 
     @Override
-    public ColumnaBool filtrarPorIndice(List<Integer> indices){
-        indices.sort(null);
-        ColumnaBool filtrada = new ColumnaBool();
-        for (Integer indice : indices) {
+    public BooleanColumn filterByIndex(List<Integer> indexes){
+        indexes.sort(null);
+        BooleanColumn filtrada = new BooleanColumn();
+        for (Integer indice : indexes) {
             filtrada.add(this.get(indice));
         }
         return filtrada;
     }
 
     @Override
-    public Map<Integer, Integer> ordenar(boolean creciente) {
+    public Map<Integer, Integer> sort(boolean ascending) {
         // Crear lista de indices para trasladar los valores
         Map<Integer, Integer> trasladar = new HashMap<>();
 
@@ -158,7 +158,7 @@ public class ColumnaBool extends Columna<Boolean>{
                     idxMinimo = j;
                 }
             }
-            if (creciente){
+            if (ascending){
                 trasladar.put(idxMinimo, i);
             }
             else{
@@ -170,7 +170,7 @@ public class ColumnaBool extends Columna<Boolean>{
         Integer distanciaDesdeUltimo = 0;
         for (int i=0; i < this.length(); i++){
             if (this.get(i) == null){
-                if (creciente){
+                if (ascending){
                     trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
                 }
                 else{
@@ -182,36 +182,36 @@ public class ColumnaBool extends Columna<Boolean>{
         return trasladar;
     }
     @Override
-    public ColumnaBool ordenarPorIndice(Map<Integer, Integer> orden){
-        ColumnaBool copia = this.clone();
+    public BooleanColumn sortByIndex(Map<Integer, Integer> order){
+        BooleanColumn copia = this.clone();
         for (int i=0; i < copia.length(); i++){
-            Integer newIdx = orden.get(i);
+            Integer newIdx = order.get(i);
             copia.set(newIdx, get(i));
         }
         return copia;
     }
 
-    public static ColumnaBool toBoolColumn(Columna col) throws CasteoIlegalException
+    public static BooleanColumn toBooleanColumn(Column col) throws CasteoIlegalException
     {
-        return toBoolColumn(col, false);
+        return toBooleanColumn(col, false);
     }
 
-    public static ColumnaBool toBoolColumn(Columna col, boolean forzar) throws CasteoIlegalException
+    public static BooleanColumn toBooleanColumn(Column col, boolean force) throws CasteoIlegalException
     {
         switch (col.getColumnType()) 
         {
             case DOUBLE:
-                return fromColumnaDouble(col, forzar);
+                return fromDoubleColumn(col, force);
             case INT:
-                return fromColumnaInt(col, forzar);
+                return fromIntegerColumn(col, force);
             case STRING:
-                return fromColumnaString(col, forzar);
+                return fromStringColumn(col, force);
             default:
-                return (ColumnaBool) col.clone();
+                return (BooleanColumn) col.clone();
         }
     }
 
-    private static ColumnaBool fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
+    private static BooleanColumn fromStringColumn (Column<String> col, boolean force) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -231,17 +231,17 @@ public class ColumnaBool extends Columna<Boolean>{
             }
             catch(NumberFormatException e)
             {
-                if(!forzar)
+                if(!force)
                     throw new CasteoIlegalException(col.get(i), String.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }
         }
 
-        return new ColumnaBool(datos);
+        return new BooleanColumn(datos);
     }
 
-    private static ColumnaBool fromColumnaInt(Columna<Integer> col, boolean forzar) throws CasteoIlegalException
+    private static BooleanColumn fromIntegerColumn(Column<Integer> col, boolean force) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -261,17 +261,17 @@ public class ColumnaBool extends Columna<Boolean>{
             }
             catch(CasteoIlegalException e)
             {
-                if(!forzar)
+                if(!force)
                     throw new CasteoIlegalException(col.get(i).toString(), Integer.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }
         }
 
-        return new ColumnaBool(datos);
+        return new BooleanColumn(datos);
     }
 
-    private static ColumnaBool fromColumnaDouble(Columna<Double> col, boolean forzar) throws CasteoIlegalException
+    private static BooleanColumn fromDoubleColumn(Column<Double> col, boolean force) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -291,32 +291,32 @@ public class ColumnaBool extends Columna<Boolean>{
             }
             catch(CasteoIlegalException e)
             {
-                if(!forzar)
+                if(!force )
                     throw new CasteoIlegalException(col.get(i).toString(), Double.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }
         }
 
-        return new ColumnaBool(datos);
+        return new BooleanColumn(datos);
     }
 
     @Override
-    public ColumnaBool transformar(UnaryOperator<Boolean> transformacion) {
-        ColumnaBool copia = new ColumnaBool();
+    public BooleanColumn transform(UnaryOperator<Boolean> transformer) {
+        BooleanColumn copia = new BooleanColumn();
         for (int i=0; i < length(); i++){
             if (get(i) != null){
-                copia.add(transformacion.apply(get(i)));
+                copia.add(transformer.apply(get(i)));
             }
         }
         return copia;
     }
     @Override
-    public Columna<Boolean> unique() {
-        ColumnaBool unica = new ColumnaBool();
+    public Column<Boolean> unique() {
+        BooleanColumn unica = new BooleanColumn();
         for(Boolean e: data)
         {
-            if(!unica.contiene(e))
+            if(!unica.contains(e))
                 unica.add(e);
         }
         return unica;

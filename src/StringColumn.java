@@ -6,25 +6,25 @@ import java.util.function.UnaryOperator;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ColumnaString extends Columna<String> {
+public class StringColumn extends Column<String> {
     private List<String> data;
     
-    public ColumnaString(){
+    public StringColumn(){
         this.data = new ArrayList<>();
     }
 
-    public ColumnaString(List<String> datos){
+    public StringColumn(List<String> datos){
         this.data = new ArrayList<>(datos);
     }
 
-    public ColumnaString(String[] datos){
+    public StringColumn(String[] datos){
         this();
         for (String elemento : datos) {
             this.add(elemento);
         }
     }
 
-    public ColumnaString(int size)
+    public StringColumn(int size)
     {
         this();
         for(int i = 0; i < size; i++)
@@ -35,7 +35,7 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public String get(int indice) {
-        if (!contieneIndice(indice)){
+        if (!containsIndex(indice)){
             throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
         return this.data.get(indice);
@@ -43,7 +43,7 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void set(int index, String value) {
-        if (!contieneIndice(index)){
+        if (!containsIndex(index)){
             throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
         this.data.set(index, value);
@@ -51,37 +51,37 @@ public class ColumnaString extends Columna<String> {
 
     @Override
     public void add(int index, String value) {
-        if (!contieneIndice(index)){    
+        if (!containsIndex(index)){    
             throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
         this.data.add(index, value);
     }
 
     @Override
-    public void add(String valor) {
-        this.data.add(valor);
+    public void add(String value) {
+        this.data.add(value);
     }
 
     @Override
-    public void eliminarCelda(int indice) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void remove(int index) {
+        if (!containsIndex(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.remove(indice);
+        this.data.remove(index);
     }
 
     @Override
-    public void borrarValorCelda(int indice) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void erase(int index) {
+        if (!containsIndex(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.set(indice, null);
+        this.set(index, null);
     }
 
     @Override
-    public ColumnaString recortarColumna(int indiceInicio, int indiceFinal) {
-        ColumnaString recorte = new ColumnaString();
-        for (int i=indiceInicio; i <= indiceFinal; i++) {
+    public StringColumn slice(int startIndex, int endIndex) {
+        StringColumn recorte = new StringColumn();
+        for (int i=startIndex; i <= endIndex; i++) {
             recorte.add(this.get(i));
         }
         return recorte;
@@ -93,8 +93,8 @@ public class ColumnaString extends Columna<String> {
     }
     
     @Override
-    public ColumnaString clone(){
-        ColumnaString copia = new ColumnaString();
+    public StringColumn clone(){
+        StringColumn copia = new StringColumn();
         for (int i=0; i < this.length(); i++){
             copia.add(this.get(i));
         }
@@ -107,17 +107,17 @@ public class ColumnaString extends Columna<String> {
     }
     
     @Override
-    public ColumnaString filtrarPorIndice(List<Integer> indices) {
-        indices.sort(null);
-        ColumnaString filtrada = new ColumnaString();
-        for (Integer indice : indices) {
+    public StringColumn filterByIndex(List<Integer> indexes) {
+        indexes.sort(null);
+        StringColumn filtrada = new StringColumn();
+        for (Integer indice : indexes) {
             filtrada.add(this.get(indice));
         }
         return filtrada;
     }
 
     @Override
-    public Map<Integer, Integer> ordenar(boolean creciente) {
+    public Map<Integer, Integer> sort(boolean ascending) {
         // Crear lista de indices para trasladar los valores
         Map<Integer, Integer> trasladar = new HashMap<>();
 
@@ -144,7 +144,7 @@ public class ColumnaString extends Columna<String> {
                     idxMinimo = j;
                 }
             }
-            if (creciente){
+            if (ascending){
                 trasladar.put(idxMinimo, i);
             }
             else{
@@ -156,7 +156,7 @@ public class ColumnaString extends Columna<String> {
         Integer distanciaDesdeUltimo = 0;
         for (int i=0; i < this.length(); i++){
             if (this.get(i) == null){
-                if (creciente){
+                if (ascending){
                     trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
                 }
                 else{
@@ -169,31 +169,31 @@ public class ColumnaString extends Columna<String> {
     }
 
     @Override
-    public ColumnaString ordenarPorIndice(Map<Integer, Integer> orden){
-        ColumnaString copia = this.clone();
+    public StringColumn sortByIndex(Map<Integer, Integer> order){
+        StringColumn copia = this.clone();
 
         for (int i=0; i < copia.length(); i++){
-            Integer newIdx = orden.get(i);
+            Integer newIdx = order.get(i);
             copia.set(newIdx, get(i));
         }
         return copia;
     }
 
     @Override
-    public ColumnaString transformar(UnaryOperator<String> transformacion) {
-        ColumnaString copia = new ColumnaString();
+    public StringColumn transform(UnaryOperator<String> transformer) {
+        StringColumn copia = new StringColumn();
         for (int i=0; i < length(); i++){
             if (get(i) != null){
-                copia.add(transformacion.apply(get(i)));
+                copia.add(transformer.apply(get(i)));
             }
         }
         return copia;
     }
         
-    public static <T> ColumnaString toColumnaString(Columna<T> col)
+    public static <T> StringColumn toStringColumn(Column<T> col)
     {
-        if(col instanceof ColumnaString)
-            return (ColumnaString) col;
+        if(col instanceof StringColumn)
+            return (StringColumn) col;
         
         List<String> datos = new ArrayList<>();
 
@@ -210,15 +210,15 @@ public class ColumnaString extends Columna<String> {
             }
         }
 
-        return new ColumnaString(datos);
+        return new StringColumn(datos);
     }
 
     @Override
-    public Columna<String> unique() {
-        ColumnaString unica = new ColumnaString();
+    public Column<String> unique() {
+        StringColumn unica = new StringColumn();
         for(String e: data)
         {
-            if(!unica.contiene(e))
+            if(!unica.contains(e))
                 unica.add(e);
         }
         return unica;

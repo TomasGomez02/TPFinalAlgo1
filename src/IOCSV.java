@@ -84,7 +84,7 @@ public final class IOCSV
         Map<String, DataType> tiposEtiqueta = new LinkedHashMap<>();
         String[] header;
         @SuppressWarnings("rawtypes")
-        Map<String, Columna> columnas = new LinkedHashMap<>();
+        Map<String, Column> columnas = new LinkedHashMap<>();
 
         
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -153,11 +153,11 @@ public final class IOCSV
      * @throws Exception si ocurre un error al crear las columnas
      */
     @SuppressWarnings("rawtypes")
-    private static Map<String, Columna> crearColumnas(String[] headers) throws Exception {
-        Map<String, Columna> columnas = new LinkedHashMap<>();
+    private static Map<String, Column> crearColumnas(String[] headers) throws Exception {
+        Map<String, Column> columnas = new LinkedHashMap<>();
 
         for (int i=0; i < headers.length; i++){
-                columnas.put(headers[i], new ColumnaString());
+                columnas.put(headers[i], new StringColumn());
         }
         return columnas;
     }
@@ -218,13 +218,13 @@ public final class IOCSV
      * @param datatypes array con los tipos de datos a los que se deben convertir las columnas.
      * @return nuevo DataFrame con las columnas modificadas según los tipos de datos proporcionados
      */
-    private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta, DataType[] datatypes)
+    private static DataFrame crearDataFrame(Map<String, Column> columnas, Map<String, DataType> tiposEtiqueta, DataType[] datatypes)
     {
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
 
         for(int i = 0; i < keys.size(); i++)
         {
-            Columna col = columnas.get(keys.get(i));
+            Column col = columnas.get(keys.get(i));
             columnas.put(keys.get(i), castearColumna(col, datatypes[i]));
             tiposEtiqueta.put(keys.get(i), datatypes[i]);
         }
@@ -239,15 +239,15 @@ public final class IOCSV
      * @param dataType tipo dato al cual se va a convertir la columna
      * @return columna convertida al tipo de dato especificado
      */
-    private static Columna castearColumna(Columna col, DataType dataType)
+    private static Column castearColumna(Column col, DataType dataType)
     {
         switch (dataType) {
             case INT:
-                return ColumnaInt.toColumnaInt(col, true);
+                return IntegerColumn.toIntegerColumn(col, true);
             case DOUBLE:
-                return ColumnaDouble.toDoubleColumn(col, true);
+                return DoubleColumn.toDoubleColumn(col, true);
             case BOOL:
-                return ColumnaBool.toBoolColumn(col, true);
+                return BooleanColumn.toBooleanColumn(col, true);
             default:
                 return col;
         }
@@ -260,11 +260,11 @@ public final class IOCSV
      * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
      * @return Dataframe con las columnas ajustadas 
      */
-    private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta){
+    private static DataFrame autogenerarDataFrame(Map<String, Column> columnas, Map<String, DataType> tiposEtiqueta){
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
 
         for(int i = 0; i < keys.size(); i++){
-            Columna col = columnas.get(keys.get(i));
+            Column col = columnas.get(keys.get(i));
             columnas.put(keys.get(i), autodetectarColumna(col, tiposEtiqueta, i));
         }
         return new DataFrame(columnas, tiposEtiqueta);
@@ -278,7 +278,7 @@ public final class IOCSV
      * @param index indice de la columna
      * @return nueva columna ajustada segun el tipo de datos detectado
      */
-    private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index){
+    private static Column autodetectarColumna(Column col, Map<String, DataType> tiposEtiqueta, int index){
         return autodetectarColumna(col, tiposEtiqueta, index, 0);
     }
 
@@ -291,23 +291,23 @@ public final class IOCSV
      * @param count contador utilizado para realizar diferentes castings
      * @return nueva columna ajustada segun el tipo de datos detectado
      */
-    private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index, int count)
+    private static Column autodetectarColumna(Column col, Map<String, DataType> tiposEtiqueta, int index, int count)
     {
-        Columna colCasteada;
+        Column colCasteada;
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
         try
         {
             switch (count) {
                 case 0:
-                    colCasteada = ColumnaBool.toBoolColumn(col);
+                    colCasteada = BooleanColumn.toBooleanColumn(col);
                     tiposEtiqueta.put(keys.get(index), DataType.BOOL);
                     break;
                 case 1:
-                    colCasteada = ColumnaInt.toColumnaInt(col);
+                    colCasteada = IntegerColumn.toIntegerColumn(col);
                     tiposEtiqueta.put(keys.get(index), DataType.INT);
                     break;
                 case 2:
-                    colCasteada = ColumnaDouble.toDoubleColumn(col);
+                    colCasteada = DoubleColumn.toDoubleColumn(col);
                     tiposEtiqueta.put(keys.get(index), DataType.DOUBLE);
                     break;
                 default:

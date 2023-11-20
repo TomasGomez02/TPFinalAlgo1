@@ -1,49 +1,49 @@
 package src;
 
-public abstract class ColumnaNum<T extends Number> extends Columna<T> {
+public abstract class NumberColumn<T extends Number> extends Column<T> {
 
     /**
      * Calcula y devuelve la media de los elementos de la columna.
      * 
      * @return la media de los elementos de la columna 
      */
-    public abstract Double media();
+    public abstract Double mean();
 
     /**
      * Calcula y devuelve la mediana de los elementos de la columna.
      * 
      * @return la mediana de los elementos de la columna 
      */
-    public abstract Double mediana();
+    public abstract Double median();
 
     /**
      * Busca y devuelve el valor maximo de la columna.
      * 
      * @return el valor maximo de la columna
      */
-    public abstract Number maximo();
+    public abstract Number max();
 
     /**
      * Busca y devuelve el valor minimo de la columna.
      * 
      * @return el valor minimo de la columna
      */
-    public abstract Number minimo();
+    public abstract Number min();
 
     /**
      * Calcula y devuelve el desvio estandar de los elementos de la columna.
      * 
      * @return el desvio estandar de los elementos de la columna
      */
-    public abstract Double desvioEstandar();
+    public abstract Double std();
 
     /**
      * Calcula y devuelve la suma acumulada de los elementos de la columna.
      * 
      * @return la suma acumulada de los elementos de la columna
      */
-    public abstract Number sumaAcumulada();
+    public abstract Number sum();
 
     @Override
-    public abstract ColumnaNum<T> clone();
+    public abstract NumberColumn<T> clone();
 }

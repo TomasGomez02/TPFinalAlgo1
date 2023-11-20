@@ -11,33 +11,33 @@ import utils.DataType;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ColumnaInt extends ColumnaNum<Integer> {
+public class IntegerColumn extends NumberColumn<Integer> {
         
     private List<Integer> data;
 
-    public ColumnaInt() {
+    public IntegerColumn() {
         this.data = new ArrayList<>();
     }
 
-    public ColumnaInt(List<Integer> data) {
+    public IntegerColumn(List<Integer> data) {
         this.data = data;
     }
 
-    public ColumnaInt(Integer[] data){
+    public IntegerColumn(Integer[] data){
         this();
         for (Integer num : data) {
             this.add(num);
         }
     }
 
-    public ColumnaInt(int[] data){
+    public IntegerColumn(int[] data){
         this();
         for (int elem : data) {
             this.add(elem);
         }
     }
 
-    public ColumnaInt(int size)
+    public IntegerColumn(int size)
     {
         this();
         for(int i = 0; i < size; i++)
@@ -47,19 +47,19 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public Double media() {
+    public Double mean() {
         Double suma = 0.0;
         for (int i=0; i<data.size(); i++) {
             if(data.get(i) != null)
                 suma += data.get(i);
         }
-        return suma / (data.size() - cantNull());
+        return suma / (data.size() - nNull());
     }
 
     @Override
-    public Double mediana() {
-        ColumnaInt copia = this.clone();
-        copia.ordenarPorIndice(copia.ordenar(true));
+    public Double median() {
+        IntegerColumn copia = this.clone();
+        copia.sortByIndex(copia.sort(true));
         
         Double mediana;
         if (length() % 2 == 0){
@@ -74,7 +74,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public Integer maximo() {
+    public Integer max() {
         int max = data.get(0);
         for (int i=1; i<data.size(); i++) {
             if (data.get(i) != null && data.get(i) > max) {
@@ -85,7 +85,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public Integer minimo() {
+    public Integer min() {
         int min = data.get(0);
         for (int i=1; i<data.size(); i++) {
             if (get(i) != null && get(i) < min) {
@@ -96,21 +96,21 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public Double desvioEstandar() {
+    public Double std() {
         Double suma = 0.0;
-        Double media = this.media();
+        Double media = this.mean();
         for (int i=0; i<data.size(); i++) {
             Integer elem = get(i);
             if (elem != null){
                 suma = suma + ((media - elem) * (media - elem));
             }
         }
-        Double desvio = suma / (length() - cantNull());
+        Double desvio = suma / (length() - nNull());
         return Math.sqrt(desvio);
     }
 
     @Override
-    public Integer sumaAcumulada() {
+    public Integer sum() {
         int suma = 0;
         for (Integer valor : data) {
             suma += valor;
@@ -120,7 +120,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
 
     @Override
     public Integer get(int indice) {
-        if (!contieneIndice(indice)){
+        if (!containsIndex(indice)){
             throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
         return this.data.get(indice); 
@@ -128,7 +128,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
 
     @Override
     public void set(int index, Integer value) {
-        if (!contieneIndice(index)){
+        if (!containsIndex(index)){
             throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
         this.data.set(index, value);
@@ -136,37 +136,37 @@ public class ColumnaInt extends ColumnaNum<Integer> {
 
     @Override
     public void add(int index, Integer value) {
-        if (!contieneIndice(index) && index != 0){
+        if (!containsIndex(index) && index != 0){
             this.data.add(index, value);
         }
         throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
     }
 
     @Override
-    public void add(Integer valor) {
-        this.data.add(valor);
+    public void add(Integer value) {
+        this.data.add(value);
     }
 
     @Override
-    public void eliminarCelda(int indice) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void remove(int index) {
+        if (!containsIndex(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.remove(indice);
+        this.data.remove(index);
     }
 
     @Override
-    public void borrarValorCelda(int indice) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void erase(int index) {
+        if (!containsIndex(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.set(indice, null);
+        this.data.set(index, null);
     }
 
     @Override
-    public Columna<Integer> recortarColumna(int indiceInicio, int indiceFinal) {
-        ColumnaInt recorte = new ColumnaInt();
-        for (int i=indiceInicio; i <= indiceFinal; i++) {
+    public Column<Integer> slice(int startIndex, int endIndex) {
+        IntegerColumn recorte = new IntegerColumn();
+        for (int i=startIndex; i <= endIndex; i++) {
             recorte.add(this.get(i));
         }
         return recorte;
@@ -178,17 +178,17 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public ColumnaInt filtrarPorIndice(List<Integer> indices) {
-        indices.sort(null);
-        ColumnaInt filtrada = new ColumnaInt();
-        for (Integer indice : indices) {
+    public IntegerColumn filterByIndex(List<Integer> indexes) {
+        indexes.sort(null);
+        IntegerColumn filtrada = new IntegerColumn();
+        for (Integer indice : indexes) {
             filtrada.add(this.get(indice));
         }
         return filtrada;
     }
 
-    public ColumnaInt clone(){
-        ColumnaInt copia = new ColumnaInt();
+    public IntegerColumn clone(){
+        IntegerColumn copia = new IntegerColumn();
         for (Integer num : data) {
             copia.add(num);
         }
@@ -201,7 +201,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public Map<Integer, Integer> ordenar(boolean creciente) {
+    public Map<Integer, Integer> sort(boolean ascending) {
         // Crear lista de indices para trasladar los valores
         Map<Integer, Integer> trasladar = new HashMap<>();
 
@@ -228,7 +228,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
                     idxMinimo = j;
                 }
             }
-            if (creciente){
+            if (ascending){
                 trasladar.put(idxMinimo, i);
             }
             else{
@@ -240,7 +240,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         Integer distanciaDesdeUltimo = 0;
         for (int i=0; i < this.length(); i++){
             if (this.get(i) == null){
-                if (creciente){
+                if (ascending){
                     trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
                 }
                 else{
@@ -253,37 +253,37 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public ColumnaInt ordenarPorIndice(Map<Integer, Integer> orden){
-        ColumnaInt copia = this.clone();
+    public IntegerColumn sortByIndex(Map<Integer, Integer> order){
+        IntegerColumn copia = this.clone();
 
         for (int i=0; i < copia.length(); i++){
-            Integer newIdx = orden.get(i);
+            Integer newIdx = order.get(i);
             copia.set(newIdx, get(i));
         }
         return copia;
     }
 
-    public static ColumnaInt toColumnaInt(Columna col) throws CasteoIlegalException
+    public static IntegerColumn toIntegerColumn(Column col) throws CasteoIlegalException
     {
-        return toColumnaInt(col, false);
+        return toIntegerColumn(col, false);
     }
 
-    public static ColumnaInt toColumnaInt(Columna col, boolean forzar) throws CasteoIlegalException
+    public static IntegerColumn toIntegerColumn(Column col, boolean force) throws CasteoIlegalException
     {
         switch (col.getColumnType()) 
         {
             case BOOL:
-                return fromColumnaBool(col);
+                return fromBooleanColumn(col);
             case DOUBLE:
-                return fromColumnaDouble(col);
+                return fromDoubleColumn(col);
             case STRING:
-                return fromColumnaString(col, forzar);
+                return fromStringColumn(col, force);
             default:
-                return (ColumnaInt) col.clone();
+                return (IntegerColumn) col.clone();
         }
     }
 
-    private static ColumnaInt fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
+    private static IntegerColumn fromStringColumn (Column<String> col, boolean force) throws CasteoIlegalException
     {
         List<Integer> datos = new ArrayList<>();
         
@@ -303,17 +303,17 @@ public class ColumnaInt extends ColumnaNum<Integer> {
             }
             catch(NumberFormatException e)
             {
-                if(!forzar)
+                if(!force)
                     throw new CasteoIlegalException(elemento, String.class.toString(), Integer.class.toString());
                 else
                     datos.add(null);
             }
         }
 
-        return new ColumnaInt(datos);
+        return new IntegerColumn(datos);
     }
 
-    private static ColumnaInt fromColumnaDouble(Columna<Double> col)
+    private static IntegerColumn fromDoubleColumn(Column<Double> col)
     {
         List<Integer> datos = new ArrayList<>();
         
@@ -330,10 +330,10 @@ public class ColumnaInt extends ColumnaNum<Integer> {
             }
         }
 
-        return new ColumnaInt(datos);
+        return new IntegerColumn(datos);
     }
 
-    private static ColumnaInt fromColumnaBool(Columna<Boolean> col)
+    private static IntegerColumn fromBooleanColumn(Column<Boolean> col)
     {
         List<Integer> datos = new ArrayList<>();
         
@@ -350,26 +350,26 @@ public class ColumnaInt extends ColumnaNum<Integer> {
             }
         }
 
-        return new ColumnaInt(datos);
+        return new IntegerColumn(datos);
     }
 
     @Override
-    public ColumnaInt transformar(UnaryOperator<Integer> transformacion) {
-        ColumnaInt copia = new ColumnaInt();
+    public IntegerColumn transform(UnaryOperator<Integer> transformer) {
+        IntegerColumn copia = new IntegerColumn();
         for (int i=0; i < length(); i++){
             if (get(i) != null){
-                copia.add(transformacion.apply(get(i)));
+                copia.add(transformer.apply(get(i)));
             }
         }
         return copia;
     }
 
     @Override
-    public Columna<Integer> unique() {
-        ColumnaInt unica = new ColumnaInt();
+    public Column<Integer> unique() {
+        IntegerColumn unica = new IntegerColumn();
         for(Integer e: data)
         {
-            if(!unica.contiene(e))
+            if(!unica.contains(e))
                 unica.add(e);
         }
         return unica;

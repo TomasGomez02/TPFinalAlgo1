@@ -9,7 +9,7 @@ import utils.DataType;
 
 import java.util.function.Predicate;
 
-public abstract class Columna<T> implements Cloneable {
+public abstract class Column<T> implements Cloneable {
     /**
      * Obtiene el valor que se encuentra en la celda indicada.
      * 
@@ -37,51 +37,51 @@ public abstract class Columna<T> implements Cloneable {
     /**
      * Añade el valor especificado al final de la columna.
      * 
-     * @param valor valor a insertar
+     * @param value valor a insertar
      */
-    public abstract void add(T valor);
+    public abstract void add(T value);
     /**
      * Verifica si el indice esta dentro del rango de la Columna.
      * 
-     * @param indice indice a verificar
+     * @param index indice a verificar
      * @return verdadero si el indice se encuentra en el rango
      */
-    public boolean contieneIndice(int indice){
-        return 0 <= indice && indice <= length()-1;
+    public boolean containsIndex(int index){
+        return 0 <= index && index <= length()-1;
     }
     /**
      * Elimina el elemento encontrado en la posicion indicada.
      * Desplaza cualquier elemento posterior hacia la izquierda (resta uno de sus indices).
      * 
-     * @param indice indice del elemento a eliminar
+     * @param index indice del elemento a eliminar
      */
-    public abstract void eliminarCelda(int indice);
+    public abstract void remove(int index);
     /**
      * Elimina el valor de la celda indicada. La celda pasa a tener valor nulo.
      * 
-     * @param indice indice de la celda a vaciar 
+     * @param index indice de la celda a vaciar 
      */
-    public abstract void borrarValorCelda(int indice);
+    public abstract void erase(int index);
 
     /**
      * Toma la columna desde un indice inicial hasta un indice final especificado y devuelve una sub Columna formada por estas celdas.
      * 
-     * @param indiceInicio indice donde se comienza a recortar (primer elemento de la sub Columna)
-     * @param indiceFinal indice hasta el cual se recorta (ultimo elemento de la sub Columna)
+     * @param startIndex indice donde se comienza a recortar (primer elemento de la sub Columna)
+     * @param endIndex indice hasta el cual se recorta (ultimo elemento de la sub Columna)
      * @return Columna recortada
      */
 
-    public abstract Columna<T> recortarColumna(int indiceInicio, int indiceFinal);
+    public abstract Column<T> slice(int startIndex, int endIndex);
 
     /**
      * Concatena los elementos de la columna especificada a la columna actual.
      * 
-     * @param otraColumna columna de tipo Columna que se va a concatenar a la columna actual 
+     * @param other columna de tipo Columna que se va a concatenar a la columna actual 
      */
     
-    public void concatenarColumna(Columna<T> otraColumna){
-        for (int i=0; i < otraColumna.length(); i++){
-            this.add(otraColumna.get(i));
+    public void concat(Column<T> other){
+        for (int i=0; i < other.length(); i++){
+            this.add(other.get(i));
         }
     }
 
@@ -95,16 +95,16 @@ public abstract class Columna<T> implements Cloneable {
     /**
      * Ordena la columna de manera ascendente o descendente segun lo indicado y devuelve un mapa que asocia los indices originales con los nuevos indices despues del ordenamiento.
      * 
-     * @param creciente indica si la ordenamiento debe ser ascendente (true) o descendente (false)
+     * @param ascending indica si la ordenamiento debe ser ascendente (true) o descendente (false)
      * @return mapa que asocia los indices originales con los nuevos indices obtenidos despues del ordenamiento 
      */
-    public abstract Map<Integer, Integer> ordenar(boolean creciente);
+    public abstract Map<Integer, Integer> sort(boolean ascending);
 
     /**
      * Devuelve la cantidad de nulos en la columna
      * @return cantidad de nulos
      */
-    public int cantNull(){
+    public int nNull(){
         int count = 0;
         for (int i=0; i < length(); i++){
             if (get(i) == null){
@@ -117,13 +117,13 @@ public abstract class Columna<T> implements Cloneable {
     /**
      * Filtra los elementos de la columna segun el predicado proporcionado y devuelve una lista de los indices de los elementos que cumplen con el criterio de filtrado.
      * 
-     * @param filtro predicado que define el criterio de filtrado
+     * @param filter predicado que define el criterio de filtrado
      * @return lista de los indices de los elementos que cumplen con el criterio de filtrado
      */
-    public List<Integer> filtrar(Predicate<T> filtro){
+    public List<Integer> filter(Predicate<T> filter){
         List<Integer> indices = new ArrayList<>();
         for (int i=0; i < this.length(); i++){
-            if (this.get(i) != null && filtro.test(this.get(i))){
+            if (this.get(i) != null && filter.test(this.get(i))){
                 indices.add(i);
             }
         }
@@ -133,41 +133,41 @@ public abstract class Columna<T> implements Cloneable {
      /**
      * Reorganiza los elementos de la columna segun un mapa de orden que contiene los indices originales.  
      *  
-     * @param orden mapa que contiene como claves los indices originales y como valores los nuevos indices obtenidos despues del ordenamiento 
+     * @param order mapa que contiene como claves los indices originales y como valores los nuevos indices obtenidos despues del ordenamiento 
      */
-    public abstract Columna<T> ordenarPorIndice(Map<Integer, Integer> orden);
+    public abstract Column<T> sortByIndex(Map<Integer, Integer> order);
 
     /**
      * Toma los elementos correspondientes a los indices de la lista indices y crea una nueva columna con estos elementos.
      * 
-     * @param indices lista de indices que especifica que elementos se incluiran en la nueva columna
+     * @param indexes lista de indices que especifica que elementos se incluiran en la nueva columna
      * @return nueva columna con los elementos correspondientes a los indices proporcionados
      */
-    public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
+    public abstract Column<T> filterByIndex(List<Integer> indexes);
 
     /**
      * Aplica una transformacion a cada elemento no nulo de la columna utilizando el operador proporcionado.
      * 
-     * @param transformacion operador que define la transformacion a aplicar a cada elemento no nulo de la columna
+     * @param transformer operador que define la transformacion a aplicar a cada elemento no nulo de la columna
      */
-    public abstract Columna<T> transformar(UnaryOperator<T> transformacion);
+    public abstract Column<T> transform(UnaryOperator<T> transformer);
 
     /**
      * Crea y devuelve una copia profunda de la columna actual, incluyendo todos sus elementos
      */
-    public abstract Columna<T> clone();
+    public abstract Column<T> clone();
 
     public DataType getColumnType()
     {
-        if(this instanceof ColumnaInt)
+        if(this instanceof IntegerColumn)
         {
             return DataType.INT;
         }
-        else if(this instanceof ColumnaBool)
+        else if(this instanceof BooleanColumn)
         {
             return DataType.BOOL;
         }
-        else if(this instanceof ColumnaDouble)
+        else if(this instanceof DoubleColumn)
         {
             return DataType.DOUBLE;
         }
@@ -175,17 +175,17 @@ public abstract class Columna<T> implements Cloneable {
         return DataType.STRING;
     }
 
-    public abstract Columna<T> unique();
+    public abstract Column<T> unique();
 
-    public boolean contiene(T elemento)
+    public boolean contains(T element)
     {
-        if(elemento == null)
+        if(element == null)
         {
-            return (cantNull() > 0);
+            return (nNull() > 0);
         }
 
         for(int i = 0; i < length(); i++)
-            if(elemento.equals(get(i)))
+            if(element.equals(get(i)))
                 return true;
 
         return false;
