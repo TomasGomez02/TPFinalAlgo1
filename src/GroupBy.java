@@ -22,8 +22,6 @@ public class GroupBy implements Cloneable
     public GroupBy(DataFrame df, List<String> colAgrupadas)
     {
         this.data = df.clone();
-
-        
         this.colAgrupadas = new LinkedHashMap<>();
         
         colNoAgrupadas = this.data.nombreColumnas();
@@ -33,7 +31,6 @@ public class GroupBy implements Cloneable
             colNoAgrupadas.remove(col);
         }
         colAgregadas = new ArrayList<>();
-
         grupos = generarGrupos();
     }
 
@@ -65,6 +62,10 @@ public class GroupBy implements Cloneable
         return new ArrayList<>(colAgrupadas.keySet());
     }
 
+    /**
+     * 
+     * @return
+     */
     private Map<String, List<Integer>> generarGrupos()
     {
         valorGrupos = new ArrayList<>();
@@ -82,7 +83,13 @@ public class GroupBy implements Cloneable
         return grupos;
     }
 
-    private List<Integer> generarIndicesGrupo(String grupo)
+    /**
+     * 
+     * 
+     * @param grupo cadena con los valores del grupo separados por coma
+     * @return
+     */
+    private List<Integer> generarIndicesGrupo(String grupo) 
     {
         List<Integer> indices = new ArrayList<>();
 
@@ -93,7 +100,6 @@ public class GroupBy implements Cloneable
                 indices.add(i);
             }
         }
-
         return indices;
     }
 
@@ -244,6 +250,9 @@ public class GroupBy implements Cloneable
         return linea;
     }
 
+    /**
+     * Imprime en la consola una representacion de cadena del objeto actual utilizando el metodo toString().
+     */
     public void print()
     {
         System.out.println(toString());
@@ -285,6 +294,11 @@ public class GroupBy implements Cloneable
         return out;
     }
 
+    /**
+     * Crea y devuelve el DataFrame con las nuevas columnas para las operaciones de agrupacion.  
+     * 
+     * @return Dataframe original sumando las columnas que fueron resultado de la agrupacion 
+     */
     public DataFrame unGroup()
     {
         return data.clone();
@@ -340,6 +354,12 @@ public class GroupBy implements Cloneable
         return colOperada;
     }
 
+    /**
+     * Calcula y devuelve la media para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param etiqueta columna para la cual se calcula la media
+     * @return         nuevo objeto GroupBy que incluye la media calculada para cada grupo como una columna adicional
+     */
     public GroupBy media(String etiqueta)
     {
         Function<ColumnaNum, Double> op = (col) -> (col.media());
@@ -349,9 +369,15 @@ public class GroupBy implements Cloneable
         String nuevaCol = "Media: " + etiqueta;
         gb.data = gb.data.addColumna(nuevaCol, col);
         gb.colAgregadas.add(nuevaCol);
-        return gb;
+        return gb; 
     }
 
+    /**
+     * Calcula y devuelve la mediana para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param etiqueta columna para la cual se calcula la mediana
+     * @return         nuevo objeto GroupBy que incluye la mediana calculada para cada grupo como una columna adicional
+     */
     public GroupBy mediana(String etiqueta)
     {
         Function<ColumnaNum, Double> op = (col) -> (col.mediana());
@@ -363,7 +389,13 @@ public class GroupBy implements Cloneable
         gb.colAgregadas.add(nuevaCol);
         return gb;
     }
-
+    
+    /**
+     * Obtiene y devuelve el valor maximo para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param etiqueta columna para la cual se obtiene el valor maximo
+     * @return         nuevo objeto GroupBy que incluye el valor maximo obtenido para cada grupo como una columna adicional
+     */
     public GroupBy maximo(String etiqueta)
     {
         Function<ColumnaNum, Number> op = (col) -> (col.maximo());
@@ -376,6 +408,12 @@ public class GroupBy implements Cloneable
         return gb;
     }
 
+    /**
+     * Obtiene y devuelve el valor minimo para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param etiqueta columna para la cual se obtiene el valor minimo
+     * @return         nuevo objeto GroupBy que incluye el valor minimo obtenido para cada grupo como una columna adicional
+     */
     public GroupBy minimo(String etiqueta)
     {
         Function<ColumnaNum, Number> op = (col) -> (col.minimo());
@@ -388,6 +426,12 @@ public class GroupBy implements Cloneable
         return gb;
     }
 
+    /**
+     * Calcula y devuelve el desvio estandar para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param etiqueta columna para la cual se calcula el desvio estandar
+     * @return         nuevo objeto GroupBy que incluye el desvio estandar calculado para cada grupo como una columna adicional
+     */
     public GroupBy desvioEstandar(String etiqueta)
     {
         Function<ColumnaNum, Double> op = (col) -> (col.desvioEstandar());
@@ -400,6 +444,12 @@ public class GroupBy implements Cloneable
         return gb;
     }
 
+    /**
+     * Calcula y devuelve la suma acumulada para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param etiqueta columna para la cual se calcula la suma acumulada
+     * @return         nuevo objeto GroupBy que incluye la suma acumulada calculada para cada grupo como una columna adicional
+     */
     public GroupBy sumaAcumulada(String etiqueta)
     {
         Function<ColumnaNum, Number> op = (col) -> (col.sumaAcumulada());
@@ -412,6 +462,11 @@ public class GroupBy implements Cloneable
         return gb;
     }
 
+    /**
+     * Devuelve la cantidad de elementos que contiene cada grupo.
+     * 
+     * @return nuevo objeto GroupBy que incluye la cantidad de elementos para cada grupo como una columna adicional
+     */
     public GroupBy cant()
     {
         ColumnaNum<Double> col = new ColumnaDouble(data.cantidadFilas());

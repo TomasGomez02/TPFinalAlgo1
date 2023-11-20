@@ -34,9 +34,9 @@ public final class IOCSV
     /**
      * Crea un Dataframe a partir de un archivo csv.
      * 
-     * @param path ruta del archivo csv
+     * @param path      ruta del archivo csv
      * @param dataTypes tipos de datos de las columnas del Dataframe 
-     * @return DataFrame creado a partir del archivo csv
+     * @return          DataFrame creado a partir del archivo csv
      */
     public static DataFrame fromCSV(String path, DataType[] dataTypes) {
         return fromCSV(new File(path), dataTypes);
@@ -46,7 +46,7 @@ public final class IOCSV
      * Crea un Dataframe a partir de un archivo File.
      * 
      * @param file archivo csv representado como un objeto File
-     * @return Dataframe creado a partir del archivo csv
+     * @return     Dataframe creado a partir del archivo csv
      */
     public static DataFrame fromCSV(File file)
     {
@@ -56,9 +56,9 @@ public final class IOCSV
     /**
      * Crea un Dataframe a partir de un archivo File.
      * 
-     * @param file archivo csv representado como un objeto File
+     * @param file      archivo csv representado como un objeto File
      * @param dataTypes tipos de datos de las columnas del Dataframe
-     * @return Dataframe creado a partir del archivo csv
+     * @return          Dataframe creado a partir del archivo csv
      */
     public static DataFrame fromCSV(File file, DataType[] dataTypes){
         Map<String, DataType> tiposEtiqueta = new LinkedHashMap<>();
@@ -115,8 +115,8 @@ public final class IOCSV
     /**
      * Crea las columnas del Dataframe a partir de las etiquetas proporcionadas.
      * 
-     * @param headers array de etiquetas de las columnas
-     * @return mapa que asocia cada etiqueta con su respectiva Columna
+     * @param headers    array de etiquetas de las columnas
+     * @return           mapa que asocia cada etiqueta con su respectiva Columna
      * @throws Exception si ocurre un error al crear las columnas
      */
     @SuppressWarnings("rawtypes")
@@ -133,7 +133,7 @@ public final class IOCSV
      * Procesa las cadenas proporcionadas como entrada. 
      * 
      * @param fila cadena a procesar
-     * @return array de String que contiene las filas procesadas
+     * @return     array de String que contiene las filas procesadas
      */
     public static String[] procesarFila(String fila)
     {
@@ -180,10 +180,10 @@ public final class IOCSV
     /**
      * Crea y devuelve un nuevo DataFrame con columnas modificadas según los tipos de datos proporcionados.
      * 
-     * @param columnas mapa que asocia etiqueta con objetos Columna
+     * @param columnas      mapa que asocia etiqueta con objetos Columna
      * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
-     * @param datatypes array con los tipos de datos a los que se deben convertir las columnas.
-     * @return nuevo DataFrame con las columnas modificadas según los tipos de datos proporcionados
+     * @param datatypes     array con los tipos de datos a los que se deben convertir las columnas.
+     * @return              nuevo DataFrame con las columnas modificadas según los tipos de datos proporcionados
      */
     private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta, DataType[] datatypes)
     {
@@ -202,9 +202,9 @@ public final class IOCSV
     /**
      * Convierte una columna al tipo de dato especificado como entrada.
      * 
-     * @param col columna a convertir
+     * @param col      columna a convertir
      * @param dataType tipo dato al cual se va a convertir la columna
-     * @return columna convertida al tipo de dato especificado
+     * @return         columna convertida al tipo de dato especificado
      */
     private static Columna castearColumna(Columna col, DataType dataType)
     {
@@ -223,9 +223,9 @@ public final class IOCSV
     /**
      * Autogenera un nuevo DataFrame ajustando automaticamente las columnas segun los tipos de datos proporcionados.
      *
-     * @param columnas  mapa que asocia etiqueta con objetos Columna
+     * @param columnas      mapa que asocia etiqueta con objetos Columna
      * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
-     * @return Dataframe con las columnas ajustadas 
+     * @return              Dataframe con las columnas ajustadas 
      */
     private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta){
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
@@ -240,10 +240,10 @@ public final class IOCSV
     /**
      * Realiza la deteccion automatica del tipo de datos de una columna.
      * 
-     * @param col Columna a autodetectar
+     * @param col           Columna a autodetectar
      * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
-     * @param index indice de la columna
-     * @return nueva columna ajustada segun el tipo de datos detectado
+     * @param index         indice de la columna
+     * @return              nueva columna ajustada segun el tipo de datos detectado
      */
     private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index){
         return autodetectarColumna(col, tiposEtiqueta, index, 0);
@@ -252,11 +252,11 @@ public final class IOCSV
     /**
      * Realiza la deteccion automatica del tipo de datos de una columna, intentando diferentes castings.
      * 
-     * @param col Columna a autodetectar
+     * @param col           Columna a autodetectar
      * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
-     * @param index indice de la columna
-     * @param count contador utilizado para realizar diferentes castings
-     * @return nueva columna ajustada segun el tipo de datos detectado
+     * @param index         indice de la columna
+     * @param count         contador utilizado para realizar diferentes castings
+     * @return              nueva columna ajustada segun el tipo de datos detectado
      */
     private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index, int count)
     {
@@ -292,7 +292,7 @@ public final class IOCSV
      * Obtiene una linea de encabezado con los nombres de las columnas del DataFrame.
      *
      * @param df DataFrame del cual se obtendran los nombres de las columnas
-     * @return cadena que contiene los nombres de las columnas, separando los valores por comas
+     * @return   cadena que contiene los nombres de las columnas, separando los valores por comas
      */
     private static String getHeaderLine(DataFrame df)
     {
@@ -307,7 +307,7 @@ public final class IOCSV
      * Obtiene la primera fila del Dataframe.
      * 
      * @param df Dataframe del cual se obtendra la fila
-     * @return cadena que contiene la primera fila. separando los valores por comas
+     * @return   cadena que contiene la primera fila. separando los valores por comas
      */
     private static String getRowLine(DataFrame df)
     {

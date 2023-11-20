@@ -14,7 +14,7 @@ public abstract class Columna<T> implements Cloneable {
      * Obtiene el valor que se encuentra en la celda indicada.
      * 
      * @param indice indice de la celda
-     * @return valor encontrado en la celda 
+     * @return       valor encontrado en la celda 
      */
     public abstract T getCelda(int indice);
 
@@ -22,7 +22,7 @@ public abstract class Columna<T> implements Cloneable {
      * Establece el valor de la celda.
      * 
      * @param indice indice de la celda 
-     * @param valor valor que se desea establecer
+     * @param valor  valor que se desea establecer
      */
     public abstract void setCelda(int indice, T valor);
 
@@ -31,7 +31,7 @@ public abstract class Columna<T> implements Cloneable {
      * Desplaza el elemento actualmente en esa posicion (si lo hay) y cualquier elemento posterior hacia la derecha (agrega uno a sus indices). 
      * 
      * @param indice indice donde se inserta el valor
-     * @param valor valor a insertar
+     * @param valor  valor a insertar
      */
     public abstract void añadirCelda(int indice, T valor);
     /**
@@ -44,7 +44,7 @@ public abstract class Columna<T> implements Cloneable {
      * Verifica si el indice esta dentro del rango de la Columna.
      * 
      * @param indice indice a verificar
-     * @return verdadero si el indice se encuentra en el rango
+     * @return       verdadero si el indice se encuentra en el rango
      */
     public boolean contieneIndice(int indice){
         return 0 <= indice && indice <= length()-1;
@@ -67,8 +67,8 @@ public abstract class Columna<T> implements Cloneable {
      * Toma la columna desde un indice inicial hasta un indice final especificado y devuelve una sub Columna formada por estas celdas.
      * 
      * @param indiceInicio indice donde se comienza a recortar (primer elemento de la sub Columna)
-     * @param indiceFinal indice hasta el cual se recorta (ultimo elemento de la sub Columna)
-     * @return Columna recortada
+     * @param indiceFinal  indice hasta el cual se recorta (ultimo elemento de la sub Columna)
+     * @return             Columna recortada
      */
 
     public abstract Columna<T> recortarColumna(int indiceInicio, int indiceFinal);
@@ -96,7 +96,7 @@ public abstract class Columna<T> implements Cloneable {
      * Ordena la columna de manera ascendente o descendente segun lo indicado y devuelve un mapa que asocia los indices originales con los nuevos indices despues del ordenamiento.
      * 
      * @param creciente indica si la ordenamiento debe ser ascendente (true) o descendente (false)
-     * @return mapa que asocia los indices originales con los nuevos indices obtenidos despues del ordenamiento 
+     * @return          mapa que asocia los indices originales con los nuevos indices obtenidos despues del ordenamiento 
      */
     public abstract Map<Integer, Integer> ordenar(boolean creciente);
 
@@ -118,7 +118,7 @@ public abstract class Columna<T> implements Cloneable {
      * Filtra los elementos de la columna segun el predicado proporcionado y devuelve una lista de los indices de los elementos que cumplen con el criterio de filtrado.
      * 
      * @param filtro predicado que define el criterio de filtrado
-     * @return lista de los indices de los elementos que cumplen con el criterio de filtrado
+     * @return       lista de los indices de los elementos que cumplen con el criterio de filtrado
      */
     public List<Integer> filtrar(Predicate<T> filtro){
         List<Integer> indices = new ArrayList<>();
@@ -141,7 +141,7 @@ public abstract class Columna<T> implements Cloneable {
      * Toma los elementos correspondientes a los indices de la lista indices y crea una nueva columna con estos elementos.
      * 
      * @param indices lista de indices que especifica que elementos se incluiran en la nueva columna
-     * @return nueva columna con los elementos correspondientes a los indices proporcionados
+     * @return        nueva columna con los elementos correspondientes a los indices proporcionados
      */
     public abstract Columna<T> filtrarPorIndice(List<Integer> indices);
 
@@ -157,6 +157,11 @@ public abstract class Columna<T> implements Cloneable {
      */
     public abstract Columna<T> clone();
 
+    /**
+     * Obtiene y devuelve el tipo de dato de la columna.
+     * 
+     * @return tipo de dato de la columna
+     */
     public DataType getColumnType()
     {
         if(this instanceof ColumnaInt)
@@ -175,8 +180,17 @@ public abstract class Columna<T> implements Cloneable {
         return DataType.STRING;
     }
 
+    /**
+     * Obtiene los valores unicos de la columna. 
+     */
     public abstract Columna<T> unique();
 
+    /**
+     * Verifica si una columna contiene un elemento especifico.
+     * 
+     * @param elemento valor que se quiere verificar si está contenido en la columna
+     * @return
+     */
     public boolean contiene(T elemento)
     {
         if(elemento == null)
@@ -191,6 +205,11 @@ public abstract class Columna<T> implements Cloneable {
         return false;
     }
 
+    /**
+     * Convierte la columna actual a una lista.
+     * 
+     * @return una lista que contiene todos los elementos de la columna convertida
+     */
     public List<T> toList()
     {
         List<T> lista = new ArrayList<>();
