@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
+
+import utils.DataType;
+
 import java.util.function.Predicate;
 
 public abstract class Columna<T> implements Cloneable {
@@ -153,4 +156,49 @@ public abstract class Columna<T> implements Cloneable {
      * Crea y devuelve una copia profunda de la columna actual, incluyendo todos sus elementos
      */
     public abstract Columna<T> clone();
+
+    public DataType getColumnType()
+    {
+        if(this instanceof ColumnaInt)
+        {
+            return DataType.INT;
+        }
+        else if(this instanceof ColumnaBool)
+        {
+            return DataType.BOOL;
+        }
+        else if(this instanceof ColumnaDouble)
+        {
+            return DataType.DOUBLE;
+        }
+        
+        return DataType.STRING;
+    }
+
+    public abstract Columna<T> unique();
+
+    public boolean contiene(T elemento)
+    {
+        if(elemento == null)
+        {
+            return (cantNull() > 0);
+        }
+
+        for(int i = 0; i < length(); i++)
+            if(elemento.equals(getCelda(i)))
+                return true;
+
+        return false;
+    }
+
+    public List<T> toList()
+    {
+        List<T> lista = new ArrayList<>();
+        for(int i = 0; i < length(); i++)
+        {
+            lista.add(getCelda(i));
+        }
+
+        return lista;
+    }
 }

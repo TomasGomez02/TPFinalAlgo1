@@ -182,6 +182,9 @@ public class ColumnaString extends Columna<String> {
         
     public static <T> ColumnaString toColumnaString(Columna<T> col)
     {
+        if(col instanceof ColumnaString)
+            return (ColumnaString) col;
+        
         List<String> datos = new ArrayList<>();
 
         for(int i = 0; i < col.length(); i++)
@@ -198,5 +201,16 @@ public class ColumnaString extends Columna<String> {
         }
 
         return new ColumnaString(datos);
+    }
+
+    @Override
+    public Columna<String> unique() {
+        ColumnaString unica = new ColumnaString();
+        for(String e: data)
+        {
+            if(!unica.contiene(e))
+                unica.añadirCelda(e);
+        }
+        return unica;
     }
 }

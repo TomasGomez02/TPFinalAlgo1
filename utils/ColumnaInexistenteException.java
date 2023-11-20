@@ -5,6 +5,6 @@ public class ColumnaInexistenteException extends RuntimeException {
         super("No existe la Columna");
     }
     public ColumnaInexistenteException(String colName){
-        super("No existe la columna: "+colName);
+        super("No existe la columna: |"+colName + "|");
     }
 }

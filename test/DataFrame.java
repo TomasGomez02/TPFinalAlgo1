@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import utils.ColumnaInexistenteException;
-import utils.DataTypes;
+import utils.DataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ public class DataFrame implements Cloneable {
     @SuppressWarnings("rawtypes")   // Literalmente es lo que dice
     private Map<String, Columna> data;
     private List<String> etiquetas;
-    private Map<String, DataTypes> tiposColumna;
+    private Map<String, DataType> tiposColumna;
 
     public DataFrame(){
         this.data = new HashMap<>();
@@ -26,7 +26,7 @@ public class DataFrame implements Cloneable {
     }
 
     @SuppressWarnings("rawtypes")
-    public DataFrame(Map<String, Columna> data, Map<String, DataTypes> tiposColumna){
+    public DataFrame(Map<String, Columna> data, Map<String, DataType> tiposColumna){
         this.data = data;
         this.tiposColumna = tiposColumna;
         // this.etiquetas = data.keySet().stream().toList();
@@ -53,7 +53,7 @@ public class DataFrame implements Cloneable {
      * @return una lista que contiene todas las etiquetas 
      */
     public List<String> nombreColumnas(){
-        return this.etiquetas;
+        return new ArrayList<>(this.etiquetas);
     }
 
     /**
@@ -82,7 +82,7 @@ public class DataFrame implements Cloneable {
      * 
      * @return un mapa que representa la asociacion entre los nombres de las columnas y sus tipos de datos.
      */
-    public Map<String, DataTypes> tiposColumna(){
+    public Map<String, DataType> tiposColumna(){
         return this.tiposColumna;
     }
 
@@ -348,7 +348,7 @@ public class DataFrame implements Cloneable {
     @Override
     public DataFrame clone(){
         Map<String, Columna> columnas = new LinkedHashMap<>();
-        Map<String, DataTypes> dataTypes = new LinkedHashMap<>();
+        Map<String, DataType> dataTypes = new LinkedHashMap<>();
         for (String colName : this.etiquetas){
             columnas.put(colName, this.getColumna(colName).clone());
             dataTypes.put(colName, this.tiposColumna.get(colName));
@@ -357,63 +357,20 @@ public class DataFrame implements Cloneable {
     }
 
     /**
-     * Agrega una nueva columna de cadenas al dataframe. 
-     * 
-     * @param etiqueta etiqueta de la nueva columna
-     * @param columna lista de cadenas que contiene los valores que tendran las celdas de la nueva columna
-     */
-    public void addColumna(String etiqueta, ColumnaString columna){
-        if (contieneEtiqueta(etiqueta)){
-            throw new RuntimeException("la columna "+etiqueta+" ya existe");
-        }
-        this.data.put(etiqueta, columna);
-        this.tiposColumna.put(etiqueta, DataTypes.STRING);
-        this.etiquetas.add(etiqueta);
-    }
-
-    /**
-     * Agrega una nueva columna de enteros al dataframe. 
-     * 
-     * @param etiqueta etiqueta de la nueva columna
-     * @param columna  lista de enteros que contiene los valores que tendran las celdas de la nueva columna
-     */
-    public void addColumna(String etiqueta, ColumnaInt columna){
-        if (contieneEtiqueta(etiqueta)){
-            throw new RuntimeException("la columna "+etiqueta+" ya existe");
-        }
-        this.data.put(etiqueta, columna);
-        this.tiposColumna.put(etiqueta, DataTypes.INT);
-        this.etiquetas.add(etiqueta);
-    }
-
-    /**
-     * Agrega una nueva columna de Double al dataframe. 
-     * 
-     * @param etiqueta etiqueta de la nueva columna
-     * @param columna  lista de Double que contiene los valores que tendran las celdas de la nueva columna
-     */
-    public void addColumna(String etiqueta, ColumnaDouble columna){
-        if (contieneEtiqueta(etiqueta)){
-            throw new RuntimeException("la columna "+etiqueta+" ya existe");
-        }
-        this.data.put(etiqueta, columna);
-        this.tiposColumna.put(etiqueta, DataTypes.DOUBLE);
-        this.etiquetas.add(etiqueta);
-    }
-
-    /**
      * Agrega una nueva columna de booleanos al dataframe. 
      * 
      * @param etiqueta etiqueta de la nueva columna
      * @param columna  lista de booleanos que contiene los valores que tendran las celdas de la nueva columna
      */
-    public void addColumna(String etiqueta, ColumnaBool columna){
-        if (contieneEtiqueta(etiqueta)){
+    public DataFrame addColumna(String etiqueta, Columna columna){
+        DataFrame df = clone();
+        if (df.contieneEtiqueta(etiqueta)){
             throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
-        this.data.put(etiqueta, columna);
-        this.tiposColumna.put(etiqueta, DataTypes.BOOL);
-        this.etiquetas.add(etiqueta);
+        df.data.put(etiqueta, columna);
+        df.tiposColumna.put(etiqueta, columna.getColumnType());
+        df.etiquetas.add(etiqueta);
+        return df;
     }
 
     /**
@@ -437,7 +394,7 @@ public class DataFrame implements Cloneable {
      */
     public DataFrame getColumna(String[] etiqueta){
         Map<String, Columna> columnas = new HashMap<>();
-        Map<String, DataTypes> tiposCol = new HashMap<>();
+        Map<String, DataType> tiposCol = new HashMap<>();
         for (String colName : etiqueta){
             columnas.put(colName, this.getColumna(colName));
             tiposCol.put(colName, this.tiposColumna.get(colName));
@@ -453,7 +410,7 @@ public class DataFrame implements Cloneable {
      */
     public DataFrame getColumna(List<String> etiqueta){
         Map<String, Columna> columnas = new LinkedHashMap<>();
-        Map<String, DataTypes> tiposCol = new LinkedHashMap<>();
+        Map<String, DataType> tiposCol = new LinkedHashMap<>();
         for (String colName : etiqueta){
             columnas.put(colName, this.getColumna(colName));
             tiposCol.put(colName, this.tiposColumna.get(colName));
@@ -693,4 +650,21 @@ public class DataFrame implements Cloneable {
         return copia;
     }
 
+    public GroupBy groupBy(String etiqueta)
+    {
+        
+        return groupBy(new String[]{etiqueta});
+    }
+
+    public GroupBy groupBy(List<String> etiquetas)
+    {
+        
+        return groupBy(etiquetas.toArray(String[] ::new));
+    }
+
+    public GroupBy groupBy(String[] etiquetas)
+    {
+        
+        return new GroupBy(this, etiquetas);
+    }
 }

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import utils.CasteoIlegal;
+import utils.CasteoIlegalException;
 import utils.Types;
 
 import java.util.ArrayList;
@@ -182,12 +182,12 @@ public class ColumnaBool extends Columna<Boolean>{
         return copia;
     }
 
-    public static ColumnaBool fromColumnaString (Columna<String> col) throws CasteoIlegal
+    public static ColumnaBool fromColumnaString (Columna<String> col) throws CasteoIlegalException
     {
         return fromColumnaString(col, false);
     }
 
-    public static ColumnaBool fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegal
+    public static ColumnaBool fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -208,7 +208,7 @@ public class ColumnaBool extends Columna<Boolean>{
             catch(NumberFormatException e)
             {
                 if(!forzar)
-                    throw new CasteoIlegal(col.getCelda(i), String.class.toString(), Boolean.class.toString());
+                    throw new CasteoIlegalException(col.getCelda(i), String.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }
@@ -217,12 +217,12 @@ public class ColumnaBool extends Columna<Boolean>{
         return new ColumnaBool(datos);
     }
 
-    public static ColumnaBool fromColumnaInt(Columna<Integer> col) throws CasteoIlegal
+    public static ColumnaBool fromColumnaInt(Columna<Integer> col) throws CasteoIlegalException
     {
         return fromColumnaInt(col, false);
     }
 
-    public static ColumnaBool fromColumnaInt(Columna<Integer> col, boolean forzar) throws CasteoIlegal
+    public static ColumnaBool fromColumnaInt(Columna<Integer> col, boolean forzar) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -240,10 +240,10 @@ public class ColumnaBool extends Columna<Boolean>{
                     datos.add(null);
                 }
             }
-            catch(CasteoIlegal e)
+            catch(CasteoIlegalException e)
             {
                 if(!forzar)
-                    throw new CasteoIlegal(col.getCelda(i).toString(), Integer.class.toString(), Boolean.class.toString());
+                    throw new CasteoIlegalException(col.getCelda(i).toString(), Integer.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }
@@ -252,12 +252,12 @@ public class ColumnaBool extends Columna<Boolean>{
         return new ColumnaBool(datos);
     }
 
-    public static ColumnaBool fromColumnaDouble(Columna<Double> col) throws CasteoIlegal
+    public static ColumnaBool fromColumnaDouble(Columna<Double> col) throws CasteoIlegalException
     {
         return fromColumnaDouble(col, false);
     }
 
-    public static ColumnaBool fromColumnaDouble(Columna<Double> col, boolean forzar) throws CasteoIlegal
+    public static ColumnaBool fromColumnaDouble(Columna<Double> col, boolean forzar) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -275,10 +275,10 @@ public class ColumnaBool extends Columna<Boolean>{
                     datos.add(null);
                 }
             }
-            catch(CasteoIlegal e)
+            catch(CasteoIlegalException e)
             {
                 if(!forzar)
-                    throw new CasteoIlegal(col.getCelda(i).toString(), Double.class.toString(), Boolean.class.toString());
+                    throw new CasteoIlegalException(col.getCelda(i).toString(), Double.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }
@@ -296,5 +296,15 @@ public class ColumnaBool extends Columna<Boolean>{
             }
         }
         return copia;
+    }
+    @Override
+    public Columna<Boolean> unique() {
+        ColumnaBool unica = new ColumnaBool();
+        for(Boolean e: data)
+        {
+            if(!unica.contiene(e))
+                unica.añadirCelda(e);
+        }
+        return unica;
     }
 }

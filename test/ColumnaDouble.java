@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import utils.CasteoIlegal;
+import utils.CasteoIlegalException;
 import utils.Types;
 
 import java.util.ArrayList;
@@ -255,12 +255,12 @@ public class ColumnaDouble extends ColumnaNum<Double>
         return copia;
     }
 
-    public static ColumnaDouble fromColumnaString (Columna<String> col) throws CasteoIlegal
+    public static ColumnaDouble fromColumnaString (Columna<String> col) throws CasteoIlegalException
     {
         return fromColumnaString(col, false);
     }
     
-    public static ColumnaDouble fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegal
+    public static ColumnaDouble fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
     {
         List<Double> datos = new ArrayList<>();
 
@@ -281,7 +281,7 @@ public class ColumnaDouble extends ColumnaNum<Double>
             catch(NumberFormatException e)
             {
                 if(!forzar)
-                    throw new CasteoIlegal(col.getCelda(i), String.class.toString(), Double.class.toString());
+                    throw new CasteoIlegalException(col.getCelda(i), String.class.toString(), Double.class.toString());
                 else
                     datos.add(null);
             }
@@ -339,5 +339,16 @@ public class ColumnaDouble extends ColumnaNum<Double>
             }
         }
         return copia;
+    }
+
+    @Override
+    public Columna<Double> unique() {
+        ColumnaDouble unica = new ColumnaDouble();
+        for(Double e: data)
+        {
+            if(!unica.contiene(e))
+                unica.añadirCelda(e);
+        }
+        return unica;
     }
 }

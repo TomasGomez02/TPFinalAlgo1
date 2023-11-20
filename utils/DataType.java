@@ -1,6 +1,6 @@
 package utils;
 
-public enum DataTypes{
+public enum DataType{
     STRING,
     INT,
     DOUBLE,

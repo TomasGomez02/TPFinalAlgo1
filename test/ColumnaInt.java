@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import utils.CasteoIlegal;
+import utils.CasteoIlegalException;
 import utils.Types;
 
 import java.util.ArrayList;
@@ -251,12 +251,12 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         return copia;
     }
 
-    public static ColumnaInt fromColumnaString(Columna<String> col) throws CasteoIlegal
+    public static ColumnaInt fromColumnaString(Columna<String> col) throws CasteoIlegalException
     {
         return fromColumnaString(col, false);
     }
 
-    public static ColumnaInt fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegal
+    public static ColumnaInt fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
     {
         List<Integer> datos = new ArrayList<>();
         
@@ -277,7 +277,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
             catch(NumberFormatException e)
             {
                 if(!forzar)
-                    throw new CasteoIlegal(elemento, String.class.toString(), Integer.class.toString());
+                    throw new CasteoIlegalException(elemento, String.class.toString(), Integer.class.toString());
                 else
                     datos.add(null);
             }
@@ -335,5 +335,16 @@ public class ColumnaInt extends ColumnaNum<Integer> {
             }
         }
         return copia;
+    }
+
+    @Override
+    public Columna<Integer> unique() {
+        ColumnaInt unica = new ColumnaInt();
+        for(Integer e: data)
+        {
+            if(!unica.contiene(e))
+                unica.añadirCelda(e);
+        }
+        return unica;
     }
 }

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-import utils.CasteoIlegal;
-import utils.DataTypes;
+import utils.CasteoIlegalException;
+import utils.DataType;
 
 public final class IOCSV 
 {
@@ -25,7 +25,7 @@ public final class IOCSV
         return fromCSV(path, null);
     }
 
-    public static DataFrame fromCSV(String path, DataTypes[] dataTypes) {
+    public static DataFrame fromCSV(String path, DataType[] dataTypes) {
         return fromCSV(new File(path), dataTypes);
     }
 
@@ -34,8 +34,8 @@ public final class IOCSV
         return fromCSV(file, null);
     }
 
-    public static DataFrame fromCSV(File file, DataTypes[] dataTypes){
-        Map<String, DataTypes> tiposEtiqueta = new LinkedHashMap<>();
+    public static DataFrame fromCSV(File file, DataType[] dataTypes){
+        Map<String, DataType> tiposEtiqueta = new LinkedHashMap<>();
         String[] header;
         @SuppressWarnings("rawtypes")
         Map<String, Columna> columnas = new LinkedHashMap<>();
@@ -55,12 +55,12 @@ public final class IOCSV
                 if(dataTypes != null)
                     tiposEtiqueta.put(header[i], dataTypes[i]);
                 else
-                    tiposEtiqueta.put(header[i], DataTypes.STRING);
+                    tiposEtiqueta.put(header[i], DataType.STRING);
             }  
 
             // Asigno los valores a cada columna
             while ((linea = br.readLine()) != null) {
-                String[] valores = procesarFila(linea);
+                String[] valores = procesarFila(linea, header.length);
                 //System.out.println(valores.length);
                 for (int i=0; i < valores.length; i++) {
                     columnas.get(header[i]).añadirCelda(valores[i]);
@@ -96,32 +96,49 @@ public final class IOCSV
         return columnas;
     }
 
-    private static String[] procesarFila(String fila)
+    public static String[] procesarFila(String fila)
     {
-        String[] filaComillas = fila.split("\"");
+        return procesarFila(fila, 0);
+    }
+
+    private static String[] procesarFila(String fila, int cantidadCol)
+    {
         List<String> filaProcesada = new ArrayList<>();
 
-        for(int i = 0; i < filaComillas.length; i++)
+        String elemento = "";
+        boolean enComillas = false;
+
+        char[] filaChar = fila.toCharArray();
+        for(int i = 0; i < filaChar.length; i++)    
         {
-            if(i % 2 == 0 && !filaComillas[i].equals(",") && !filaComillas[i].equals(""))
+            switch (filaChar[i]) 
             {
-                if(i > 0)
-                {
-                    filaComillas[i] = filaComillas[i].replaceFirst(",", "");
-                }
-                filaProcesada.addAll(Arrays.asList(filaComillas[i].replaceAll("\n", "")
-                                            .split(",")));
-            }
-            else if(i % 2 == 1)
-            {
-                filaProcesada.add(filaComillas[i]);
+                case ',':
+                    if(!enComillas)
+                    {
+                        filaProcesada.add(elemento);
+                        elemento = "";
+                    }
+                    break;
+                case '"':
+                    enComillas = !enComillas;
+                    break;
+                default:
+                    elemento += filaChar[i];
+                    break;
             }
         }
+
+        if(elemento != "")
+            filaProcesada.add(elemento);
+
+        while(cantidadCol > 0 && filaProcesada.size() < cantidadCol)
+            filaProcesada.add("");
 
         return filaProcesada.toArray(String[] ::new);
     }
 
-    private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataTypes> tiposEtiqueta, DataTypes[] datatypes)
+    private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta, DataType[] datatypes)
     {
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
 
@@ -135,7 +152,7 @@ public final class IOCSV
         return new DataFrame(columnas, tiposEtiqueta);
     }
 
-    private static Columna castearColumna(Columna col, DataTypes dataType)
+    private static Columna castearColumna(Columna col, DataType dataType)
     {
         switch (dataType) {
             case INT:
@@ -149,7 +166,7 @@ public final class IOCSV
         }
     }
 
-    private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataTypes> tiposEtiqueta)
+    private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta)
     {
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
 
@@ -162,12 +179,12 @@ public final class IOCSV
         return new DataFrame(columnas, tiposEtiqueta);
     }
 
-    private static Columna autodetectarColumna(Columna col, Map<String, DataTypes> tiposEtiqueta, int index)
+    private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index)
     {
         return autodetectarColumna(col, tiposEtiqueta, index, 0);
     }
 
-    private static Columna autodetectarColumna(Columna col, Map<String, DataTypes> tiposEtiqueta, int index, int count)
+    private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index, int count)
     {
         Columna colCasteada;
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
@@ -176,21 +193,21 @@ public final class IOCSV
             switch (count) {
                 case 0:
                     colCasteada = ColumnaBool.fromColumnaString(col);
-                    tiposEtiqueta.put(keys.get(index), DataTypes.BOOL);
+                    tiposEtiqueta.put(keys.get(index), DataType.BOOL);
                     break;
                 case 1:
                     colCasteada = ColumnaInt.fromColumnaString(col);
-                    tiposEtiqueta.put(keys.get(index), DataTypes.INT);
+                    tiposEtiqueta.put(keys.get(index), DataType.INT);
                     break;
                 case 2:
                     colCasteada = ColumnaDouble.fromColumnaString(col);
-                    tiposEtiqueta.put(keys.get(index), DataTypes.DOUBLE);
+                    tiposEtiqueta.put(keys.get(index), DataType.DOUBLE);
                     break;
                 default:
                     colCasteada = col;
             }
         }
-        catch(CasteoIlegal e)
+        catch(CasteoIlegalException e)
         {
             colCasteada = autodetectarColumna(col, tiposEtiqueta, index, count + 1);
         }

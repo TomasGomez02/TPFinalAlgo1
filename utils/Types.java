@@ -4,7 +4,7 @@ public class Types
 {
     private Types(){}
     
-    public static Class evaluarTipo(DataTypes tipo)
+    public static Class evaluarTipo(DataType tipo)
     {
         switch(tipo)
         {
@@ -58,7 +58,7 @@ public class Types
         if(n.intValue() == 0.0)
             return false;
 
-        throw new CasteoIlegal(n.toString(), Number.class.toString(), Boolean.class.toString());
+        throw new CasteoIlegalException(n.toString(), Number.class.toString(), Boolean.class.toString());
     }
 
 
