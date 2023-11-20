@@ -1,4 +1,5 @@
-package src;
+package koala;
+
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,10 +11,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashMap;
 
-import utils.IllegalCastException;
-import utils.DataType;
+import koala.utils.DataType;
+import koala.utils.IllegalCastException;
+
+import java.util.LinkedHashMap;
 
 public final class IOCSV 
 {

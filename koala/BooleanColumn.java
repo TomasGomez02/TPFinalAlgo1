@@ -1,11 +1,11 @@
-package src;
+package koala;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import utils.IllegalCastException;
-import utils.Types;
+import koala.utils.IllegalCastException;
+import koala.utils.Types;
 
 import java.util.ArrayList;
 import java.util.HashMap;

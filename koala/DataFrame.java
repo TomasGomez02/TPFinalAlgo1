@@ -1,13 +1,14 @@
-package src;
+package koala;
+
 
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import utils.UnexistentColumnException;
-import utils.DataType;
-import utils.Types;
+import koala.utils.DataType;
+import koala.utils.Types;
+import koala.utils.UnexistentColumnException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -437,7 +438,6 @@ public class DataFrame implements Cloneable {
         df.data.put(tag, col.clone());
         df.columnTypes.put(tag, col.getColumnType());
         df.tags.add(tag);
-        df.head();
         return df;
     }
 

@@ -1,4 +1,5 @@
-package src;
+package koala;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import utils.UnexistentColumnException;
-import utils.InoperableColumnException;
+import koala.utils.InoperableColumnException;
+import koala.utils.UnexistentColumnException;
 
 public class GroupBy implements Cloneable
 {
@@ -357,7 +358,7 @@ public class GroupBy implements Cloneable
         NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
-        String nuevaCol = "Media: " + tag;
+        String nuevaCol = "Mean: " + tag;
         gb.data = gb.data.addCol(nuevaCol, col);
         gb.aggregatedCols.add(nuevaCol);
         return gb; 
@@ -375,7 +376,7 @@ public class GroupBy implements Cloneable
         NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
-        String nuevaCol = "Mediana: " + tag;
+        String nuevaCol = "Median: " + tag;
         gb.data = gb.data.addCol(nuevaCol, col);
         gb.aggregatedCols.add(nuevaCol);
         return gb;
@@ -393,7 +394,7 @@ public class GroupBy implements Cloneable
         NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
-        String nuevaCol = "Maximo: " + tag;
+        String nuevaCol = "Max: " + tag;
         gb.data = gb.data.addCol(nuevaCol, col);
         gb.aggregatedCols.add(nuevaCol);
         return gb;
@@ -411,7 +412,7 @@ public class GroupBy implements Cloneable
         NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
-        String nuevaCol = "Minimo: " + tag;
+        String nuevaCol = "Min: " + tag;
         gb.data = gb.data.addCol(nuevaCol, col);
         gb.aggregatedCols.add(nuevaCol);
         return gb;
@@ -429,7 +430,7 @@ public class GroupBy implements Cloneable
         NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
-        String nuevaCol = "SD: " + tag;
+        String nuevaCol = "STD: " + tag;
         gb.data = gb.data.addCol(nuevaCol, col);
         gb.aggregatedCols.add(nuevaCol);
         return gb;
@@ -447,7 +448,7 @@ public class GroupBy implements Cloneable
         NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
-        String nuevaCol = "Suma: " + tag;
+        String nuevaCol = "Sum: " + tag;
         gb.data = gb.data.addCol(nuevaCol, col);
         gb.aggregatedCols.add(nuevaCol);
         return gb;

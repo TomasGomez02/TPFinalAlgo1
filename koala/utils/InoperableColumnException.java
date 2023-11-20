@@ -1,4 +1,4 @@
-package utils;
+package koala.utils;
 
 public class InoperableColumnException extends RuntimeException 
 {

@@ -1,4 +1,4 @@
-package utils;
+package koala.utils;
 
 public class IllegalCastException extends RuntimeException 
 {
