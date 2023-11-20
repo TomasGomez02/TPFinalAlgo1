@@ -24,20 +24,45 @@ public class DataFrame implements Cloneable {
     private Map<String, DataType> tiposColumna;
 
     public DataFrame(){
-        this.data = new HashMap<>();
+        this.data = new LinkedHashMap<>();
         this.etiquetas = new ArrayList<>();
-        this.tiposColumna = new HashMap<>();
+        this.tiposColumna = new LinkedHashMap<>();
     }
 
     @SuppressWarnings("rawtypes")
     public DataFrame(Map<String, Columna> data, Map<String, DataType> tiposColumna){
-        this.data = data;
-        this.tiposColumna = tiposColumna;
-        // this.etiquetas = data.keySet().stream().toList();
-        // Esto es porque el .toList() no funciona en la compu de la unsam
-        this.etiquetas = new ArrayList<>();
-        for (String etiqueta : data.keySet()) {
-            this.etiquetas.add(etiqueta);
+        this.data = new LinkedHashMap<>(data);
+        this.tiposColumna = new LinkedHashMap<>(tiposColumna);
+        this.etiquetas = new ArrayList<>(data.keySet());
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(List<Columna> data){
+        this();
+        for (int i=0; i < data.size(); i++){
+            this.data.put(String.valueOf(i), data.get(i).clone());
+            this.etiquetas.add(String.valueOf(i));
+            this.tiposColumna.put(String.valueOf(i), data.get(i).getColumnType());
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(Columna[] data){
+        this();
+        for (int i=0; i < data.length; i++){
+            this.data.put(String.valueOf(i), data[i].clone());
+            this.etiquetas.add(String.valueOf(i));
+            this.tiposColumna.put(String.valueOf(i), data[i].getColumnType());
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(Map<String, Columna> data){
+        this();
+        for (String colName : data.keySet()){
+            this.data.put(colName, data.get(colName).clone());
+            this.etiquetas.add(colName);
+            this.tiposColumna.put(colName, data.get(colName).getColumnType());
         }
     }
 
@@ -87,12 +112,9 @@ public class DataFrame implements Cloneable {
      * @return un mapa que representa la asociacion entre los nombres de las columnas y sus tipos de datos.
      */
     public Map<String, DataType> tiposColumna(){
-        return this.tiposColumna;
+        return new LinkedHashMap<>(this.tiposColumna);
     }
 
-    /**
-     * HAY QUE DOCUMENTAR ESTE?
-     */
     public String toString(){
         this.head();
         return "";
@@ -408,9 +430,10 @@ public class DataFrame implements Cloneable {
         if (df.contieneEtiqueta(etiqueta)){
             throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
-        df.data.put(etiqueta, columna);
+        df.data.put(etiqueta, columna.clone());
         df.tiposColumna.put(etiqueta, columna.getColumnType());
         df.etiquetas.add(etiqueta);
+        df.head();
         return df;
     }
 
@@ -434,8 +457,8 @@ public class DataFrame implements Cloneable {
      * @return Dataframe que contiene las columnas obtenidas 
      */
     public DataFrame getColumna(String[] etiqueta){
-        Map<String, Columna> columnas = new HashMap<>();
-        Map<String, DataType> tiposCol = new HashMap<>();
+        Map<String, Columna> columnas = new LinkedHashMap<>();
+        Map<String, DataType> tiposCol = new LinkedHashMap<>();
         for (String colName : etiqueta){
             columnas.put(colName, this.getColumna(colName));
             tiposCol.put(colName, this.tiposColumna.get(colName));
