@@ -20,7 +20,7 @@ public class ColumnaString extends Columna<String> {
     public ColumnaString(String[] datos){
         this();
         for (String elemento : datos) {
-            this.añadirCelda(elemento);
+            this.add(elemento);
         }
     }
 
@@ -29,7 +29,7 @@ public class ColumnaString extends Columna<String> {
         this();
         for(int i = 0; i < size; i++)
         {
-            añadirCelda(null);
+            add(null);
         }
     }
 
@@ -42,23 +42,23 @@ public class ColumnaString extends Columna<String> {
     }
 
     @Override
-    public void setCelda(int indice, String valor) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void set(int index, String value) {
+        if (!contieneIndice(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.set(indice, valor);
+        this.data.set(index, value);
     }
 
     @Override
-    public void añadirCelda(int indice, String valor) {
-        if (!contieneIndice(indice)){    
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void add(int index, String value) {
+        if (!contieneIndice(index)){    
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.add(indice, valor);
+        this.data.add(index, value);
     }
 
     @Override
-    public void añadirCelda(String valor) {
+    public void add(String valor) {
         this.data.add(valor);
     }
 
@@ -75,14 +75,14 @@ public class ColumnaString extends Columna<String> {
         if (!contieneIndice(indice)){
             throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
-        this.setCelda(indice, null);
+        this.set(indice, null);
     }
 
     @Override
     public ColumnaString recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaString recorte = new ColumnaString();
         for (int i=indiceInicio; i <= indiceFinal; i++) {
-            recorte.añadirCelda(this.get(i));
+            recorte.add(this.get(i));
         }
         return recorte;
     }
@@ -96,7 +96,7 @@ public class ColumnaString extends Columna<String> {
     public ColumnaString clone(){
         ColumnaString copia = new ColumnaString();
         for (int i=0; i < this.length(); i++){
-            copia.añadirCelda(this.get(i));
+            copia.add(this.get(i));
         }
         return copia;
     }
@@ -111,7 +111,7 @@ public class ColumnaString extends Columna<String> {
         indices.sort(null);
         ColumnaString filtrada = new ColumnaString();
         for (Integer indice : indices) {
-            filtrada.añadirCelda(this.get(indice));
+            filtrada.add(this.get(indice));
         }
         return filtrada;
     }
@@ -174,7 +174,7 @@ public class ColumnaString extends Columna<String> {
 
         for (int i=0; i < copia.length(); i++){
             Integer newIdx = orden.get(i);
-            copia.setCelda(newIdx, get(i));
+            copia.set(newIdx, get(i));
         }
         return copia;
     }
@@ -184,7 +184,7 @@ public class ColumnaString extends Columna<String> {
         ColumnaString copia = new ColumnaString();
         for (int i=0; i < length(); i++){
             if (get(i) != null){
-                copia.añadirCelda(transformacion.apply(get(i)));
+                copia.add(transformacion.apply(get(i)));
             }
         }
         return copia;
@@ -219,7 +219,7 @@ public class ColumnaString extends Columna<String> {
         for(String e: data)
         {
             if(!unica.contiene(e))
-                unica.añadirCelda(e);
+                unica.add(e);
         }
         return unica;
     }

@@ -327,7 +327,7 @@ public class DataFrame implements Cloneable {
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException(etiqueta);
         }
-        this.data.get(etiqueta).setCelda(indice, valor);
+        this.data.get(etiqueta).set(indice, valor);
     }
 
     /**
@@ -374,7 +374,7 @@ public class DataFrame implements Cloneable {
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException();
         }
-        this.data.get(etiqueta).añadirCelda(valor);
+        this.data.get(etiqueta).add(valor);
     }
     @Override
     public DataFrame clone(){
@@ -518,7 +518,7 @@ public class DataFrame implements Cloneable {
      */
     public void addFila(Map<String, Object> fila){
         for (String colName : fila.keySet()){
-            this.data.get(colName).añadirCelda(fila.get(colName));
+            this.data.get(colName).add(fila.get(colName));
         }
     }
 
@@ -546,19 +546,19 @@ public class DataFrame implements Cloneable {
                 switch (this.tiposColumna.get(colName)){
                     case STRING:
                         otro.put(colName, new ColumnaString());
-                        otro.get(colName).añadirCelda(getCelda(colName, fila, String.class));
+                        otro.get(colName).add(getCelda(colName, fila, String.class));
                         break;
                     case INT:
                         otro.put(colName, new ColumnaInt());
-                        otro.get(colName).añadirCelda(getCelda(colName, fila, Integer.class));
+                        otro.get(colName).add(getCelda(colName, fila, Integer.class));
                         break;
                     case DOUBLE:
                         otro.put(colName, new ColumnaDouble());
-                        otro.get(colName).añadirCelda(getCelda(colName, fila, Double.class));
+                        otro.get(colName).add(getCelda(colName, fila, Double.class));
                         break;
                     case BOOL:
                         otro.put(colName, new ColumnaBool());
-                        otro.get(colName).añadirCelda(getCelda(colName, fila, Boolean.class));
+                        otro.get(colName).add(getCelda(colName, fila, Boolean.class));
                         break;
                 }
             }
@@ -644,14 +644,20 @@ public class DataFrame implements Cloneable {
      * 
      * @param etiqueta el indice de la fila a eliminar
      */
-    public void eliminarFila(int fila){
-        if (0 <= fila && fila <= this.cantidadFilas()-1){
-            for (String colName : this.etiquetas){
-                this.getColumna(colName).eliminarCelda(fila);
-            }
-            return;
+    public DataFrame eliminarFila(int fila){
+        // if (0 <= fila && fila <= this.cantidadFilas()-1){
+        //     for (String colName : this.etiquetas){
+        //         this.getColumna(colName).eliminarCelda(fila);
+        //     }
+        //     return;
+        // }
+        // throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
+        if (fila < 0 || fila > this.cantidadFilas()-1){
+            throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
         }
-        throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
+        for (String colName : this.etiquetas){
+            this.getColumna(colName).eliminarCelda(fila);
+        }
     }
 
     /**

@@ -21,25 +21,25 @@ public abstract class Columna<T> implements Cloneable {
     /**
      * Establece el valor de la celda.
      * 
-     * @param indice indice de la celda 
-     * @param valor valor que se desea establecer
+     * @param index indice de la celda 
+     * @param value valor que se desea establecer
      */
-    public abstract void setCelda(int indice, T valor);
+    public abstract void set(int index, T value);
 
     /**
      * Añade el valor especificado en el indice indicado. 
      * Desplaza el elemento actualmente en esa posicion (si lo hay) y cualquier elemento posterior hacia la derecha (agrega uno a sus indices). 
      * 
-     * @param indice indice donde se inserta el valor
-     * @param valor valor a insertar
+     * @param index indice donde se inserta el valor
+     * @param value valor a insertar
      */
-    public abstract void añadirCelda(int indice, T valor);
+    public abstract void add(int index, T value);
     /**
      * Añade el valor especificado al final de la columna.
      * 
      * @param valor valor a insertar
      */
-    public abstract void añadirCelda(T valor);
+    public abstract void add(T valor);
     /**
      * Verifica si el indice esta dentro del rango de la Columna.
      * 
@@ -81,7 +81,7 @@ public abstract class Columna<T> implements Cloneable {
     
     public void concatenarColumna(Columna<T> otraColumna){
         for (int i=0; i < otraColumna.length(); i++){
-            this.añadirCelda(otraColumna.get(i));
+            this.add(otraColumna.get(i));
         }
     }
 

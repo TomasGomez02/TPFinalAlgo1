@@ -20,7 +20,7 @@ public class ColumnaBool extends Columna<Boolean>{
     public ColumnaBool(Boolean[] data){
         this();
         for (Boolean element : data) {
-            this.añadirCelda(element);
+            this.add(element);
         }
     }
 
@@ -33,7 +33,7 @@ public class ColumnaBool extends Columna<Boolean>{
         this();
         for(int i = 0; i < size; i++)
         {
-            añadirCelda(null);
+            add(null);
         }
     }
 
@@ -46,23 +46,23 @@ public class ColumnaBool extends Columna<Boolean>{
     }
 
     @Override
-    public void setCelda(int indice, Boolean valor) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void set(int index, Boolean value) {
+        if (!contieneIndice(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.set(indice, valor);
+        this.data.set(index, value);
     }
 
     @Override
-    public void añadirCelda(int indice, Boolean valor) {
-        if (!contieneIndice(indice) && indice != 0){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void add(int index, Boolean value) {
+        if (!contieneIndice(index) && index != 0){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.add(indice, valor);
+        this.data.add(index, value);
     }
 
     @Override
-    public void añadirCelda(Boolean valor) {
+    public void add(Boolean valor) {
         this.data.add(valor); 
     }
 
@@ -86,7 +86,7 @@ public class ColumnaBool extends Columna<Boolean>{
     public Columna<Boolean> recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaBool recorte = new ColumnaBool();
         for (int i=indiceInicio; i <= indiceFinal; i++) {
-            recorte.añadirCelda(this.get(i));
+            recorte.add(this.get(i));
         }
         return recorte;
     }
@@ -100,7 +100,7 @@ public class ColumnaBool extends Columna<Boolean>{
     public ColumnaBool clone(){
         ColumnaBool copia = new ColumnaBool();
         for (int i=0; i < this.length(); i++) {
-            copia.añadirCelda(this.get(i));
+            copia.add(this.get(i));
         }
         return copia;
     }
@@ -125,7 +125,7 @@ public class ColumnaBool extends Columna<Boolean>{
         indices.sort(null);
         ColumnaBool filtrada = new ColumnaBool();
         for (Integer indice : indices) {
-            filtrada.añadirCelda(this.get(indice));
+            filtrada.add(this.get(indice));
         }
         return filtrada;
     }
@@ -186,7 +186,7 @@ public class ColumnaBool extends Columna<Boolean>{
         ColumnaBool copia = this.clone();
         for (int i=0; i < copia.length(); i++){
             Integer newIdx = orden.get(i);
-            copia.setCelda(newIdx, get(i));
+            copia.set(newIdx, get(i));
         }
         return copia;
     }
@@ -306,7 +306,7 @@ public class ColumnaBool extends Columna<Boolean>{
         ColumnaBool copia = new ColumnaBool();
         for (int i=0; i < length(); i++){
             if (get(i) != null){
-                copia.añadirCelda(transformacion.apply(get(i)));
+                copia.add(transformacion.apply(get(i)));
             }
         }
         return copia;
@@ -317,7 +317,7 @@ public class ColumnaBool extends Columna<Boolean>{
         for(Boolean e: data)
         {
             if(!unica.contiene(e))
-                unica.añadirCelda(e);
+                unica.add(e);
         }
         return unica;
     }

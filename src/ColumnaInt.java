@@ -26,14 +26,14 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     public ColumnaInt(Integer[] data){
         this();
         for (Integer num : data) {
-            this.añadirCelda(num);
+            this.add(num);
         }
     }
 
     public ColumnaInt(int[] data){
         this();
         for (int elem : data) {
-            this.añadirCelda(elem);
+            this.add(elem);
         }
     }
 
@@ -42,7 +42,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         this();
         for(int i = 0; i < size; i++)
         {
-            añadirCelda(null);
+            add(null);
         }
     }
 
@@ -127,23 +127,23 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     }
 
     @Override
-    public void setCelda(int indice, Integer valor) {
-        if (!contieneIndice(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public void set(int index, Integer value) {
+        if (!contieneIndice(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        this.data.set(indice, valor);
+        this.data.set(index, value);
     }
 
     @Override
-    public void añadirCelda(int indice, Integer valor) {
-        if (!contieneIndice(indice) && indice != 0){
-            this.data.add(indice, valor);
+    public void add(int index, Integer value) {
+        if (!contieneIndice(index) && index != 0){
+            this.data.add(index, value);
         }
-        throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+        throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
     }
 
     @Override
-    public void añadirCelda(Integer valor) {
+    public void add(Integer valor) {
         this.data.add(valor);
     }
 
@@ -167,7 +167,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     public Columna<Integer> recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaInt recorte = new ColumnaInt();
         for (int i=indiceInicio; i <= indiceFinal; i++) {
-            recorte.añadirCelda(this.get(i));
+            recorte.add(this.get(i));
         }
         return recorte;
     }
@@ -182,7 +182,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         indices.sort(null);
         ColumnaInt filtrada = new ColumnaInt();
         for (Integer indice : indices) {
-            filtrada.añadirCelda(this.get(indice));
+            filtrada.add(this.get(indice));
         }
         return filtrada;
     }
@@ -190,7 +190,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     public ColumnaInt clone(){
         ColumnaInt copia = new ColumnaInt();
         for (Integer num : data) {
-            copia.añadirCelda(num);
+            copia.add(num);
         }
         return copia;
     }
@@ -258,7 +258,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
 
         for (int i=0; i < copia.length(); i++){
             Integer newIdx = orden.get(i);
-            copia.setCelda(newIdx, get(i));
+            copia.set(newIdx, get(i));
         }
         return copia;
     }
@@ -358,7 +358,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         ColumnaInt copia = new ColumnaInt();
         for (int i=0; i < length(); i++){
             if (get(i) != null){
-                copia.añadirCelda(transformacion.apply(get(i)));
+                copia.add(transformacion.apply(get(i)));
             }
         }
         return copia;
@@ -370,7 +370,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         for(Integer e: data)
         {
             if(!unica.contiene(e))
-                unica.añadirCelda(e);
+                unica.add(e);
         }
         return unica;
     }

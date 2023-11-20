@@ -121,7 +121,7 @@ public final class IOCSV
                 String[] valores = procesarFila(linea, header.length);
                 //System.out.println(valores.length);
                 for (int i=0; i < valores.length; i++) {
-                    columnas.get(header[i]).añadirCelda(valores[i]);
+                    columnas.get(header[i]).add(valores[i]);
                 }
                 linea = br.readLine();
             }

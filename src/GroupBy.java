@@ -319,7 +319,7 @@ public class GroupBy implements Cloneable
         ColumnaNum<Double> colInsertada = col.clone();
         for(Integer indice: indices)
         {
-            colInsertada.setCelda(indice, valor);
+            colInsertada.set(indice, valor);
         }
 
         return colInsertada;
