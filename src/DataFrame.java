@@ -28,14 +28,9 @@ public class DataFrame implements Cloneable {
 
     @SuppressWarnings("rawtypes")
     public DataFrame(Map<String, Columna> data, Map<String, DataType> tiposColumna){
-        this.data = data;
-        this.tiposColumna = tiposColumna;
-        // this.etiquetas = data.keySet().stream().toList();
-        // Esto es porque el .toList() no funciona en la compu de la unsam
-        this.etiquetas = new ArrayList<>();
-        for (String etiqueta : data.keySet()) {
-            this.etiquetas.add(etiqueta);
-        }
+        this.data = new LinkedHashMap<>(data);
+        this.tiposColumna = new LinkedHashMap<>(tiposColumna);
+        this.etiquetas = new ArrayList<>(data.keySet());
     }
 
     @SuppressWarnings("rawtypes")
@@ -45,6 +40,26 @@ public class DataFrame implements Cloneable {
             this.data.put(String.valueOf(i), data.get(i).clone());
             this.etiquetas.add(String.valueOf(i));
             this.tiposColumna.put(String.valueOf(i), data.get(i).getColumnType());
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(Columna[] data){
+        this();
+        for (int i=0; i < data.length; i++){
+            this.data.put(String.valueOf(i), data[i].clone());
+            this.etiquetas.add(String.valueOf(i));
+            this.tiposColumna.put(String.valueOf(i), data[i].getColumnType());
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(Map<String, Columna> data){
+        this();
+        for (String colName : data.keySet()){
+            this.data.put(colName, data.get(colName).clone());
+            this.etiquetas.add(colName);
+            this.tiposColumna.put(colName, data.get(colName).getColumnType());
         }
     }
 
