@@ -2,6 +2,7 @@ package src;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,10 +174,10 @@ public class GroupBy implements Cloneable
         for(int i = 0; i < values.length(); i++)
         {
             if(siguientesGrupos == null)
-                grupos.add(String.valueOf(values.getCelda(i)));
+                grupos.add(String.valueOf(values.get(i)));
             else
                 for(String str: siguientesGrupos)
-                    grupos.add(String.valueOf(values.getCelda(i)) + "," + str);
+                    grupos.add(String.valueOf(values.get(i)) + "," + str);
         }
 
         return grupos;
@@ -261,7 +262,6 @@ public class GroupBy implements Cloneable
     @Override
     public String toString()
     {
-        final String fila = "";
         final List<String> colPrinteables = getColumnasAgrupadas();
         colPrinteables.addAll(colAgregadas);
         int[] tamaño = new int[colPrinteables.size()];
@@ -333,7 +333,7 @@ public class GroupBy implements Cloneable
         ColumnaNum<Double> colInsertada = col.clone();
         for(Integer indice: indices)
         {
-            colInsertada.setCelda(indice, valor);
+            colInsertada.set(indice, valor);
         }
 
         return colInsertada;
@@ -478,13 +478,43 @@ public class GroupBy implements Cloneable
             col = insertarValoresGrupo(col, indicesGrupo, val);
         }
 
-        ColumnaInt nuevaCol = ColumnaInt.fromColumnaDouble(col);
+        ColumnaInt nuevaCol = ColumnaInt.toColumnaInt(col);
 
         GroupBy gb = clone();
 
         String nuevaColName = "n";
         gb.data = gb.data.addColumna(nuevaColName, nuevaCol);
         gb.colAgregadas.add(nuevaColName);
+        return gb;
+    }
+
+    public GroupBy order(String etiqueta, boolean creciente)
+    {
+        GroupBy gb = clone();
+
+        for(String grupo: valorGrupos)
+        {
+            List<Integer> indexGroup = grupos.get(grupo);
+            indexGroup.sort(null);
+            
+            DataFrame slice = gb.data.getFila(indexGroup);
+            
+            Map<Integer, Integer> mappedIndexes = new HashMap<>();
+            for(int i = 0; i < indexGroup.size(); i++)
+            {
+                mappedIndexes.put(i, indexGroup.get(i));
+            }
+            
+            Map<Integer, Integer> orderIndex = slice.getColumna(etiqueta).ordenar(creciente);
+            Map<Integer, Integer> newOrder = new HashMap<>();
+
+            for(Map.Entry<Integer, Integer> entry: orderIndex.entrySet())
+            {
+                newOrder.put(mappedIndexes.get(entry.getKey()), mappedIndexes.get(entry.getValue()));
+            }
+            gb.data = gb.data.orderByIndex(newOrder);
+        }
+
         return gb;
     }
 }

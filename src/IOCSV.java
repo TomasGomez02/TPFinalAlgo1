@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -18,6 +17,11 @@ import utils.DataType;
 
 public final class IOCSV 
 {
+    static char delim;
+    static final char defaultDelim = ',';
+    static final boolean defaultHasHeaders = true;
+    static final DataType[] defaultDataTypes = null;
+
     private IOCSV(){}
 
     /**
@@ -28,7 +32,22 @@ public final class IOCSV
      */
     public static DataFrame fromCSV(String path)
     {
-        return fromCSV(path, null);
+        return fromCSV(path, defaultHasHeaders);
+    }
+
+    public static DataFrame fromCSV(String path, boolean hasHeaders)
+    {
+        return fromCSV(path, hasHeaders, defaultDelim);
+    }
+
+    public static DataFrame fromCSV(String path, boolean hasHeaders, char delim)
+    {
+        return fromCSV(new File(path), hasHeaders, delim, defaultDataTypes);
+    }
+
+    public static DataFrame fromCSV(String path, char delim)
+    {
+        return fromCSV(path, defaultHasHeaders, delim);
     }
 
     /**
@@ -39,7 +58,7 @@ public final class IOCSV
      * @return          DataFrame creado a partir del archivo csv
      */
     public static DataFrame fromCSV(String path, DataType[] dataTypes) {
-        return fromCSV(new File(path), dataTypes);
+        return fromCSV(new File(path), defaultHasHeaders, defaultDelim, dataTypes);
     }
 
     /**
@@ -50,7 +69,7 @@ public final class IOCSV
      */
     public static DataFrame fromCSV(File file)
     {
-        return fromCSV(file, null);
+        return fromCSV(file, defaultHasHeaders, defaultDelim, defaultDataTypes);
     }
 
     /**
@@ -60,7 +79,8 @@ public final class IOCSV
      * @param dataTypes tipos de datos de las columnas del Dataframe
      * @return          Dataframe creado a partir del archivo csv
      */
-    public static DataFrame fromCSV(File file, DataType[] dataTypes){
+    public static DataFrame fromCSV(File file, boolean hasHeaders, char delim, DataType[] dataTypes){
+        IOCSV.delim = delim;
         Map<String, DataType> tiposEtiqueta = new LinkedHashMap<>();
         String[] header;
         @SuppressWarnings("rawtypes")
@@ -73,7 +93,16 @@ public final class IOCSV
             
             // Genero las columnas para cada etiqueta
             // Y el tipo de dato para cada etiqueta
+            
             header = procesarFila(linea);
+
+            if(!hasHeaders)
+            {
+                for(int i = 0; i < header.length; i++)
+                {
+                    header[i] = String.valueOf(i);
+                }
+            }
             //System.out.println(header.length);
             columnas = crearColumnas(header);
 
@@ -84,13 +113,17 @@ public final class IOCSV
                     tiposEtiqueta.put(header[i], DataType.STRING);
             }  
 
+            if(hasHeaders)
+                linea = br.readLine();
+
             // Asigno los valores a cada columna
-            while ((linea = br.readLine()) != null) {
+            while (linea != null) {
                 String[] valores = procesarFila(linea, header.length);
                 //System.out.println(valores.length);
                 for (int i=0; i < valores.length; i++) {
-                    columnas.get(header[i]).añadirCelda(valores[i]);
+                    columnas.get(header[i]).add(valores[i]);
                 }
+                linea = br.readLine();
             }
             
         } catch (FileNotFoundException e) {
@@ -150,21 +183,21 @@ public final class IOCSV
         char[] filaChar = fila.toCharArray();
         for(int i = 0; i < filaChar.length; i++)    
         {
-            switch (filaChar[i]) 
+            if(filaChar[i] == IOCSV.delim)
             {
-                case ',':
-                    if(!enComillas)
-                    {
-                        filaProcesada.add(elemento);
-                        elemento = "";
-                    }
-                    break;
-                case '"':
-                    enComillas = !enComillas;
-                    break;
-                default:
-                    elemento += filaChar[i];
-                    break;
+                if(!enComillas)
+                {
+                    filaProcesada.add(elemento);
+                    elemento = "";
+                }
+            }
+            else if(filaChar[i] == '"')
+            {
+                enComillas = !enComillas;
+            }
+            else
+            {
+                elemento += filaChar[i];
             }
         }
 
@@ -210,11 +243,11 @@ public final class IOCSV
     {
         switch (dataType) {
             case INT:
-                return ColumnaInt.fromColumnaString(col, true);
+                return ColumnaInt.toColumnaInt(col, true);
             case DOUBLE:
-                return ColumnaDouble.fromColumnaString(col, true);
+                return ColumnaDouble.toDoubleColumn(col, true);
             case BOOL:
-                return ColumnaBool.fromColumnaString(col, true);
+                return ColumnaBool.toBoolColumn(col, true);
             default:
                 return col;
         }
@@ -266,15 +299,15 @@ public final class IOCSV
         {
             switch (count) {
                 case 0:
-                    colCasteada = ColumnaBool.fromColumnaString(col);
+                    colCasteada = ColumnaBool.toBoolColumn(col);
                     tiposEtiqueta.put(keys.get(index), DataType.BOOL);
                     break;
                 case 1:
-                    colCasteada = ColumnaInt.fromColumnaString(col);
+                    colCasteada = ColumnaInt.toColumnaInt(col);
                     tiposEtiqueta.put(keys.get(index), DataType.INT);
                     break;
                 case 2:
-                    colCasteada = ColumnaDouble.fromColumnaString(col);
+                    colCasteada = ColumnaDouble.toDoubleColumn(col);
                     tiposEtiqueta.put(keys.get(index), DataType.DOUBLE);
                     break;
                 default:

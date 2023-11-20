@@ -1,14 +1,18 @@
 package src;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import utils.ColumnaInexistenteException;
 import utils.DataType;
+import utils.Types;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -20,20 +24,45 @@ public class DataFrame implements Cloneable {
     private Map<String, DataType> tiposColumna;
 
     public DataFrame(){
-        this.data = new HashMap<>();
+        this.data = new LinkedHashMap<>();
         this.etiquetas = new ArrayList<>();
-        this.tiposColumna = new HashMap<>();
+        this.tiposColumna = new LinkedHashMap<>();
     }
 
     @SuppressWarnings("rawtypes")
     public DataFrame(Map<String, Columna> data, Map<String, DataType> tiposColumna){
-        this.data = data;
-        this.tiposColumna = tiposColumna;
-        // this.etiquetas = data.keySet().stream().toList();
-        // Esto es porque el .toList() no funciona en la compu de la unsam
-        this.etiquetas = new ArrayList<>();
-        for (String etiqueta : data.keySet()) {
-            this.etiquetas.add(etiqueta);
+        this.data = new LinkedHashMap<>(data);
+        this.tiposColumna = new LinkedHashMap<>(tiposColumna);
+        this.etiquetas = new ArrayList<>(data.keySet());
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(List<Columna> data){
+        this();
+        for (int i=0; i < data.size(); i++){
+            this.data.put(String.valueOf(i), data.get(i).clone());
+            this.etiquetas.add(String.valueOf(i));
+            this.tiposColumna.put(String.valueOf(i), data.get(i).getColumnType());
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(Columna[] data){
+        this();
+        for (int i=0; i < data.length; i++){
+            this.data.put(String.valueOf(i), data[i].clone());
+            this.etiquetas.add(String.valueOf(i));
+            this.tiposColumna.put(String.valueOf(i), data[i].getColumnType());
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(Map<String, Columna> data){
+        this();
+        for (String colName : data.keySet()){
+            this.data.put(colName, data.get(colName).clone());
+            this.etiquetas.add(colName);
+            this.tiposColumna.put(colName, data.get(colName).getColumnType());
         }
     }
 
@@ -83,7 +112,7 @@ public class DataFrame implements Cloneable {
      * @return un mapa que representa la asociacion entre los nombres de las columnas y sus tipos de datos.
      */
     public Map<String, DataType> tiposColumna(){
-        return this.tiposColumna;
+        return new LinkedHashMap<>(this.tiposColumna);
     }
 
     public String toString(){
@@ -93,9 +122,8 @@ public class DataFrame implements Cloneable {
 
     /**
      * Imprime una porcion del dataframe delimitado por un indice de inicio y un indice final.
-     * 
      * @param indiceInicio primer indice de fila a imprimir
-     * @param indiceFinal  ultimo indice de fila a imprimir 
+     * @param indiceFinal ultimo indice de fila a imprimir 
      */
     public void printDesdeHasta(int indiceInicio, int indiceFinal){
         printDesdeHasta(indiceInicio, indiceFinal, 4);
@@ -140,20 +168,40 @@ public class DataFrame implements Cloneable {
         fila += " ".repeat(tamañoIndice) + sep;
         // Esta parte es para escribir los nombres de las columnas
         
-        if(COLUMNASOVERFLOW)
-            fila += OVERFLOWSTRING;
-        System.out.println(fila);
+        for (int i = 0; i < cantColumnas; i++)
+        {
+            int diff = tamaño[i] - etiquetas.get(i).length();
+            espacioIzq = diff / 2;
+            if (diff % 2 == 0)
+            {
+                espacioDer = espacioIzq;
+            } 
+            else 
+            {
+                espacioDer = espacioIzq+1;
+            }
+            fila += " ".repeat(espacioIzq)+etiquetas.get(i)+" ".repeat(espacioDer)+sep;
+        }
+
         int cantidadSepHeader = 0;
+        if(COLUMNASOVERFLOW)
+        {
+            fila += OVERFLOWSTRING;
+            cantidadSepHeader += OVERFLOWSTRING.length();
+        }
+        System.out.println(fila);
+        
         for(int tam: tamaño)
             cantidadSepHeader += tam + 1;
-        System.out.println("-".repeat(cantidadSepHeader + tamañoIndice));
+        System.out.println("-".repeat(cantidadSepHeader + tamañoIndice + 1));
+
         fila = "";
         // Esta parte es para escribir los valores
         for (int row=indiceInicio; row <= indiceFinal; row++){
             int diffTamañoIndice = tamañoIndice - String.valueOf(row).length();
             fila += row + " ".repeat(diffTamañoIndice) + sep;
             for (int i = 0; i < cantColumnas; i++) {
-                String elem = String.valueOf(getCelda(etiquetas.get(i), row) != null);
+                String elem = String.valueOf(getCelda(etiquetas.get(i), row));
 
                 if(elem.length() > tamaño[i])
                 {
@@ -282,7 +330,7 @@ public class DataFrame implements Cloneable {
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException(etiqueta);
         }
-        this.data.get(etiqueta).setCelda(indice, valor);
+        this.data.get(etiqueta).set(indice, valor);
     }
 
     /**
@@ -297,7 +345,7 @@ public class DataFrame implements Cloneable {
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException(etiqueta);
         }
-        return this.data.get(etiqueta).getCelda(indice);
+        return this.data.get(etiqueta).get(indice);
     }
 
     /**
@@ -314,7 +362,7 @@ public class DataFrame implements Cloneable {
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException(etiqueta);
         }
-        return tipoDato.cast(data.get(etiqueta).getCelda(indice));
+        return tipoDato.cast(data.get(etiqueta).get(indice));
     }
 
     /**
@@ -329,7 +377,7 @@ public class DataFrame implements Cloneable {
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException();
         }
-        this.data.get(etiqueta).añadirCelda(valor);
+        this.data.get(etiqueta).add(valor);
     }
     @Override
     public DataFrame clone(){
@@ -340,6 +388,38 @@ public class DataFrame implements Cloneable {
             dataTypes.put(colName, this.tiposColumna.get(colName));
         }
         return new DataFrame(columnas, dataTypes);
+    }
+
+    public DataFrame switchRows(int row1, int row2)
+    {
+        if(row1 < 0 || row1 >= cantidadFilas())
+            throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + row1);
+        if(row2 < 0 || row2 >= cantidadFilas())
+            throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + row2);
+
+        DataFrame df = clone();
+
+        for(String etiqueta: etiquetas)
+        {
+            df = df.setRow(this.getFila(row1), row2)
+                    .setRow(this.getFila(row2), row1);
+        }
+
+        return df;
+    }
+
+    public DataFrame setRow(DataFrame fila, int index)
+    {
+        if(index < 0 || index >= cantidadFilas())
+            throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + index);
+        DataFrame df = clone();
+        
+        for(String etiqueta: etiquetas)
+        {
+            df.setCelda(etiqueta, index, fila.getCelda(etiqueta, 0, Types.evaluarTipo(tiposColumna.get(etiqueta))));
+        }
+
+        return df;
     }
 
     /**
@@ -353,9 +433,10 @@ public class DataFrame implements Cloneable {
         if (df.contieneEtiqueta(etiqueta)){
             throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
-        df.data.put(etiqueta, columna);
+        df.data.put(etiqueta, columna.clone());
         df.tiposColumna.put(etiqueta, columna.getColumnType());
         df.etiquetas.add(etiqueta);
+        df.head();
         return df;
     }
 
@@ -379,8 +460,8 @@ public class DataFrame implements Cloneable {
      * @return         Dataframe que contiene las columnas obtenidas 
      */
     public DataFrame getColumna(String[] etiqueta){
-        Map<String, Columna> columnas = new HashMap<>();
-        Map<String, DataType> tiposCol = new HashMap<>();
+        Map<String, Columna> columnas = new LinkedHashMap<>();
+        Map<String, DataType> tiposCol = new LinkedHashMap<>();
         for (String colName : etiqueta){
             columnas.put(colName, this.getColumna(colName));
             tiposCol.put(colName, this.tiposColumna.get(colName));
@@ -440,7 +521,7 @@ public class DataFrame implements Cloneable {
      */
     public void addFila(Map<String, Object> fila){
         for (String colName : fila.keySet()){
-            this.data.get(colName).añadirCelda(fila.get(colName));
+            this.data.get(colName).add(fila.get(colName));
         }
     }
 
@@ -468,19 +549,19 @@ public class DataFrame implements Cloneable {
                 switch (this.tiposColumna.get(colName)){
                     case STRING:
                         otro.put(colName, new ColumnaString());
-                        otro.get(colName).añadirCelda(getCelda(colName, fila, String.class));
+                        otro.get(colName).add(getCelda(colName, fila, String.class));
                         break;
                     case INT:
                         otro.put(colName, new ColumnaInt());
-                        otro.get(colName).añadirCelda(getCelda(colName, fila, Integer.class));
+                        otro.get(colName).add(getCelda(colName, fila, Integer.class));
                         break;
                     case DOUBLE:
                         otro.put(colName, new ColumnaDouble());
-                        otro.get(colName).añadirCelda(getCelda(colName, fila, Double.class));
+                        otro.get(colName).add(getCelda(colName, fila, Double.class));
                         break;
                     case BOOL:
                         otro.put(colName, new ColumnaBool());
-                        otro.get(colName).añadirCelda(getCelda(colName, fila, Boolean.class));
+                        otro.get(colName).add(getCelda(colName, fila, Boolean.class));
                         break;
                 }
             }
@@ -496,6 +577,8 @@ public class DataFrame implements Cloneable {
      * @return     un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
     public DataFrame getFila(int[] fila){
+        Arrays.sort(fila);
+        System.out.println(fila);
         DataFrame copia = this.getFila(fila[0]);
         for (int i=1; i < fila.length; i++){
             copia.addFila(this.getFila(fila[i]));
@@ -504,12 +587,13 @@ public class DataFrame implements Cloneable {
     }
 
     /**
-     * Obtiene un DataFrame que contiene las filas indicadas por un array de enteros.
-     * 
-     * @param fila Array de enteros que representan los indices de las filas deseadas
-     * @return
+     * Obtiene y devuelve un Dataframe formado solo por las filas correspondientes a los indices proporcionados.
+     * @param fila lista de Integer que representan los indices de las filas a obtener
+     * @return un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
     public DataFrame getFila(Integer[] fila){
+        Arrays.sort(fila);
+        // System.out.println(fila);
         DataFrame copia = this.getFila(fila[0]);
         for (int i=1; i < fila.length; i++){
             copia.addFila(this.getFila(fila[i]));
@@ -524,6 +608,8 @@ public class DataFrame implements Cloneable {
      * @return     un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
     public DataFrame getFila(List<Integer> fila){
+        fila.sort(null);
+        // System.out.println(fila);
         DataFrame copia = this.getFila(fila.get(0));
         for (int i=1; i < fila.size(); i++){
             copia.addFila(this.getFila(fila.get(i)));
@@ -537,13 +623,23 @@ public class DataFrame implements Cloneable {
      * @param etiqueta la etiqueta de la columna a eliminar
      * @throws ColumnaInexistenteException Si la columna con la etiqueta especificada no existe en el DataFrame
      */
-    public void eliminarCol(String etiqueta){
-        if (this.contieneEtiqueta(etiqueta)){
-            this.data.remove(etiqueta);
-            this.etiquetas.remove(this.etiquetas.indexOf(etiqueta));
-            return;
+    public DataFrame eliminarCol(String etiqueta){
+        if (!contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistenteException(etiqueta);
         }
-        throw new ColumnaInexistenteException(etiqueta);
+        DataFrame df = clone();
+        df.data.remove(etiqueta);
+        df.tiposColumna.remove(etiqueta);
+        df.etiquetas.remove(df.etiquetas.indexOf(etiqueta));
+        return df;
+    }
+
+    public DataFrame eliminarCol(String[] etiquetas){
+        DataFrame df = eliminarCol(etiquetas[0]);
+        for (int i=1; i < etiquetas.length; i++){
+            df = df.eliminarCol(etiquetas[i]);
+        }
+        return df;
     }
 
     /**
@@ -551,14 +647,20 @@ public class DataFrame implements Cloneable {
      * 
      * @param etiqueta el indice de la fila a eliminar
      */
-    public void eliminarFila(int fila){
-        if (0 <= fila && fila <= this.cantidadFilas()-1){
-            for (String colName : this.etiquetas){
-                this.getColumna(colName).eliminarCelda(fila);
-            }
-            return;
+    public DataFrame eliminarFila(int fila){
+        // if (0 <= fila && fila <= this.cantidadFilas()-1){
+        //     for (String colName : this.etiquetas){
+        //         this.getColumna(colName).eliminarCelda(fila);
+        //     }
+        //     return;
+        // }
+        // throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
+        if (fila < 0 || fila > this.cantidadFilas()-1){
+            throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
         }
-        throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
+        for (String colName : this.etiquetas){
+            this.getColumna(colName).eliminarCelda(fila);
+        }
     }
 
     /**
@@ -594,6 +696,69 @@ public class DataFrame implements Cloneable {
             copia.data.put(colName, getColumna(colName).ordenarPorIndice(orden));
         }
         return copia;
+    }
+
+    public DataFrame sort(String[] tags, boolean increasing)
+    {
+        for(String tag: tags)
+        {
+            if(!contieneEtiqueta(tag))
+                throw new ColumnaInexistenteException(tag);
+        }
+
+        DataFrame df = clone();
+        List<String> groupedTags = new ArrayList<>();
+        df = df.ordenar(tags[0], increasing);
+
+        for(int i = 1; i < tags.length; i++)
+        {
+            groupedTags.add(tags[i - 1]);
+            df = df.groupBy(groupedTags).order(tags[i], increasing).unGroup();
+        }
+        return df;
+    }
+
+    public DataFrame orderByIndex(Map<Integer, Integer> indexes)
+    {
+        if(!indexes.keySet().equals(new HashSet<Integer>(indexes.values())))
+        {
+            throw new IllegalArgumentException("Se requiere tener una posición para cada indice dado.");
+        }
+        DataFrame df = clone();
+
+        for(Map.Entry<Integer, Integer> entry: indexes.entrySet())
+        {
+            df = df.setRow(getFila(entry.getKey()), entry.getValue());
+        }
+
+        return df;
+    }
+
+    public DataFrame sample(double fraction)
+    {
+        if(fraction < 0 || fraction > 1)
+        {
+            throw new IllegalArgumentException("La fracción debe estar entre 0.0 y 1.0.");
+        }
+        long cant = Math.round(fraction * cantidadFilas());
+        return sample((int) cant);
+    }
+
+    public DataFrame sample(int n)
+    {
+        List<Integer> indexes = new ArrayList<>();
+        Random rand = new Random();
+
+        while(indexes.size() < n)
+        {
+            int indice = rand.nextInt(cantidadFilas());
+            if(!indexes.contains(indice))
+            {
+                indexes.add(indice);
+            }
+        }
+
+        return getFila(indexes);
     }
 
     /**
