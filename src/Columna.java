@@ -16,7 +16,7 @@ public abstract class Columna<T> implements Cloneable {
      * @param indice indice de la celda
      * @return valor encontrado en la celda 
      */
-    public abstract T getCelda(int indice);
+    public abstract T get(int indice);
 
     /**
      * Establece el valor de la celda.
@@ -81,7 +81,7 @@ public abstract class Columna<T> implements Cloneable {
     
     public void concatenarColumna(Columna<T> otraColumna){
         for (int i=0; i < otraColumna.length(); i++){
-            this.añadirCelda(otraColumna.getCelda(i));
+            this.añadirCelda(otraColumna.get(i));
         }
     }
 
@@ -107,7 +107,7 @@ public abstract class Columna<T> implements Cloneable {
     public int cantNull(){
         int count = 0;
         for (int i=0; i < length(); i++){
-            if (getCelda(i) == null){
+            if (get(i) == null){
                 count++;
             }
         }
@@ -123,7 +123,7 @@ public abstract class Columna<T> implements Cloneable {
     public List<Integer> filtrar(Predicate<T> filtro){
         List<Integer> indices = new ArrayList<>();
         for (int i=0; i < this.length(); i++){
-            if (this.getCelda(i) != null && filtro.test(this.getCelda(i))){
+            if (this.get(i) != null && filtro.test(this.get(i))){
                 indices.add(i);
             }
         }
@@ -185,7 +185,7 @@ public abstract class Columna<T> implements Cloneable {
         }
 
         for(int i = 0; i < length(); i++)
-            if(elemento.equals(getCelda(i)))
+            if(elemento.equals(get(i)))
                 return true;
 
         return false;
@@ -196,7 +196,7 @@ public abstract class Columna<T> implements Cloneable {
         List<T> lista = new ArrayList<>();
         for(int i = 0; i < length(); i++)
         {
-            lista.add(getCelda(i));
+            lista.add(get(i));
         }
 
         return lista;

@@ -10,7 +10,9 @@ import utils.DataType;
 import utils.Types;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -318,7 +320,7 @@ public class DataFrame implements Cloneable {
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException(etiqueta);
         }
-        return this.data.get(etiqueta).getCelda(indice);
+        return this.data.get(etiqueta).get(indice);
     }
 
     /**
@@ -335,7 +337,7 @@ public class DataFrame implements Cloneable {
         if (!this.contieneEtiqueta(etiqueta)){
             throw new ColumnaInexistenteException(etiqueta);
         }
-        return tipoDato.cast(data.get(etiqueta).getCelda(indice));
+        return tipoDato.cast(data.get(etiqueta).get(indice));
     }
 
     /**
@@ -374,8 +376,22 @@ public class DataFrame implements Cloneable {
 
         for(String etiqueta: etiquetas)
         {
-            df.setCelda(etiqueta, row1, this.getCelda(etiqueta, row2, Types.evaluarTipo(tiposColumna.get(etiqueta))));
-            df.setCelda(etiqueta, row2, this.getCelda(etiqueta, row1, Types.evaluarTipo(tiposColumna.get(etiqueta))));
+            df = df.setRow(this.getFila(row1), row2)
+                    .setRow(this.getFila(row2), row1);
+        }
+
+        return df;
+    }
+
+    public DataFrame setRow(DataFrame fila, int index)
+    {
+        if(index < 0 || index >= cantidadFilas())
+            throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + index);
+        DataFrame df = clone();
+        
+        for(String etiqueta: etiquetas)
+        {
+            df.setCelda(etiqueta, index, fila.getCelda(etiqueta, 0, Types.evaluarTipo(tiposColumna.get(etiqueta))));
         }
 
         return df;
@@ -535,6 +551,8 @@ public class DataFrame implements Cloneable {
      * @return un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
     public DataFrame getFila(int[] fila){
+        Arrays.sort(fila);
+        System.out.println(fila);
         DataFrame copia = this.getFila(fila[0]);
         for (int i=1; i < fila.length; i++){
             copia.addFila(this.getFila(fila[i]));
@@ -548,6 +566,8 @@ public class DataFrame implements Cloneable {
      * @return
      */
     public DataFrame getFila(Integer[] fila){
+        Arrays.sort(fila);
+        // System.out.println(fila);
         DataFrame copia = this.getFila(fila[0]);
         for (int i=1; i < fila.length; i++){
             copia.addFila(this.getFila(fila[i]));
@@ -562,6 +582,8 @@ public class DataFrame implements Cloneable {
      * @return un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
     public DataFrame getFila(List<Integer> fila){
+        fila.sort(null);
+        // System.out.println(fila);
         DataFrame copia = this.getFila(fila.get(0));
         for (int i=1; i < fila.size(); i++){
             copia.addFila(this.getFila(fila.get(i)));
@@ -634,9 +656,40 @@ public class DataFrame implements Cloneable {
         return copia;
     }
 
-    public DataFrame orderByIndex(Map<Integer, Integer> indices)
+    public DataFrame sort(String[] tags, boolean increasing)
     {
-        return clone();
+        for(String tag: tags)
+        {
+            if(!contieneEtiqueta(tag))
+                throw new ColumnaInexistenteException(tag);
+        }
+
+        DataFrame df = clone();
+        List<String> groupedTags = new ArrayList<>();
+        df = df.ordenar(tags[0], increasing);
+
+        for(int i = 1; i < tags.length; i++)
+        {
+            groupedTags.add(tags[i - 1]);
+            df = df.groupBy(groupedTags).order(tags[i], increasing).unGroup();
+        }
+        return df;
+    }
+
+    public DataFrame orderByIndex(Map<Integer, Integer> indexes)
+    {
+        if(!indexes.keySet().equals(new HashSet<Integer>(indexes.values())))
+        {
+            throw new IllegalArgumentException("Se requiere tener una posición para cada indice dado.");
+        }
+        DataFrame df = clone();
+
+        for(Map.Entry<Integer, Integer> entry: indexes.entrySet())
+        {
+            df = df.setRow(getFila(entry.getKey()), entry.getValue());
+        }
+
+        return df;
     }
 
     public DataFrame sample(double fraction)
