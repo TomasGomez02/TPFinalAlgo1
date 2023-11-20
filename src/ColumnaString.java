@@ -34,7 +34,7 @@ public class ColumnaString extends Columna<String> {
     }
 
     @Override
-    public String getCelda(int indice) {
+    public String get(int indice) {
         if (!contieneIndice(indice)){
             throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
         }
@@ -82,7 +82,7 @@ public class ColumnaString extends Columna<String> {
     public ColumnaString recortarColumna(int indiceInicio, int indiceFinal) {
         ColumnaString recorte = new ColumnaString();
         for (int i=indiceInicio; i <= indiceFinal; i++) {
-            recorte.añadirCelda(this.getCelda(i));
+            recorte.añadirCelda(this.get(i));
         }
         return recorte;
     }
@@ -96,7 +96,7 @@ public class ColumnaString extends Columna<String> {
     public ColumnaString clone(){
         ColumnaString copia = new ColumnaString();
         for (int i=0; i < this.length(); i++){
-            copia.añadirCelda(this.getCelda(i));
+            copia.añadirCelda(this.get(i));
         }
         return copia;
     }
@@ -111,7 +111,7 @@ public class ColumnaString extends Columna<String> {
         indices.sort(null);
         ColumnaString filtrada = new ColumnaString();
         for (Integer indice : indices) {
-            filtrada.añadirCelda(this.getCelda(indice));
+            filtrada.añadirCelda(this.get(indice));
         }
         return filtrada;
     }
@@ -130,7 +130,7 @@ public class ColumnaString extends Columna<String> {
             Integer idxMinimo = -1;
             // Uso esto para tomar el primer indice no nulo y no ordenado
             for (int k=0; k < this.length(); k++){
-                if (this.getCelda(k) != null && !yaSeOrdeno[k]){
+                if (this.get(k) != null && !yaSeOrdeno[k]){
                     idxMinimo = k;
                     break;
                 }
@@ -139,8 +139,8 @@ public class ColumnaString extends Columna<String> {
                 continue;
             }
             for (int j=0; j < this.length(); j++){
-                if (!yaSeOrdeno[j] && this.getCelda(j) != null &&
-                this.getCelda(j).compareTo(this.getCelda(idxMinimo)) < 0){
+                if (!yaSeOrdeno[j] && this.get(j) != null &&
+                this.get(j).compareTo(this.get(idxMinimo)) < 0){
                     idxMinimo = j;
                 }
             }
@@ -155,7 +155,7 @@ public class ColumnaString extends Columna<String> {
         // Esta parte manda los null al final de la lista
         Integer distanciaDesdeUltimo = 0;
         for (int i=0; i < this.length(); i++){
-            if (this.getCelda(i) == null){
+            if (this.get(i) == null){
                 if (creciente){
                     trasladar.put(i, this.length() - distanciaDesdeUltimo -1);
                 }
@@ -174,7 +174,7 @@ public class ColumnaString extends Columna<String> {
 
         for (int i=0; i < copia.length(); i++){
             Integer newIdx = orden.get(i);
-            copia.setCelda(newIdx, getCelda(i));
+            copia.setCelda(newIdx, get(i));
         }
         return copia;
     }
@@ -183,8 +183,8 @@ public class ColumnaString extends Columna<String> {
     public ColumnaString transformar(UnaryOperator<String> transformacion) {
         ColumnaString copia = new ColumnaString();
         for (int i=0; i < length(); i++){
-            if (getCelda(i) != null){
-                copia.añadirCelda(transformacion.apply(getCelda(i)));
+            if (get(i) != null){
+                copia.añadirCelda(transformacion.apply(get(i)));
             }
         }
         return copia;
@@ -199,7 +199,7 @@ public class ColumnaString extends Columna<String> {
 
         for(int i = 0; i < col.length(); i++)
         {
-            T elemento = col.getCelda(i);
+            T elemento = col.get(i);
             if(elemento != null)
             {
                 datos.add(elemento.toString());

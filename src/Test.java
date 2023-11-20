@@ -2,7 +2,12 @@ package src;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -13,10 +18,10 @@ public class Test
 {
     public static void main(String[] args) 
     {
-        // String path = "datasets/taylor_all_songs.csv";
+        String path = "datasets/taylor_all_songs.csv";
         // String path = "datasets/taylor_albums.csv";
         // String path = "datasets/taylor_album_songs.csv";
-        String path = "datasets/tiny.csv";
+        // String path = "datasets/tiny.csv";
         // String path = "datasets/mucho_texto.csv";
 
         DataFrame df = IOCSV.fromCSV(path);
@@ -44,7 +49,19 @@ public class Test
 
         // IOCSV.toCSV(gb.unGroup(), "datasets/ganamos.csv");
 
-        df.head(7);
+        df.eliminarCol("featuring");
+        df.eliminarCol("bonus_track");
+        df.eliminarCol("promotional_release");
+        df.eliminarCol("single_release");
+        df.eliminarCol("artist");
+        
+        df.sort(new String[]{"album_name", "key", "danceability"}, true).head(25);
+
+        // df.groupBy(new String[]{"album_name", "track_release"}).print();
+
+
+
+        
         // GroupBy gb = df.groupBy("album_name");
         // gb.media("energy").unGroup().getColumna(new String[]{"album_name", "energy", "Media: energy"}).head(25);
     }
