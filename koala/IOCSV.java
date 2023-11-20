@@ -37,16 +37,38 @@ public final class IOCSV
         return fromCSV(path, defaultHasHeaders);
     }
 
+    /**
+     * Crea un Dataframe a partir de un archivo CSC, indicando si presenta encabezados o no. 
+     * 
+     * @param path       ruta del archivo csv
+     * @param hasHeaders indica si el archivo csv tiene encabezados 
+     * @return           DataFrame creado a partir del archivo csv
+     */
     public static DataFrame fromCSV(String path, boolean hasHeaders)
     {
         return fromCSV(path, hasHeaders, defaultDelim);
     }
 
+    /**
+     * Crea un Dataframe a partir de un archivo CSC, indicando si presenta encabezados y estableciendo el caracter delimitador de columnas.
+     * 
+     * @param path       ruta del archivo csv
+     * @param hasHeaders indica si el archivo csv tiene encabezados
+     * @param delim      el caracter delimitador de columnas
+     * @return           DataFrame creado a partir del archivo csv con las condiciones establecidas
+     */
     public static DataFrame fromCSV(String path, boolean hasHeaders, char delim)
     {
         return fromCSV(new File(path), hasHeaders, delim, defaultDataTypes);
     }
 
+    /**
+     * Crea un Dataframe a partir de un archivo CSC, indicando si presenta encabezados y estableciendo el caracter delimitador de columnas.
+     * 
+     * @param path  ruta del archivo csv
+     * @param delim el caracter delimitador de columnas
+     * @return      DataFrame creado a partir del archivo csv con las condiciones establecidas
+     */
     public static DataFrame fromCSV(String path, char delim)
     {
         return fromCSV(path, defaultHasHeaders, delim);

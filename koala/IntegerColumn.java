@@ -264,11 +264,26 @@ public class IntegerColumn extends NumberColumn<Integer> {
         return copia;
     }
 
+    /**
+     * Convierte una columna generica en una columna de tipo entero.
+     * 
+     * @param col columna la cual se quiere convertir
+     * @return    una columna de tipo entero
+     * @throws IllegalCastException si la conversion no es posible.
+     */
     public static IntegerColumn toIntegerColumn(Column col) throws IllegalCastException
     {
         return toIntegerColumn(col, false);
     }
 
+    /**
+     * Convierte una columna generica en una columna de tipo entero, con la opcion de forzar la conversion.
+     * 
+     * @param col   columna que se debe convertir a tipo entero
+     * @param force indica si se debe forzar la conversion
+     * @return      una columna de tipo entero
+     * @throws IllegalCastException si la conversion no es posible o si se fuerza y hay perdida de informacion.
+     */
     public static IntegerColumn toIntegerColumn(Column col, boolean force) throws IllegalCastException
     {
         switch (col.getColumnType()) 

@@ -480,6 +480,13 @@ public class GroupBy implements Cloneable
         return gb;
     }
 
+    /**
+     * Ordena los grupos de las columnas del Dataframe de manera ascendente o descendente segun lo indicado.
+     * 
+     * @param tag etiqueta de la columna a ordenar
+     * @param ascending determina si el ordenamiento sera ascendente o descendente 
+     * @return un objeto GroupBy con los grupos ordenados
+     */
     public GroupBy sort(String tag, boolean ascending)
     {
         GroupBy gb = clone();

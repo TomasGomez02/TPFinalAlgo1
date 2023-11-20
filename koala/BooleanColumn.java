@@ -105,6 +105,11 @@ public class BooleanColumn extends Column<Boolean>{
         return copia;
     }
 
+    /**
+     * Calcula la suma de los valores booleanos en la columna.
+     * 
+     * @return la suma de los valores booleanos en la columna
+     */
     public int sum(){
         int suma = 0;
         for (Boolean valor : data) {
@@ -191,11 +196,26 @@ public class BooleanColumn extends Column<Boolean>{
         return copia;
     }
 
+    /**
+     * Convierte una columna generica en una columna booleana.
+     * 
+     * @param col columna la cual se quiere convertir
+     * @return    una columna de tipo Bool
+     * @throws IllegalCastException si la conversion no es posible.
+     */
     public static BooleanColumn toBooleanColumn(Column col) throws IllegalCastException
     {
         return toBooleanColumn(col, false);
     }
 
+     /**
+     * Convierte una columna generica en una columna booleana, con la opcion de forzar la conversion.
+     * 
+     * @param col   columna que se debe convertir a tipo Bool
+     * @param force indica si se debe forzar la conversion
+     * @return      una columna de tipo Bool
+     * @throws IllegalCastException si la conversion no es posible o si se fuerza y hay perdida de informacion.
+     */
     public static BooleanColumn toBooleanColumn(Column col, boolean force) throws IllegalCastException
     {
         switch (col.getColumnType()) 

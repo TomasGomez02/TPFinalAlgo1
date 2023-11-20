@@ -269,11 +269,26 @@ public class DoubleColumn extends NumberColumn<Double>
         return copia;
     }
 
+    /**
+     * Convierte una columna generica en una columna de tipo double.
+     * 
+     * @param col columna la cual se quiere convertir
+     * @return    una columna de tipo double
+     * @throws IllegalCastException si la conversion no es posible.
+     */
     public static DoubleColumn toDoubleColumn(Column col) throws IllegalCastException
     {
         return toDoubleColumn(col, false);
     }
 
+    /**
+     * Convierte una columna generica en una columna de tipo Double, con la opcion de forzar la conversion.
+     * 
+     * @param col   columna que se debe convertir a tipo Double
+     * @param force indica si se debe forzar la conversion
+     * @return      una columna de tipo Double
+     * @throws IllegalCastException si la conversion no es posible o si se fuerza y hay perdida de informacion.
+     */
     public static DoubleColumn toDoubleColumn(Column col, boolean force) throws IllegalCastException
     {
         switch (col.getColumnType()) 
@@ -289,6 +304,14 @@ public class DoubleColumn extends NumberColumn<Double>
         }
     }
     
+    /**
+     * Convierte una columna String en una columna de tipo Double, con la opcion de forzar la conversion.
+     * 
+     * @param col   la columna de tipo String que se debe convertir a tipo Double
+     * @param force indica si se debe forzar la conversion
+     * @return      una nueva columna de tipo double
+     * @throws IllegalCastException
+     */
     private static DoubleColumn fromStringColumn (Column<String> col, boolean force) throws IllegalCastException
     {
         List<Double> datos = new ArrayList<>();

@@ -392,6 +392,13 @@ public class DataFrame implements Cloneable {
         return new DataFrame(columnas, dataTypes);
     }
 
+    /**
+     * Intercambia dos filas del Dataframe de lugar a partir de sus indices.
+     * 
+     * @param row1 fila a intercambiar
+     * @param row2 fila a intercambiar
+     * @return     un nuevo Dataframe con las filas intercambiadas
+     */
     public DataFrame switchRows(int row1, int row2)
     {
         if(row1 < 0 || row1 >= nRow())
@@ -410,6 +417,13 @@ public class DataFrame implements Cloneable {
         return df;
     }
 
+    /**
+     * Establece los valores de una fila del Dataframe indicada por su indice.
+     * 
+     * @param fila  DataFrame que representa la fila cuyos valores se deben establecer
+     * @param index indice de la fila en el DataFrame donde se deben establecer los valores
+     * @return      nuevo DataFrame con los valores de la fila actualizados en el indice especificado
+     */
     public DataFrame setRow(DataFrame fila, int index)
     {
         if(index < 0 || index >= nRow())
@@ -428,7 +442,7 @@ public class DataFrame implements Cloneable {
      * Agrega una nueva columna de booleanos al dataframe. 
      * 
      * @param tag etiqueta de la nueva columna
-     * @param col  lista de booleanos que contiene los valores que tendran las celdas de la nueva columna
+     * @param col lista de booleanos que contiene los valores que tendran las celdas de la nueva columna
      */
     public DataFrame addCol(String tag, Column col){
         DataFrame df = clone();
@@ -445,7 +459,7 @@ public class DataFrame implements Cloneable {
      * Obtiene una columna completa a partir de su etiqueta. 
      * 
      * @param tag etiqueta de la columna a obtener 
-     * @return         la columna completa asociada a la etiqueta especificada
+     * @return    la columna completa asociada a la etiqueta especificada
      */
     public Column getCol(String tag){
         if (!this.containsCol(tag)){
@@ -458,7 +472,7 @@ public class DataFrame implements Cloneable {
      * Obtiene un nuevo Dataframe que contiene las columnas proporcionadas a partir de sus etiquetas. 
      * 
      * @param tags array de las etiquetas de las columnas a obtener 
-     * @return         Dataframe que contiene las columnas obtenidas 
+     * @return     Dataframe que contiene las columnas obtenidas 
      */
     public DataFrame getCol(String[] tags){
         Map<String, Column> columnas = new LinkedHashMap<>();
@@ -474,7 +488,7 @@ public class DataFrame implements Cloneable {
      * Obtiene un nuevo Dataframe que contiene las columnas proporcionadas a partir de sus etiquetas. 
      * 
      * @param tags lista de las etiquetas de las columnas a obtener
-     * @return         Dataframe que contiene las columnas obtenidas 
+     * @return     Dataframe que contiene las columnas obtenidas 
      */
     public DataFrame getCol(List<String> tags){
         Map<String, Column> columnas = new LinkedHashMap<>();
@@ -535,7 +549,7 @@ public class DataFrame implements Cloneable {
      * Obtiene y devuelve los valores de la fila indicada.
      * 
      * @param row indice de la fila a obtener
-     * @return     la fila obtenida en formato Dataframe
+     * @return    la fila obtenida en formato Dataframe
      */
     public DataFrame getRow(int row){
         if (0 <= row && row <= this.nRow()-1){
@@ -629,6 +643,12 @@ public class DataFrame implements Cloneable {
         return df;
     }
 
+    /**
+     * Elimina columnas del Dataframe a partir de sus etiquetas.
+     * 
+     * @param tag arreglo de etiquetas de las columnas a eliminar
+     * @return    un nuevo Dataframe sin las columnas eliminadas
+     */
     public DataFrame removeCol(String[] tag){
         DataFrame df = removeCol(tag[0]);
         for (int i=1; i < tag.length; i++){
@@ -693,6 +713,13 @@ public class DataFrame implements Cloneable {
         return copia;
     }
 
+    /**
+     * Ordena las etiquetas del Dataframe de manera ascendente o descendente.
+     * 
+     * @param tags       Arreglo de nombres de columnas a ordenar
+     * @param increasing indica la forma de ordenamiento (true para ascendente, false para descendente).
+     * @return           un nuevo Dataframe ordenado segun las columnas y el orden indicado
+     */
     public DataFrame sort(String[] tags, boolean increasing)
     {
         for(String tag: tags)
@@ -713,6 +740,12 @@ public class DataFrame implements Cloneable {
         return df;
     }
 
+    /**
+     * Ordena el DataFrame en funcion de los indices proporcionados. 
+     * 
+     * @param indexes un mapa que asocia indices originales con sus nuevas posiciones en el DataFrame
+     * @return        nuevo DataFrame ordenado segun las nuevas posiciones especificadas
+     */
     public DataFrame sortByIndex(Map<Integer, Integer> indexes)
     {
         if(!indexes.keySet().equals(new HashSet<Integer>(indexes.values())))
@@ -729,6 +762,12 @@ public class DataFrame implements Cloneable {
         return df;
     }
 
+    /**
+     * Obtiene una muestra aleatoria de filas del DataFrame basada en una fraccion del total de filas.
+     * 
+     * @param fraction fraccion de filas que se deben incluir en la muestra (debe estar entre 0.0 y 1.0)
+     * @return         un nuevo DataFrame que contiene una muestra aleatoria basada en la fraccion especificada.
+     */
     public DataFrame sample(double fraction)
     {
         if(fraction < 0 || fraction > 1)
@@ -739,6 +778,12 @@ public class DataFrame implements Cloneable {
         return sample((int) cant);
     }
 
+    /**
+     * Obtiene una muestra aleatoria de filas del DataFrame.
+     * 
+     * @param n cantidad de filas que se deben incluir en la muestra
+     * @return  nuevo DataFrame que contiene una muestra aleatoria de 'n' filas
+     */
     public DataFrame sample(int n)
     {
         List<Integer> indexes = new ArrayList<>();
@@ -760,7 +805,7 @@ public class DataFrame implements Cloneable {
      * Filtra la filas de una columna del dataframe segun la conidicion proporcionada.
      * 
      * @param <T>      tipo de datos de la columna a filtrar
-     * @param tag etiqueta de la columna a filtrar
+     * @param tag      etiqueta de la columna a filtrar
      * @param filter   el predicado que define las condiciones de filtrado
      * @return         nuevo DataFrame que contiene solo las filas que cumplen con las condiciones de filtrado
      * @throws UnsupportedOperationException si el metodo no fue implementado

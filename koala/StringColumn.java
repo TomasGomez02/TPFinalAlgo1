@@ -190,7 +190,14 @@ public class StringColumn extends Column<String> {
         }
         return copia;
     }
-        
+    
+    /**
+     * Convierte una columna de tipo generico en una de tipo String.
+     * 
+     * @param <T> tipo generico de la columna original.
+     * @param col columna a convertir
+     * @return    una columna de tipo String
+     */
     public static <T> StringColumn toStringColumn(Column<T> col)
     {
         if(col instanceof StringColumn)
