@@ -38,7 +38,7 @@ public final class IOCSV
      * @param dataTypes tipos de datos de las columnas del Dataframe 
      * @return DataFrame creado a partir del archivo csv
      */
-    public static DataFrame fromCSV(String path, DataTypes[] dataTypes) {
+    public static DataFrame fromCSV(String path, DataType[] dataTypes) {
         return fromCSV(new File(path), dataTypes);
     }
 
@@ -60,8 +60,8 @@ public final class IOCSV
      * @param dataTypes tipos de datos de las columnas del Dataframe
      * @return Dataframe creado a partir del archivo csv
      */
-    public static DataFrame fromCSV(File file, DataTypes[] dataTypes){
-        Map<String, DataTypes> tiposEtiqueta = new LinkedHashMap<>();
+    public static DataFrame fromCSV(File file, DataType[] dataTypes){
+        Map<String, DataType> tiposEtiqueta = new LinkedHashMap<>();
         String[] header;
         @SuppressWarnings("rawtypes")
         Map<String, Columna> columnas = new LinkedHashMap<>();
@@ -185,7 +185,7 @@ public final class IOCSV
      * @param datatypes array con los tipos de datos a los que se deben convertir las columnas.
      * @return nuevo DataFrame con las columnas modificadas según los tipos de datos proporcionados
      */
-    private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataTypes> tiposEtiqueta, DataTypes[] datatypes)
+    private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta, DataType[] datatypes)
     {
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
 
@@ -206,7 +206,7 @@ public final class IOCSV
      * @param dataType tipo dato al cual se va a convertir la columna
      * @return columna convertida al tipo de dato especificado
      */
-    private static Columna castearColumna(Columna col, DataTypes dataType)
+    private static Columna castearColumna(Columna col, DataType dataType)
     {
         switch (dataType) {
             case INT:
@@ -227,7 +227,7 @@ public final class IOCSV
      * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
      * @return Dataframe con las columnas ajustadas 
      */
-    private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataTypes> tiposEtiqueta){
+    private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta){
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
 
         for(int i = 0; i < keys.size(); i++){
@@ -245,7 +245,7 @@ public final class IOCSV
      * @param index indice de la columna
      * @return nueva columna ajustada segun el tipo de datos detectado
      */
-    private static Columna autodetectarColumna(Columna col, Map<String, DataTypes> tiposEtiqueta, int index){
+    private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index){
         return autodetectarColumna(col, tiposEtiqueta, index, 0);
     }
 
@@ -258,7 +258,7 @@ public final class IOCSV
      * @param count contador utilizado para realizar diferentes castings
      * @return nueva columna ajustada segun el tipo de datos detectado
      */
-    private static Columna autodetectarColumna(Columna col, Map<String, DataTypes> tiposEtiqueta, int index, int count)
+    private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index, int count)
     {
         Columna colCasteada;
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
