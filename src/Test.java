@@ -13,12 +13,11 @@ public class Test
 {
     public static void main(String[] args) 
     {
-        // String path = "datasets/tiny.csv";
         // String path = "datasets/taylor_all_songs.csv";
         // String path = "datasets/taylor_albums.csv";
         // String path = "datasets/taylor_album_songs.csv";
-        // String path = "datasets/tiny.csv";
-        String path = "datasets/mucho_texto.csv";
+        String path = "datasets/tiny.csv";
+        // String path = "datasets/mucho_texto.csv";
 
         DataFrame df = IOCSV.fromCSV(path);
         // DataFrame df2 = IOCSV.fromCSV(path2);
@@ -32,18 +31,21 @@ public class Test
         // df3.head();
         // System.out.println(df3.tiposColumna());
 
-        GroupBy gb = df.groupBy(new String[]{"ANO4", "cumple_requisito"});
+        // GroupBy gb = df.groupBy(new String[]{"ANO4", "cumple_requisito"});
 
         // System.out.println(gb.getInfoGrupos());
-        gb = gb.cant()
-                .media("CH06")
-                .media("ITF")
-                .maximo("ITF")
-                .maximo("CH06");
+        // gb = gb.cant()
+        //         .media("CH06")
+        //         .media("ITF")
+        //         .maximo("ITF")
+        //         .maximo("CH06");
 
-        gb.print();
+        // gb.print();
 
-        IOCSV.toCSV(gb.unGroup(), "datasets/ganamos.csv");
+        // IOCSV.toCSV(gb.unGroup(), "datasets/ganamos.csv");
 
+        df.head(7);
+        // GroupBy gb = df.groupBy("album_name");
+        // gb.media("energy").unGroup().getColumna(new String[]{"album_name", "energy", "Media: energy"}).head(25);
     }
 }

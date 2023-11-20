@@ -191,12 +191,27 @@ public class ColumnaBool extends Columna<Boolean>{
         return copia;
     }
 
-    public static ColumnaBool fromColumnaString (Columna<String> col) throws CasteoIlegalException
+    public static ColumnaBool toBoolColumn(Columna col) throws CasteoIlegalException
     {
-        return fromColumnaString(col, false);
+        return toBoolColumn(col, false);
     }
 
-    public static ColumnaBool fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
+    public static ColumnaBool toBoolColumn(Columna col, boolean forzar) throws CasteoIlegalException
+    {
+        switch (col.getColumnType()) 
+        {
+            case DOUBLE:
+                return fromColumnaDouble(col, forzar);
+            case INT:
+                return fromColumnaInt(col, forzar);
+            case STRING:
+                return fromColumnaString(col, forzar);
+            default:
+                return (ColumnaBool) col.clone();
+        }
+    }
+
+    private static ColumnaBool fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -226,12 +241,7 @@ public class ColumnaBool extends Columna<Boolean>{
         return new ColumnaBool(datos);
     }
 
-    public static ColumnaBool fromColumnaInt(Columna<Integer> col) throws CasteoIlegalException
-    {
-        return fromColumnaInt(col, false);
-    }
-
-    public static ColumnaBool fromColumnaInt(Columna<Integer> col, boolean forzar) throws CasteoIlegalException
+    private static ColumnaBool fromColumnaInt(Columna<Integer> col, boolean forzar) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -261,12 +271,7 @@ public class ColumnaBool extends Columna<Boolean>{
         return new ColumnaBool(datos);
     }
 
-    public static ColumnaBool fromColumnaDouble(Columna<Double> col) throws CasteoIlegalException
-    {
-        return fromColumnaDouble(col, false);
-    }
-
-    public static ColumnaBool fromColumnaDouble(Columna<Double> col, boolean forzar) throws CasteoIlegalException
+    private static ColumnaBool fromColumnaDouble(Columna<Double> col, boolean forzar) throws CasteoIlegalException
     {
         List<Boolean> datos = new ArrayList<>();
 

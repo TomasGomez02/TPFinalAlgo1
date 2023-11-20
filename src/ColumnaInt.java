@@ -6,6 +6,7 @@ import java.util.function.UnaryOperator;
 
 import utils.CasteoIlegalException;
 import utils.Types;
+import utils.DataType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -261,12 +262,27 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         return copia;
     }
 
-    public static ColumnaInt fromColumnaString(Columna<String> col) throws CasteoIlegalException
+    public static ColumnaInt toColumnaInt(Columna col) throws CasteoIlegalException
     {
-        return fromColumnaString(col, false);
+        return toColumnaInt(col, false);
     }
 
-    public static ColumnaInt fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
+    public static ColumnaInt toColumnaInt(Columna col, boolean forzar) throws CasteoIlegalException
+    {
+        switch (col.getColumnType()) 
+        {
+            case BOOL:
+                return fromColumnaBool(col);
+            case DOUBLE:
+                return fromColumnaDouble(col);
+            case STRING:
+                return fromColumnaString(col, forzar);
+            default:
+                return (ColumnaInt) col.clone();
+        }
+    }
+
+    private static ColumnaInt fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
     {
         List<Integer> datos = new ArrayList<>();
         
@@ -296,7 +312,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         return new ColumnaInt(datos);
     }
 
-    public static ColumnaInt fromColumnaDouble(Columna<Double> col)
+    private static ColumnaInt fromColumnaDouble(Columna<Double> col)
     {
         List<Integer> datos = new ArrayList<>();
         
@@ -316,7 +332,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         return new ColumnaInt(datos);
     }
 
-    public static ColumnaInt fromColumnaBool(Columna<Boolean> col)
+    private static ColumnaInt fromColumnaBool(Columna<Boolean> col)
     {
         List<Integer> datos = new ArrayList<>();
         

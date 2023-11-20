@@ -1,11 +1,13 @@
 package src;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import utils.ColumnaInexistenteException;
 import utils.DataType;
+import utils.Types;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -148,20 +150,40 @@ public class DataFrame implements Cloneable {
         fila += " ".repeat(tamañoIndice) + sep;
         // Esta parte es para escribir los nombres de las columnas
         
-        if(COLUMNASOVERFLOW)
-            fila += OVERFLOWSTRING;
-        System.out.println(fila);
+        for (int i = 0; i < cantColumnas; i++)
+        {
+            int diff = tamaño[i] - etiquetas.get(i).length();
+            espacioIzq = diff / 2;
+            if (diff % 2 == 0)
+            {
+                espacioDer = espacioIzq;
+            } 
+            else 
+            {
+                espacioDer = espacioIzq+1;
+            }
+            fila += " ".repeat(espacioIzq)+etiquetas.get(i)+" ".repeat(espacioDer)+sep;
+        }
+
         int cantidadSepHeader = 0;
+        if(COLUMNASOVERFLOW)
+        {
+            fila += OVERFLOWSTRING;
+            cantidadSepHeader += OVERFLOWSTRING.length();
+        }
+        System.out.println(fila);
+        
         for(int tam: tamaño)
             cantidadSepHeader += tam + 1;
-        System.out.println("-".repeat(cantidadSepHeader + tamañoIndice));
+        System.out.println("-".repeat(cantidadSepHeader + tamañoIndice + 1));
+
         fila = "";
         // Esta parte es para escribir los valores
         for (int row=indiceInicio; row <= indiceFinal; row++){
             int diffTamañoIndice = tamañoIndice - String.valueOf(row).length();
             fila += row + " ".repeat(diffTamañoIndice) + sep;
             for (int i = 0; i < cantColumnas; i++) {
-                String elem = String.valueOf(getCelda(etiquetas.get(i), row) != null);
+                String elem = String.valueOf(getCelda(etiquetas.get(i), row));
 
                 if(elem.length() > tamaño[i])
                 {
@@ -345,6 +367,24 @@ public class DataFrame implements Cloneable {
             dataTypes.put(colName, this.tiposColumna.get(colName));
         }
         return new DataFrame(columnas, dataTypes);
+    }
+
+    public DataFrame switchRows(int row1, int row2)
+    {
+        if(row1 < 0 || row1 >= cantidadFilas())
+            throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + row1);
+        if(row2 < 0 || row2 >= cantidadFilas())
+            throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + row2);
+
+        DataFrame df = clone();
+
+        for(String etiqueta: etiquetas)
+        {
+            df.setCelda(etiqueta, row1, this.getCelda(etiqueta, row2, Types.evaluarTipo(tiposColumna.get(etiqueta))));
+            df.setCelda(etiqueta, row2, this.getCelda(etiqueta, row1, Types.evaluarTipo(tiposColumna.get(etiqueta))));
+        }
+
+        return df;
     }
 
     /**
@@ -599,6 +639,38 @@ public class DataFrame implements Cloneable {
             copia.data.put(colName, getColumna(colName).ordenarPorIndice(orden));
         }
         return copia;
+    }
+
+    public DataFrame orderByIndex(Map<Integer, Integer> indices)
+    {
+        return clone();
+    }
+
+    public DataFrame sample(double fraction)
+    {
+        if(fraction < 0 || fraction > 1)
+        {
+            throw new IllegalArgumentException("La fracción debe estar entre 0.0 y 1.0.");
+        }
+        long cant = Math.round(fraction * cantidadFilas());
+        return sample((int) cant);
+    }
+
+    public DataFrame sample(int n)
+    {
+        List<Integer> indexes = new ArrayList<>();
+        Random rand = new Random();
+
+        while(indexes.size() < n)
+        {
+            int indice = rand.nextInt(cantidadFilas());
+            if(!indexes.contains(indice))
+            {
+                indexes.add(indice);
+            }
+        }
+
+        return getFila(indexes);
     }
 
     /**

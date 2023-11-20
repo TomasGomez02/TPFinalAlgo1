@@ -252,7 +252,6 @@ public class GroupBy implements Cloneable
     @Override
     public String toString()
     {
-        final String fila = "";
         final List<String> colPrinteables = getColumnasAgrupadas();
         colPrinteables.addAll(colAgregadas);
         int[] tamaño = new int[colPrinteables.size()];
@@ -423,7 +422,7 @@ public class GroupBy implements Cloneable
             col = insertarValoresGrupo(col, indicesGrupo, val);
         }
 
-        ColumnaInt nuevaCol = ColumnaInt.fromColumnaDouble(col);
+        ColumnaInt nuevaCol = ColumnaInt.toColumnaInt(col);
 
         GroupBy gb = clone();
 
