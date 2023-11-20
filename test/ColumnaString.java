@@ -24,6 +24,15 @@ public class ColumnaString extends Columna<String> {
         }
     }
 
+    public ColumnaString(int size)
+    {
+        this();
+        for(int i = 0; i < size; i++)
+        {
+            añadirCelda(null);
+        }
+    }
+
     @Override
     public String getCelda(int indice) {
         if (!contieneIndice(indice)){

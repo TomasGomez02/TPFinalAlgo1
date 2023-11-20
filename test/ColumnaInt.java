@@ -36,13 +36,23 @@ public class ColumnaInt extends ColumnaNum<Integer> {
         }
     }
 
+    public ColumnaInt(int size)
+    {
+        this();
+        for(int i = 0; i < size; i++)
+        {
+            añadirCelda(null);
+        }
+    }
+
     @Override
     public Double media() {
         Double suma = 0.0;
         for (int i=0; i<data.size(); i++) {
-            suma += data.get(i);
+            if(data.get(i) != null)
+                suma += data.get(i);
         }
-        return suma / data.size();
+        return suma / (data.size() - cantNull());
     }
 
     @Override
@@ -66,7 +76,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
     public Integer maximo() {
         int max = data.get(0);
         for (int i=1; i<data.size(); i++) {
-            if (data.get(i) > max) {
+            if (data.get(i) != null && data.get(i) > max) {
                 max = data.get(i);
             }
         }
@@ -94,7 +104,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
                 suma = suma + ((media - elem) * (media - elem));
             }
         }
-        Double desvio = suma / data.size();
+        Double desvio = suma / (length() - cantNull());
         return Math.sqrt(desvio);
     }
 

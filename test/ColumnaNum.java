@@ -14,7 +14,7 @@ public abstract class ColumnaNum<T extends Number> extends Columna<T> {
      * 
      * @return la mediana de los elementos de la columna 
      */
-    public abstract Number mediana();
+    public abstract Double mediana();
 
     /**
      * Busca y devuelve el valor maximo de la columna.
@@ -43,4 +43,7 @@ public abstract class ColumnaNum<T extends Number> extends Columna<T> {
      * @return la suma acumulada de los elementos de la columna
      */
     public abstract Number sumaAcumulada();
+
+    @Override
+    public abstract ColumnaNum<T> clone();
 }

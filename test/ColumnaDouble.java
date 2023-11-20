@@ -40,15 +40,25 @@ public class ColumnaDouble extends ColumnaNum<Double>
         }
     }
 
+    public ColumnaDouble(int size)
+    {
+        this();
+        for(int i = 0; i < size; i++)
+        {
+            añadirCelda(null);
+        }
+    }
+
     @Override
     public Double media() {
-        double sum = 0;
-        for(double num: data)
+        Double sum = 0.0;
+        for(Double num: data)
         {
-            sum += num;
+            if(num != null)
+                sum += num;
         }
 
-        return sum / length();
+        return sum / (length() - cantNull());
     }
 
     @Override
@@ -96,16 +106,18 @@ public class ColumnaDouble extends ColumnaNum<Double>
         double sumatoria = 0.0;
         final double media = this.media();
         for (int i=0; i < this.length(); i++){
-            sumatoria += Math.pow(getCelda(i) - media, 2);
+            if(getCelda(i) != null)
+                sumatoria += Math.pow(getCelda(i) - media, 2);
         }
-        return Math.sqrt(sumatoria / this.length());
+        return Math.sqrt(sumatoria / (this.length() - cantNull()));
     }
 
     @Override
     public Double sumaAcumulada() {
         Double suma = 0.0;
         for (int i=0; i < length(); i++){
-            suma += getCelda(i);
+            if(getCelda(i) != null)
+                suma += getCelda(i);
         }
         return suma;
     }

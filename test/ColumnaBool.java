@@ -28,6 +28,15 @@ public class ColumnaBool extends Columna<Boolean>{
         this.data = new ArrayList<>(otro);
     }
 
+    public ColumnaBool(int size)
+    {
+        this();
+        for(int i = 0; i < size; i++)
+        {
+            añadirCelda(null);
+        }
+    }
+
     @Override
     public Boolean getCelda(int indice) {
         if (!contieneIndice(indice)){

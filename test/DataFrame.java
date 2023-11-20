@@ -132,7 +132,6 @@ public class DataFrame implements Cloneable {
         int espacioIzq;
         int espacioDer;
 
-        // Esta parte ajusta el center por si la etiqueta es muy larga
         for (int i = 0; i < cantColumnas; i++){
             tamaño[i] = OFFSETMINIMO * 2;
             if (etiquetas.get(i).length() + OFFSETMINIMO > tamaño[i]){
@@ -142,35 +141,21 @@ public class DataFrame implements Cloneable {
 
         fila += " ".repeat(tamañoIndice) + sep;
         // Esta parte es para escribir los nombres de las columnas
-        for (int i = 0; i < cantColumnas; i++){
-            int diff = tamaño[i] - etiquetas.get(i).length();
-            espacioIzq = diff / 2;
-            if (diff % 2 == 0){
-                espacioDer = espacioIzq;
-            } else {
-                espacioDer = espacioIzq+1;
-            }
-            fila += " ".repeat(espacioIzq)+etiquetas.get(i)+" ".repeat(espacioDer)+sep;
-        }
+        
         if(COLUMNASOVERFLOW)
             fila += OVERFLOWSTRING;
         System.out.println(fila);
         int cantidadSepHeader = 0;
         for(int tam: tamaño)
             cantidadSepHeader += tam + 1;
-        System.out.println("-".repeat(cantidadSepHeader+2));
+        System.out.println("-".repeat(cantidadSepHeader + tamañoIndice));
         fila = "";
         // Esta parte es para escribir los valores
         for (int row=indiceInicio; row <= indiceFinal; row++){
             int diffTamañoIndice = tamañoIndice - String.valueOf(row).length();
             fila += row + " ".repeat(diffTamañoIndice) + sep;
             for (int i = 0; i < cantColumnas; i++) {
-                String elem;
-                if (getCelda(etiquetas.get(i), row) != null){
-                    elem = this.getCelda(etiquetas.get(i), row).toString();
-                } else {
-                    elem = "null";
-                }
+                String elem = String.valueOf(getCelda(etiquetas.get(i), row) != null);
 
                 if(elem.length() > tamaño[i])
                 {
