@@ -17,7 +17,10 @@ import utils.DataType;
 
 public final class IOCSV 
 {
-    static char delim = ',';
+    static char delim;
+    static final char defaultDelim = ',';
+    static final boolean defaultHasHeaders = true;
+    static final DataType[] defaultDataTypes = null;
 
     private IOCSV(){}
 
@@ -29,7 +32,22 @@ public final class IOCSV
      */
     public static DataFrame fromCSV(String path)
     {
-        return fromCSV(path, null, ',');
+        return fromCSV(path, defaultHasHeaders);
+    }
+
+    public static DataFrame fromCSV(String path, boolean hasHeaders)
+    {
+        return fromCSV(path, hasHeaders, defaultDelim);
+    }
+
+    public static DataFrame fromCSV(String path, boolean hasHeaders, char delim)
+    {
+        return fromCSV(new File(path), hasHeaders, delim, defaultDataTypes);
+    }
+
+    public static DataFrame fromCSV(String path, char delim)
+    {
+        return fromCSV(path, defaultHasHeaders, delim);
     }
 
     /**
@@ -40,7 +58,7 @@ public final class IOCSV
      * @return DataFrame creado a partir del archivo csv
      */
     public static DataFrame fromCSV(String path, DataType[] dataTypes) {
-        return fromCSV(new File(path), dataTypes, ',');
+        return fromCSV(new File(path), defaultHasHeaders, defaultDelim, dataTypes);
     }
 
     /**
@@ -51,19 +69,8 @@ public final class IOCSV
      */
     public static DataFrame fromCSV(File file)
     {
-        return fromCSV(file, null, ',');
+        return fromCSV(file, defaultHasHeaders, defaultDelim, defaultDataTypes);
     }
-
-    public static DataFrame fromCSV(String path, DataType[] dataTypes, char delim)
-    {
-        return fromCSV(new File(path), dataTypes, delim);
-    }
-
-    public static DataFrame fromCSV(String path, char delim)
-    {
-        return fromCSV(new File(path), null, delim);
-    }
-
 
     /**
      * Crea un Dataframe a partir de un archivo File.
@@ -72,7 +79,7 @@ public final class IOCSV
      * @param dataTypes tipos de datos de las columnas del Dataframe
      * @return Dataframe creado a partir del archivo csv
      */
-    public static DataFrame fromCSV(File file, DataType[] dataTypes, char delim){
+    public static DataFrame fromCSV(File file, boolean hasHeaders, char delim, DataType[] dataTypes){
         IOCSV.delim = delim;
         Map<String, DataType> tiposEtiqueta = new LinkedHashMap<>();
         String[] header;
@@ -86,7 +93,16 @@ public final class IOCSV
             
             // Genero las columnas para cada etiqueta
             // Y el tipo de dato para cada etiqueta
+            
             header = procesarFila(linea);
+
+            if(!hasHeaders)
+            {
+                for(int i = 0; i < header.length; i++)
+                {
+                    header[i] = String.valueOf(i);
+                }
+            }
             //System.out.println(header.length);
             columnas = crearColumnas(header);
 
@@ -97,13 +113,17 @@ public final class IOCSV
                     tiposEtiqueta.put(header[i], DataType.STRING);
             }  
 
+            if(hasHeaders)
+                linea = br.readLine();
+
             // Asigno los valores a cada columna
-            while ((linea = br.readLine()) != null) {
+            while (linea != null) {
                 String[] valores = procesarFila(linea, header.length);
                 //System.out.println(valores.length);
                 for (int i=0; i < valores.length; i++) {
                     columnas.get(header[i]).añadirCelda(valores[i]);
                 }
+                linea = br.readLine();
             }
             
         } catch (FileNotFoundException e) {
