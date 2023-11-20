@@ -23,8 +23,6 @@ public class GroupBy implements Cloneable
     public GroupBy(DataFrame df, List<String> colAgrupadas)
     {
         this.data = df.clone();
-
-        
         this.colAgrupadas = new LinkedHashMap<>();
         
         colNoAgrupadas = this.data.nombreColumnas();
@@ -94,7 +92,6 @@ public class GroupBy implements Cloneable
                 indices.add(i);
             }
         }
-
         return indices;
     }
 
@@ -245,6 +242,9 @@ public class GroupBy implements Cloneable
         return linea;
     }
 
+    /**
+     * Imprime en la consola una representacion de cadena del objeto actual utilizando el metodo toString().
+     */
     public void print()
     {
         System.out.println(toString());
@@ -285,6 +285,11 @@ public class GroupBy implements Cloneable
         return out;
     }
 
+    /**
+     * Crea y devuelve el DataFrame con las nuevas columnas para las operaciones de agrupacion.  
+     * 
+     * @return Dataframe original sumando las columnas que fueron resultado de la agrupacion 
+     */
     public DataFrame unGroup()
     {
         return data.clone();
@@ -349,7 +354,7 @@ public class GroupBy implements Cloneable
         String nuevaCol = "Media: " + tag;
         gb.data = gb.data.addColumna(nuevaCol, col);
         gb.colAgregadas.add(nuevaCol);
-        return gb;
+        return gb; 
     }
 
     public GroupBy median(String tags)

@@ -14,7 +14,7 @@ public abstract class Column<T> implements Cloneable {
      * Obtiene el valor que se encuentra en la celda indicada.
      * 
      * @param indice indice de la celda
-     * @return valor encontrado en la celda 
+     * @return       valor encontrado en la celda 
      */
     public abstract T get(int indice);
 
@@ -157,6 +157,11 @@ public abstract class Column<T> implements Cloneable {
      */
     public abstract Column<T> clone();
 
+    /**
+     * Obtiene y devuelve el tipo de dato de la columna.
+     * 
+     * @return tipo de dato de la columna
+     */
     public DataType getColumnType()
     {
         if(this instanceof IntegerColumn)
@@ -191,6 +196,11 @@ public abstract class Column<T> implements Cloneable {
         return false;
     }
 
+    /**
+     * Convierte la columna actual a una lista.
+     * 
+     * @return una lista que contiene todos los elementos de la columna convertida
+     */
     public List<T> toList()
     {
         List<T> lista = new ArrayList<>();
