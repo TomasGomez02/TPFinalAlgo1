@@ -108,6 +108,7 @@ public class ColumnaString extends Columna<String> {
     
     @Override
     public ColumnaString filtrarPorIndice(List<Integer> indices) {
+        indices.sort(null);
         ColumnaString filtrada = new ColumnaString();
         for (Integer indice : indices) {
             filtrada.añadirCelda(this.getCelda(indice));

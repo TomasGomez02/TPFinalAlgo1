@@ -122,6 +122,7 @@ public class ColumnaBool extends Columna<Boolean>{
 
     @Override
     public ColumnaBool filtrarPorIndice(List<Integer> indices){
+        indices.sort(null);
         ColumnaBool filtrada = new ColumnaBool();
         for (Integer indice : indices) {
             filtrada.añadirCelda(this.getCelda(indice));
@@ -183,7 +184,6 @@ public class ColumnaBool extends Columna<Boolean>{
     @Override
     public ColumnaBool ordenarPorIndice(Map<Integer, Integer> orden){
         ColumnaBool copia = this.clone();
-
         for (int i=0; i < copia.length(); i++){
             Integer newIdx = orden.get(i);
             copia.setCelda(newIdx, getCelda(i));

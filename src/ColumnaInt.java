@@ -179,6 +179,7 @@ public class ColumnaInt extends ColumnaNum<Integer> {
 
     @Override
     public ColumnaInt filtrarPorIndice(List<Integer> indices) {
+        indices.sort(null);
         ColumnaInt filtrada = new ColumnaInt();
         for (Integer indice : indices) {
             filtrada.añadirCelda(this.getCelda(indice));

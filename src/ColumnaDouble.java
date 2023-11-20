@@ -197,6 +197,7 @@ public class ColumnaDouble extends ColumnaNum<Double>
 
     @Override
     public ColumnaDouble filtrarPorIndice(List<Integer> indices) {
+        indices.sort(null);
         ColumnaDouble filtrada = new ColumnaDouble();
         for (Integer indice : indices) {
             filtrada.añadirCelda(this.getCelda(indice));

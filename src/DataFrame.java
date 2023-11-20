@@ -118,9 +118,9 @@ public class DataFrame implements Cloneable {
     }
 
     /**
-     * 
-     * @param indiceInicio
-     * @param indiceFinal
+     * Imprime una porcion del dataframe delimitado por un indice de inicio y un indice final.
+     * @param indiceInicio primer indice de fila a imprimir
+     * @param indiceFinal ultimo indice de fila a imprimir 
      */
     public void printDesdeHasta(int indiceInicio, int indiceFinal){
         printDesdeHasta(indiceInicio, indiceFinal, 4);
@@ -565,9 +565,9 @@ public class DataFrame implements Cloneable {
     }
 
     /**
-     * 
-     * @param fila
-     * @return
+     * Obtiene y devuelve un Dataframe formado solo por las filas correspondientes a los indices proporcionados.
+     * @param fila lista de Integer que representan los indices de las filas a obtener
+     * @return un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
     public DataFrame getFila(Integer[] fila){
         DataFrame copia = this.getFila(fila[0]);
@@ -597,13 +597,23 @@ public class DataFrame implements Cloneable {
      * @param etiqueta la etiqueta de la columna a eliminar
      * @throws ColumnaInexistenteException Si la columna con la etiqueta especificada no existe en el DataFrame
      */
-    public void eliminarCol(String etiqueta){
-        if (this.contieneEtiqueta(etiqueta)){
-            this.data.remove(etiqueta);
-            this.etiquetas.remove(this.etiquetas.indexOf(etiqueta));
-            return;
+    public DataFrame eliminarCol(String etiqueta){
+        if (!contieneEtiqueta(etiqueta)){
+            throw new ColumnaInexistenteException(etiqueta);
         }
-        throw new ColumnaInexistenteException(etiqueta);
+        DataFrame df = clone();
+        df.data.remove(etiqueta);
+        df.tiposColumna.remove(etiqueta);
+        df.etiquetas.remove(df.etiquetas.indexOf(etiqueta));
+        return df;
+    }
+
+    public DataFrame eliminarCol(String[] etiquetas){
+        DataFrame df = eliminarCol(etiquetas[0]);
+        for (int i=1; i < etiquetas.length; i++){
+            df = df.eliminarCol(etiquetas[i]);
+        }
+        return df;
     }
 
     /**
