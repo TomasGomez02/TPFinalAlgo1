@@ -8,7 +8,6 @@ import utils.ColumnaInexistenteException;
 import utils.DataType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -20,9 +19,9 @@ public class DataFrame implements Cloneable {
     private Map<String, DataType> tiposColumna;
 
     public DataFrame(){
-        this.data = new HashMap<>();
+        this.data = new LinkedHashMap<>();
         this.etiquetas = new ArrayList<>();
-        this.tiposColumna = new HashMap<>();
+        this.tiposColumna = new LinkedHashMap<>();
     }
 
     @SuppressWarnings("rawtypes")
@@ -34,6 +33,16 @@ public class DataFrame implements Cloneable {
         this.etiquetas = new ArrayList<>();
         for (String etiqueta : data.keySet()) {
             this.etiquetas.add(etiqueta);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public DataFrame(List<Columna> data){
+        this();
+        for (int i=0; i < data.size(); i++){
+            this.data.put(String.valueOf(i), data.get(i).clone());
+            this.etiquetas.add(String.valueOf(i));
+            this.tiposColumna.put(String.valueOf(i), data.get(i).getColumnType());
         }
     }
 
@@ -83,12 +92,9 @@ public class DataFrame implements Cloneable {
      * @return un mapa que representa la asociacion entre los nombres de las columnas y sus tipos de datos.
      */
     public Map<String, DataType> tiposColumna(){
-        return this.tiposColumna;
+        return new LinkedHashMap<>(this.tiposColumna);
     }
 
-    /**
-     * HAY QUE DOCUMENTAR ESTE?
-     */
     public String toString(){
         this.head();
         return "";
@@ -352,9 +358,10 @@ public class DataFrame implements Cloneable {
         if (df.contieneEtiqueta(etiqueta)){
             throw new RuntimeException("la columna "+etiqueta+" ya existe");
         }
-        df.data.put(etiqueta, columna);
+        df.data.put(etiqueta, columna.clone());
         df.tiposColumna.put(etiqueta, columna.getColumnType());
         df.etiquetas.add(etiqueta);
+        df.head();
         return df;
     }
 
@@ -378,8 +385,8 @@ public class DataFrame implements Cloneable {
      * @return Dataframe que contiene las columnas obtenidas 
      */
     public DataFrame getColumna(String[] etiqueta){
-        Map<String, Columna> columnas = new HashMap<>();
-        Map<String, DataType> tiposCol = new HashMap<>();
+        Map<String, Columna> columnas = new LinkedHashMap<>();
+        Map<String, DataType> tiposCol = new LinkedHashMap<>();
         for (String colName : etiqueta){
             columnas.put(colName, this.getColumna(colName));
             tiposCol.put(colName, this.tiposColumna.get(colName));
