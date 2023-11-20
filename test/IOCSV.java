@@ -20,22 +20,48 @@ public final class IOCSV
 {
     private IOCSV(){}
 
+    /**
+     * Crea un DataFrame a partir de un archivo CSV.
+     * 
+     * @param path ruta del archivo csv
+     * @return DataFrame creado a partir del archivo csv
+     */
     public static DataFrame fromCSV(String path)
     {
         return fromCSV(path, null);
     }
 
-    public static DataFrame fromCSV(String path, DataType[] dataTypes) {
+    /**
+     * Crea un Dataframe a partir de un archivo csv.
+     * 
+     * @param path ruta del archivo csv
+     * @param dataTypes tipos de datos de las columnas del Dataframe 
+     * @return DataFrame creado a partir del archivo csv
+     */
+    public static DataFrame fromCSV(String path, DataTypes[] dataTypes) {
         return fromCSV(new File(path), dataTypes);
     }
 
+    /**
+     * Crea un Dataframe a partir de un archivo File.
+     * 
+     * @param file archivo csv representado como un objeto File
+     * @return Dataframe creado a partir del archivo csv
+     */
     public static DataFrame fromCSV(File file)
     {
         return fromCSV(file, null);
     }
 
-    public static DataFrame fromCSV(File file, DataType[] dataTypes){
-        Map<String, DataType> tiposEtiqueta = new LinkedHashMap<>();
+    /**
+     * Crea un Dataframe a partir de un archivo File.
+     * 
+     * @param file archivo csv representado como un objeto File
+     * @param dataTypes tipos de datos de las columnas del Dataframe
+     * @return Dataframe creado a partir del archivo csv
+     */
+    public static DataFrame fromCSV(File file, DataTypes[] dataTypes){
+        Map<String, DataTypes> tiposEtiqueta = new LinkedHashMap<>();
         String[] header;
         @SuppressWarnings("rawtypes")
         Map<String, Columna> columnas = new LinkedHashMap<>();
@@ -86,6 +112,13 @@ public final class IOCSV
         return autogenerarDataFrame(columnas, tiposEtiqueta);
     }
 
+    /**
+     * Crea las columnas del Dataframe a partir de las etiquetas proporcionadas.
+     * 
+     * @param headers array de etiquetas de las columnas
+     * @return mapa que asocia cada etiqueta con su respectiva Columna
+     * @throws Exception si ocurre un error al crear las columnas
+     */
     @SuppressWarnings("rawtypes")
     private static Map<String, Columna> crearColumnas(String[] headers) throws Exception {
         Map<String, Columna> columnas = new LinkedHashMap<>();
@@ -96,6 +129,12 @@ public final class IOCSV
         return columnas;
     }
 
+    /**
+     * Procesa las cadenas proporcionadas como entrada. 
+     * 
+     * @param fila cadena a procesar
+     * @return array de String que contiene las filas procesadas
+     */
     public static String[] procesarFila(String fila)
     {
         return procesarFila(fila, 0);
@@ -138,7 +177,15 @@ public final class IOCSV
         return filaProcesada.toArray(String[] ::new);
     }
 
-    private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta, DataType[] datatypes)
+    /**
+     * Crea y devuelve un nuevo DataFrame con columnas modificadas según los tipos de datos proporcionados.
+     * 
+     * @param columnas mapa que asocia etiqueta con objetos Columna
+     * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
+     * @param datatypes array con los tipos de datos a los que se deben convertir las columnas.
+     * @return nuevo DataFrame con las columnas modificadas según los tipos de datos proporcionados
+     */
+    private static DataFrame crearDataFrame(Map<String, Columna> columnas, Map<String, DataTypes> tiposEtiqueta, DataTypes[] datatypes)
     {
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
 
@@ -152,7 +199,14 @@ public final class IOCSV
         return new DataFrame(columnas, tiposEtiqueta);
     }
 
-    private static Columna castearColumna(Columna col, DataType dataType)
+    /**
+     * Convierte una columna al tipo de dato especificado como entrada.
+     * 
+     * @param col columna a convertir
+     * @param dataType tipo dato al cual se va a convertir la columna
+     * @return columna convertida al tipo de dato especificado
+     */
+    private static Columna castearColumna(Columna col, DataTypes dataType)
     {
         switch (dataType) {
             case INT:
@@ -166,25 +220,45 @@ public final class IOCSV
         }
     }
 
-    private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataType> tiposEtiqueta)
-    {
+    /**
+     * Autogenera un nuevo DataFrame ajustando automaticamente las columnas segun los tipos de datos proporcionados.
+     *
+     * @param columnas  mapa que asocia etiqueta con objetos Columna
+     * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
+     * @return Dataframe con las columnas ajustadas 
+     */
+    private static DataFrame autogenerarDataFrame(Map<String, Columna> columnas, Map<String, DataTypes> tiposEtiqueta){
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
 
-        for(int i = 0; i < keys.size(); i++)
-        {
+        for(int i = 0; i < keys.size(); i++){
             Columna col = columnas.get(keys.get(i));
             columnas.put(keys.get(i), autodetectarColumna(col, tiposEtiqueta, i));
         }
-
         return new DataFrame(columnas, tiposEtiqueta);
     }
 
-    private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index)
-    {
+    /**
+     * Realiza la deteccion automatica del tipo de datos de una columna.
+     * 
+     * @param col Columna a autodetectar
+     * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
+     * @param index indice de la columna
+     * @return nueva columna ajustada segun el tipo de datos detectado
+     */
+    private static Columna autodetectarColumna(Columna col, Map<String, DataTypes> tiposEtiqueta, int index){
         return autodetectarColumna(col, tiposEtiqueta, index, 0);
     }
 
-    private static Columna autodetectarColumna(Columna col, Map<String, DataType> tiposEtiqueta, int index, int count)
+    /**
+     * Realiza la deteccion automatica del tipo de datos de una columna, intentando diferentes castings.
+     * 
+     * @param col Columna a autodetectar
+     * @param tiposEtiqueta mapa que asocia etiqueta de columna y el tipo de dato de la columna
+     * @param index indice de la columna
+     * @param count contador utilizado para realizar diferentes castings
+     * @return nueva columna ajustada segun el tipo de datos detectado
+     */
+    private static Columna autodetectarColumna(Columna col, Map<String, DataTypes> tiposEtiqueta, int index, int count)
     {
         Columna colCasteada;
         List<String> keys = new ArrayList<>(tiposEtiqueta.keySet());
@@ -214,17 +288,27 @@ public final class IOCSV
         return colCasteada;
     }
 
+    /**
+     * Obtiene una linea de encabezado con los nombres de las columnas del DataFrame.
+     *
+     * @param df DataFrame del cual se obtendran los nombres de las columnas
+     * @return cadena que contiene los nombres de las columnas, separando los valores por comas
+     */
     private static String getHeaderLine(DataFrame df)
     {
         String linea = "";
-        for(String etiqueta: df.nombreColumnas())
-        {
+        for(String etiqueta: df.nombreColumnas()) {
             linea += etiqueta + ",";
         }
-
         return linea;
     }
 
+    /**
+     * Obtiene la primera fila del Dataframe.
+     * 
+     * @param df Dataframe del cual se obtendra la fila
+     * @return cadena que contiene la primera fila. separando los valores por comas
+     */
     private static String getRowLine(DataFrame df)
     {
         String linea = "";
@@ -242,6 +326,12 @@ public final class IOCSV
         return linea;
     }
 
+    /**
+     * Guarda un DataFrame en formato CSV en la ruta especificada.
+     * 
+     * @param data Dataframe a guardar
+     * @param path ruta donde se guarda el archivo
+     */
     public static void toCSV(DataFrame data, String path)
     {
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(path)))
