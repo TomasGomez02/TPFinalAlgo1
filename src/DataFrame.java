@@ -1,4 +1,4 @@
-package test;
+package src;
 
 import java.util.Map;
 import java.util.function.Predicate;
