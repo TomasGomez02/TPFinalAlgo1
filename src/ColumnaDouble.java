@@ -267,12 +267,27 @@ public class ColumnaDouble extends ColumnaNum<Double>
         return copia;
     }
 
-    public static ColumnaDouble fromColumnaString (Columna<String> col) throws CasteoIlegalException
+    public static ColumnaDouble toDoubleColumn(Columna col) throws CasteoIlegalException
     {
-        return fromColumnaString(col, false);
+        return toDoubleColumn(col, false);
+    }
+
+    public static ColumnaDouble toDoubleColumn(Columna col, boolean forzar) throws CasteoIlegalException
+    {
+        switch (col.getColumnType()) 
+        {
+            case BOOL:
+                return fromColumnaBool(col);
+            case INT:
+                return fromColumnaInt(col);
+            case STRING:
+                return fromColumnaString(col, forzar);
+            default:
+                return (ColumnaDouble) col.clone();
+        }
     }
     
-    public static ColumnaDouble fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
+    private static ColumnaDouble fromColumnaString (Columna<String> col, boolean forzar) throws CasteoIlegalException
     {
         List<Double> datos = new ArrayList<>();
 
@@ -302,7 +317,7 @@ public class ColumnaDouble extends ColumnaNum<Double>
         return new ColumnaDouble(datos);
     }
 
-    public static ColumnaDouble fromColumnaInt(Columna<Integer> col)
+    private static ColumnaDouble fromColumnaInt(Columna<Integer> col)
     {
         List<Double> datos = new ArrayList<>();
         
@@ -322,7 +337,7 @@ public class ColumnaDouble extends ColumnaNum<Double>
         return new ColumnaDouble(datos);
     }
 
-    public static ColumnaDouble fromColumnaBool(Columna<Boolean> col)
+    private static ColumnaDouble fromColumnaBool(Columna<Boolean> col)
     {
         List<Double> datos = new ArrayList<>();
         

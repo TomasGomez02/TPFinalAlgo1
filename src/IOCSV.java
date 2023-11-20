@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -18,6 +17,8 @@ import utils.DataType;
 
 public final class IOCSV 
 {
+    static char delim = ',';
+
     private IOCSV(){}
 
     /**
@@ -28,7 +29,7 @@ public final class IOCSV
      */
     public static DataFrame fromCSV(String path)
     {
-        return fromCSV(path, null);
+        return fromCSV(path, null, ',');
     }
 
     /**
@@ -39,7 +40,7 @@ public final class IOCSV
      * @return DataFrame creado a partir del archivo csv
      */
     public static DataFrame fromCSV(String path, DataType[] dataTypes) {
-        return fromCSV(new File(path), dataTypes);
+        return fromCSV(new File(path), dataTypes, ',');
     }
 
     /**
@@ -50,8 +51,19 @@ public final class IOCSV
      */
     public static DataFrame fromCSV(File file)
     {
-        return fromCSV(file, null);
+        return fromCSV(file, null, ',');
     }
+
+    public static DataFrame fromCSV(String path, DataType[] dataTypes, char delim)
+    {
+        return fromCSV(new File(path), dataTypes, delim);
+    }
+
+    public static DataFrame fromCSV(String path, char delim)
+    {
+        return fromCSV(new File(path), null, delim);
+    }
+
 
     /**
      * Crea un Dataframe a partir de un archivo File.
@@ -60,7 +72,8 @@ public final class IOCSV
      * @param dataTypes tipos de datos de las columnas del Dataframe
      * @return Dataframe creado a partir del archivo csv
      */
-    public static DataFrame fromCSV(File file, DataType[] dataTypes){
+    public static DataFrame fromCSV(File file, DataType[] dataTypes, char delim){
+        IOCSV.delim = delim;
         Map<String, DataType> tiposEtiqueta = new LinkedHashMap<>();
         String[] header;
         @SuppressWarnings("rawtypes")
@@ -150,21 +163,21 @@ public final class IOCSV
         char[] filaChar = fila.toCharArray();
         for(int i = 0; i < filaChar.length; i++)    
         {
-            switch (filaChar[i]) 
+            if(filaChar[i] == IOCSV.delim)
             {
-                case ',':
-                    if(!enComillas)
-                    {
-                        filaProcesada.add(elemento);
-                        elemento = "";
-                    }
-                    break;
-                case '"':
-                    enComillas = !enComillas;
-                    break;
-                default:
-                    elemento += filaChar[i];
-                    break;
+                if(!enComillas)
+                {
+                    filaProcesada.add(elemento);
+                    elemento = "";
+                }
+            }
+            else if(filaChar[i] == '"')
+            {
+                enComillas = !enComillas;
+            }
+            else
+            {
+                elemento += filaChar[i];
             }
         }
 
@@ -210,11 +223,11 @@ public final class IOCSV
     {
         switch (dataType) {
             case INT:
-                return ColumnaInt.fromColumnaString(col, true);
+                return ColumnaInt.toColumnaInt(col, true);
             case DOUBLE:
-                return ColumnaDouble.fromColumnaString(col, true);
+                return ColumnaDouble.toDoubleColumn(col, true);
             case BOOL:
-                return ColumnaBool.fromColumnaString(col, true);
+                return ColumnaBool.toBoolColumn(col, true);
             default:
                 return col;
         }
@@ -266,15 +279,15 @@ public final class IOCSV
         {
             switch (count) {
                 case 0:
-                    colCasteada = ColumnaBool.fromColumnaString(col);
+                    colCasteada = ColumnaBool.toBoolColumn(col);
                     tiposEtiqueta.put(keys.get(index), DataType.BOOL);
                     break;
                 case 1:
-                    colCasteada = ColumnaInt.fromColumnaString(col);
+                    colCasteada = ColumnaInt.toColumnaInt(col);
                     tiposEtiqueta.put(keys.get(index), DataType.INT);
                     break;
                 case 2:
-                    colCasteada = ColumnaDouble.fromColumnaString(col);
+                    colCasteada = ColumnaDouble.toDoubleColumn(col);
                     tiposEtiqueta.put(keys.get(index), DataType.DOUBLE);
                     break;
                 default:
