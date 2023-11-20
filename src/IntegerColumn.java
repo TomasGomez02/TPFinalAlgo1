@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import utils.CasteoIlegalException;
+import utils.IllegalCastException;
 import utils.Types;
 import utils.DataType;
 
@@ -263,12 +263,12 @@ public class IntegerColumn extends NumberColumn<Integer> {
         return copia;
     }
 
-    public static IntegerColumn toIntegerColumn(Column col) throws CasteoIlegalException
+    public static IntegerColumn toIntegerColumn(Column col) throws IllegalCastException
     {
         return toIntegerColumn(col, false);
     }
 
-    public static IntegerColumn toIntegerColumn(Column col, boolean force) throws CasteoIlegalException
+    public static IntegerColumn toIntegerColumn(Column col, boolean force) throws IllegalCastException
     {
         switch (col.getColumnType()) 
         {
@@ -283,7 +283,7 @@ public class IntegerColumn extends NumberColumn<Integer> {
         }
     }
 
-    private static IntegerColumn fromStringColumn (Column<String> col, boolean force) throws CasteoIlegalException
+    private static IntegerColumn fromStringColumn (Column<String> col, boolean force) throws IllegalCastException
     {
         List<Integer> datos = new ArrayList<>();
         
@@ -304,7 +304,7 @@ public class IntegerColumn extends NumberColumn<Integer> {
             catch(NumberFormatException e)
             {
                 if(!force)
-                    throw new CasteoIlegalException(elemento, String.class.toString(), Integer.class.toString());
+                    throw new IllegalCastException(elemento, String.class.toString(), Integer.class.toString());
                 else
                     datos.add(null);
             }

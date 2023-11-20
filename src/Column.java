@@ -180,8 +180,17 @@ public abstract class Column<T> implements Cloneable {
         return DataType.STRING;
     }
 
+    /**
+     * Obtiene los valores unicos de la columna. 
+     */
     public abstract Column<T> unique();
 
+    /**
+     * Verifica si una columna contiene un elemento especifico.
+     * 
+     * @param element valor que se quiere verificar si está contenido en la columna
+     * @return
+     */
     public boolean contains(T element)
     {
         if(element == null)

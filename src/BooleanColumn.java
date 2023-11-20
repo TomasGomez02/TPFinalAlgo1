@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import utils.CasteoIlegalException;
+import utils.IllegalCastException;
 import utils.Types;
 
 import java.util.ArrayList;
@@ -24,8 +24,8 @@ public class BooleanColumn extends Column<Boolean>{
         }
     }
 
-    public BooleanColumn(List<Boolean> otro){
-        this.data = new ArrayList<>(otro);
+    public BooleanColumn(List<Boolean> list){
+        this.data = new ArrayList<>(list);
     }
 
     public BooleanColumn(int size)
@@ -38,11 +38,11 @@ public class BooleanColumn extends Column<Boolean>{
     }
 
     @Override
-    public Boolean get(int indice) {
-        if (!containsIndex(indice)){
-            throw new IndexOutOfBoundsException("Indice "+indice+" fuera de rango para longitud "+length());
+    public Boolean get(int index) {
+        if (!containsIndex(index)){
+            throw new IndexOutOfBoundsException("Indice "+index+" fuera de rango para longitud "+length());
         }
-        return this.data.get(indice);
+        return this.data.get(index);
     }
 
     @Override
@@ -191,12 +191,12 @@ public class BooleanColumn extends Column<Boolean>{
         return copia;
     }
 
-    public static BooleanColumn toBooleanColumn(Column col) throws CasteoIlegalException
+    public static BooleanColumn toBooleanColumn(Column col) throws IllegalCastException
     {
         return toBooleanColumn(col, false);
     }
 
-    public static BooleanColumn toBooleanColumn(Column col, boolean force) throws CasteoIlegalException
+    public static BooleanColumn toBooleanColumn(Column col, boolean force) throws IllegalCastException
     {
         switch (col.getColumnType()) 
         {
@@ -211,7 +211,7 @@ public class BooleanColumn extends Column<Boolean>{
         }
     }
 
-    private static BooleanColumn fromStringColumn (Column<String> col, boolean force) throws CasteoIlegalException
+    private static BooleanColumn fromStringColumn (Column<String> col, boolean force) throws IllegalCastException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -232,7 +232,7 @@ public class BooleanColumn extends Column<Boolean>{
             catch(NumberFormatException e)
             {
                 if(!force)
-                    throw new CasteoIlegalException(col.get(i), String.class.toString(), Boolean.class.toString());
+                    throw new IllegalCastException(col.get(i), String.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }
@@ -241,7 +241,7 @@ public class BooleanColumn extends Column<Boolean>{
         return new BooleanColumn(datos);
     }
 
-    private static BooleanColumn fromIntegerColumn(Column<Integer> col, boolean force) throws CasteoIlegalException
+    private static BooleanColumn fromIntegerColumn(Column<Integer> col, boolean force) throws IllegalCastException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -259,10 +259,10 @@ public class BooleanColumn extends Column<Boolean>{
                     datos.add(null);
                 }
             }
-            catch(CasteoIlegalException e)
+            catch(IllegalCastException e)
             {
                 if(!force)
-                    throw new CasteoIlegalException(col.get(i).toString(), Integer.class.toString(), Boolean.class.toString());
+                    throw new IllegalCastException(col.get(i).toString(), Integer.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }
@@ -271,7 +271,7 @@ public class BooleanColumn extends Column<Boolean>{
         return new BooleanColumn(datos);
     }
 
-    private static BooleanColumn fromDoubleColumn(Column<Double> col, boolean force) throws CasteoIlegalException
+    private static BooleanColumn fromDoubleColumn(Column<Double> col, boolean force) throws IllegalCastException
     {
         List<Boolean> datos = new ArrayList<>();
 
@@ -289,10 +289,10 @@ public class BooleanColumn extends Column<Boolean>{
                     datos.add(null);
                 }
             }
-            catch(CasteoIlegalException e)
+            catch(IllegalCastException e)
             {
                 if(!force )
-                    throw new CasteoIlegalException(col.get(i).toString(), Double.class.toString(), Boolean.class.toString());
+                    throw new IllegalCastException(col.get(i).toString(), Double.class.toString(), Boolean.class.toString());
                 else
                     datos.add(null);
             }

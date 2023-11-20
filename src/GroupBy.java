@@ -8,65 +8,65 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import utils.ColumnaInexistenteException;
-import utils.ColumnaNoOperableException;
+import utils.UnexistentColumnException;
+import utils.InoperableColumnException;
 
 public class GroupBy implements Cloneable
 {
     private DataFrame data;
-    private Map<String, List<Integer>> grupos;
-    private Map<String, StringColumn> colAgrupadas;
-    private List<String> colNoAgrupadas;
-    private List<String> colAgregadas;
-    private List<String> valorGrupos;
+    private Map<String, List<Integer>> groups;
+    private Map<String, StringColumn> groupedCols;
+    private List<String> ungroupedCols;
+    private List<String> aggregatedCols;
+    private List<String> groupValues;
 
-    public GroupBy(DataFrame df, List<String> colAgrupadas)
+    public GroupBy(DataFrame df, List<String> groupedCols)
     {
         this.data = df.clone();
-        this.colAgrupadas = new LinkedHashMap<>();
+        this.groupedCols = new LinkedHashMap<>();
         
-        colNoAgrupadas = this.data.nombreColumnas();
-        for(String col: colAgrupadas)
+        ungroupedCols = this.data.colNames();
+        for(String col: groupedCols)
         {
-            this.colAgrupadas.put(col, StringColumn.toStringColumn(this.data.getColumna(col).unique()));
-            colNoAgrupadas.remove(col);
+            this.groupedCols.put(col, StringColumn.toStringColumn(this.data.getCol(col).unique()));
+            ungroupedCols.remove(col);
         }
-        colAgregadas = new ArrayList<>();
+        aggregatedCols = new ArrayList<>();
 
-        grupos = generateGroups();
+        groups = generateGroups();
     }
 
-    public GroupBy(DataFrame df, String[] colAgrupadas)
+    public GroupBy(DataFrame df, String[] groupedCols)
     {
-        this(df, Arrays.asList(colAgrupadas));
+        this(df, Arrays.asList(groupedCols));
     }
 
-    public GroupBy(DataFrame df, List<String> colAgrupadas, List<String> colAgregadas)
+    public GroupBy(DataFrame df, List<String> groupedCols, List<String> aggregatedCols)
     {
         this.data = df.clone();
 
         
-        this.colAgrupadas = new LinkedHashMap<>();
+        this.groupedCols = new LinkedHashMap<>();
         
-        colNoAgrupadas = this.data.nombreColumnas();
-        for(String col: colAgrupadas)
+        ungroupedCols = this.data.colNames();
+        for(String col: groupedCols)
         {
-            this.colAgrupadas.put(col, StringColumn.toStringColumn(this.data.getColumna(col).unique()));
-            colNoAgrupadas.remove(col);
+            this.groupedCols.put(col, StringColumn.toStringColumn(this.data.getCol(col).unique()));
+            ungroupedCols.remove(col);
         }
-        this.colAgregadas = new ArrayList<>(colAgregadas);
+        this.aggregatedCols = new ArrayList<>(aggregatedCols);
 
-        grupos = generateGroups();
+        groups = generateGroups();
     }
 
     private List<String> getGroupedColumns()
     {
-        return new ArrayList<>(colAgrupadas.keySet());
+        return new ArrayList<>(groupedCols.keySet());
     }
 
     private Map<String, List<Integer>> generateGroups()
     {
-        valorGrupos = new ArrayList<>();
+        groupValues = new ArrayList<>();
         Map<String, List<Integer>> grupos = new LinkedHashMap<>();
         for(String grupo: getGroups())
         {
@@ -74,7 +74,7 @@ public class GroupBy implements Cloneable
             if(indices.size() > 0)
             {
                 grupos.put(grupo, indices);
-                valorGrupos.add(grupo);
+                groupValues.add(grupo);
             }
         }
 
@@ -85,9 +85,9 @@ public class GroupBy implements Cloneable
     {
         List<Integer> indices = new ArrayList<>();
 
-        for(int i = 0; i < data.cantidadFilas(); i++)
+        for(int i = 0; i < data.nRow(); i++)
         {
-            if(belongsToGroup(data.getFila(i), group))
+            if(belongsToGroup(data.getRow(i), group))
             {
                 indices.add(i);
             }
@@ -138,7 +138,7 @@ public class GroupBy implements Cloneable
         List<String> columnas = getGroupedColumns();
         for(int i = 0; i < columnas.size(); i++)
         {
-            if(!String.valueOf(row.getCelda(columnas.get(i), 0)).equals(String.valueOf(valores[i])))
+            if(!String.valueOf(row.getValue(columnas.get(i), 0)).equals(String.valueOf(valores[i])))
             {
                 return false;
             }
@@ -155,13 +155,13 @@ public class GroupBy implements Cloneable
     {
         List<String> grupos = new ArrayList<>();
         List<String> siguientesGrupos = null;
-        if(groupIndex < colAgrupadas.size() - 1)
+        if(groupIndex < groupedCols.size() - 1)
         {
             siguientesGrupos = getGroups(groupIndex + 1);
         }
         
         List<String> cols = getGroupedColumns();
-        StringColumn values = colAgrupadas.get(cols.get(groupIndex));
+        StringColumn values = groupedCols.get(cols.get(groupIndex));
         for(int i = 0; i < values.length(); i++)
         {
             if(siguientesGrupos == null)
@@ -218,7 +218,7 @@ public class GroupBy implements Cloneable
         int espacioDer;
         for (int i = 0; i < columnasPrintear.size(); i++)
         {
-            String celda = String.valueOf(fila.getCelda(columnasPrintear.get(i), 0));
+            String celda = String.valueOf(fila.getValue(columnasPrintear.get(i), 0));
             
             if(celda.length() > tamaño[i])
             {
@@ -254,7 +254,7 @@ public class GroupBy implements Cloneable
     public String toString()
     {
         final List<String> colPrinteables = getGroupedColumns();
-        colPrinteables.addAll(colAgregadas);
+        colPrinteables.addAll(aggregatedCols);
         int[] tamaño = new int[colPrinteables.size()];
         final int OFFSETMINIMO = 4;
 
@@ -277,9 +277,9 @@ public class GroupBy implements Cloneable
 
         out += "-".repeat(cantidadSepHeader) + "\n";
 
-        for(String grupo: valorGrupos)
+        for(String grupo: groupValues)
         {
-            out += getRowLine(data.getFila(grupos.get(grupo).get(0)), colPrinteables, tamaño) + "\n";
+            out += getRowLine(data.getRow(groups.get(grupo).get(0)), colPrinteables, tamaño) + "\n";
         }
 
         return out;
@@ -300,132 +300,173 @@ public class GroupBy implements Cloneable
         DataFrame df = data.clone();
         List<String> etiquetas = new ArrayList<>(getGroupedColumns());
 
-        return new GroupBy(df, etiquetas, colAgregadas);
+        return new GroupBy(df, etiquetas, aggregatedCols);
     }
 
-    private NumberColumn getColumnaOperable(String etiqueta)
+    private NumberColumn getOperableColumn(String tag)
     {
-        if(!data.contieneEtiqueta(etiqueta))
+        if(!data.containsCol(tag))
         {
-            throw new ColumnaInexistenteException(etiqueta);
+            throw new UnexistentColumnException(tag);
         }
 
-        Column col = data.getColumna(etiqueta);
-        if(!colNoAgrupadas.contains(etiqueta) || !(col instanceof NumberColumn))
+        Column col = data.getCol(tag);
+        if(!ungroupedCols.contains(tag) || !(col instanceof NumberColumn))
         {
-            throw new ColumnaNoOperableException(etiqueta);
+            throw new InoperableColumnException(tag);
         }
 
         return (NumberColumn) col;
     }
 
-    private NumberColumn<Double> insertarValoresGrupo(NumberColumn<Double> col, List<Integer> indices, Double valor)
+    private NumberColumn<Double> insertGroupValues(NumberColumn<Double> col, List<Integer> indexes, Double value)
     {
         NumberColumn<Double> colInsertada = col.clone();
-        for(Integer indice: indices)
+        for(Integer indice: indexes)
         {
-            colInsertada.set(indice, valor);
+            colInsertada.set(indice, value);
         }
 
         return colInsertada;
     }
 
-    private <T extends Number> NumberColumn<Double> operacionDeAgregacion(String etiqueta, Function<NumberColumn, T> op)
+    private <T extends Number> NumberColumn<Double> aggregationOperation(String tag, Function<NumberColumn, T> op)
     {
-        NumberColumn col = getColumnaOperable(etiqueta);
-        NumberColumn<Double> colOperada = new DoubleColumn(data.cantidadFilas());
+        NumberColumn col = getOperableColumn(tag);
+        NumberColumn<Double> colOperada = new DoubleColumn(data.nRow());
 
-        for(String grupo: valorGrupos)
+        for(String grupo: groupValues)
         {
-            List<Integer> indicesGrupo = grupos.get(grupo);
+            List<Integer> indicesGrupo = groups.get(grupo);
             Double val = op.apply((NumberColumn) col.filterByIndex(indicesGrupo)).doubleValue();
-            colOperada = insertarValoresGrupo(colOperada, indicesGrupo, val);
+            colOperada = insertGroupValues(colOperada, indicesGrupo, val);
         }
 
         return colOperada;
     }
 
+    /**
+     * Calcula y devuelve la media para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param tag columna para la cual se calcula la media
+     * @return         nuevo objeto GroupBy que incluye la media calculada para cada grupo como una columna adicional
+     */
     public GroupBy mean(String tag)
     {
         Function<NumberColumn, Double> op = (col) -> (col.mean());
-        NumberColumn<Double> col = operacionDeAgregacion(tag, op);
+        NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
         String nuevaCol = "Media: " + tag;
-        gb.data = gb.data.addColumna(nuevaCol, col);
-        gb.colAgregadas.add(nuevaCol);
+        gb.data = gb.data.addCol(nuevaCol, col);
+        gb.aggregatedCols.add(nuevaCol);
         return gb; 
     }
 
-    public GroupBy median(String tags)
+    /**
+     * Calcula y devuelve la mediana para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param tag columna para la cual se calcula la mediana
+     * @return         nuevo objeto GroupBy que incluye la mediana calculada para cada grupo como una columna adicional
+     */
+    public GroupBy median(String tag)
     {
         Function<NumberColumn, Double> op = (col) -> (col.median());
-        NumberColumn<Double> col = operacionDeAgregacion(tags, op);
+        NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
-        String nuevaCol = "Mediana: " + tags;
-        gb.data = gb.data.addColumna(nuevaCol, col);
-        gb.colAgregadas.add(nuevaCol);
+        String nuevaCol = "Mediana: " + tag;
+        gb.data = gb.data.addCol(nuevaCol, col);
+        gb.aggregatedCols.add(nuevaCol);
         return gb;
     }
 
+    /**
+     * Obtiene y devuelve el valor maximo para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param tag columna para la cual se obtiene el valor maximo
+     * @return         nuevo objeto GroupBy que incluye el valor maximo obtenido para cada grupo como una columna adicional
+     */
     public GroupBy max(String tag)
     {
         Function<NumberColumn, Number> op = (col) -> (col.max());
-        NumberColumn<Double> col = operacionDeAgregacion(tag, op);
+        NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
         String nuevaCol = "Maximo: " + tag;
-        gb.data = gb.data.addColumna(nuevaCol, col);
-        gb.colAgregadas.add(nuevaCol);
+        gb.data = gb.data.addCol(nuevaCol, col);
+        gb.aggregatedCols.add(nuevaCol);
         return gb;
     }
 
+    /**
+     * Obtiene y devuelve el valor minimo para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param tag columna para la cual se obtiene el valor minimo
+     * @return         nuevo objeto GroupBy que incluye el valor minimo obtenido para cada grupo como una columna adicional
+     */
     public GroupBy min(String tag)
     {
         Function<NumberColumn, Number> op = (col) -> (col.min());
-        NumberColumn<Double> col = operacionDeAgregacion(tag, op);
+        NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
         String nuevaCol = "Minimo: " + tag;
-        gb.data = gb.data.addColumna(nuevaCol, col);
-        gb.colAgregadas.add(nuevaCol);
+        gb.data = gb.data.addCol(nuevaCol, col);
+        gb.aggregatedCols.add(nuevaCol);
         return gb;
     }
 
+    /**
+     * Calcula y devuelve el desvio estandar para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param tag columna para la cual se calcula el desvio estandar
+     * @return         nuevo objeto GroupBy que incluye el desvio estandar calculado para cada grupo como una columna adicional
+     */
     public GroupBy std(String tag)
     {
         Function<NumberColumn, Double> op = (col) -> (col.std());
-        NumberColumn<Double> col = operacionDeAgregacion(tag, op);
+        NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
         String nuevaCol = "SD: " + tag;
-        gb.data = gb.data.addColumna(nuevaCol, col);
-        gb.colAgregadas.add(nuevaCol);
+        gb.data = gb.data.addCol(nuevaCol, col);
+        gb.aggregatedCols.add(nuevaCol);
         return gb;
     }
 
+    /**
+     * Calcula y devuelve la suma acumulada para cada grupo que forma la columna correspondiente a la etiqueta proporcionada.
+     * 
+     * @param tag columna para la cual se calcula la suma acumulada
+     * @return         nuevo objeto GroupBy que incluye la suma acumulada calculada para cada grupo como una columna adicional
+     */
     public GroupBy sum(String tag)
     {
         Function<NumberColumn, Number> op = (col) -> (col.sum());
-        NumberColumn<Double> col = operacionDeAgregacion(tag, op);
+        NumberColumn<Double> col = aggregationOperation(tag, op);
         GroupBy gb = clone();
 
         String nuevaCol = "Suma: " + tag;
-        gb.data = gb.data.addColumna(nuevaCol, col);
-        gb.colAgregadas.add(nuevaCol);
+        gb.data = gb.data.addCol(nuevaCol, col);
+        gb.aggregatedCols.add(nuevaCol);
         return gb;
     }
 
+    /**
+     * Devuelve la cantidad de elementos que contiene cada grupo.
+     * 
+     * @return nuevo objeto GroupBy que incluye la cantidad de elementos para cada grupo como una columna adicional
+     */
     public GroupBy n()
     {
-        NumberColumn<Double> col = new DoubleColumn(data.cantidadFilas());
+        NumberColumn<Double> col = new DoubleColumn(data.nRow());
 
-        for(String grupo: valorGrupos)
+        for(String grupo: groupValues)
         {
-            List<Integer> indicesGrupo = grupos.get(grupo);
-            Double val = (double) grupos.get(grupo).size();
-            col = insertarValoresGrupo(col, indicesGrupo, val);
+            List<Integer> indicesGrupo = groups.get(grupo);
+            Double val = (double) groups.get(grupo).size();
+            col = insertGroupValues(col, indicesGrupo, val);
         }
 
         IntegerColumn nuevaCol = IntegerColumn.toIntegerColumn(col);
@@ -433,8 +474,8 @@ public class GroupBy implements Cloneable
         GroupBy gb = clone();
 
         String nuevaColName = "n";
-        gb.data = gb.data.addColumna(nuevaColName, nuevaCol);
-        gb.colAgregadas.add(nuevaColName);
+        gb.data = gb.data.addCol(nuevaColName, nuevaCol);
+        gb.aggregatedCols.add(nuevaColName);
         return gb;
     }
 
@@ -442,12 +483,12 @@ public class GroupBy implements Cloneable
     {
         GroupBy gb = clone();
 
-        for(String grupo: valorGrupos)
+        for(String grupo: groupValues)
         {
-            List<Integer> indexGroup = grupos.get(grupo);
+            List<Integer> indexGroup = groups.get(grupo);
             indexGroup.sort(null);
             
-            DataFrame slice = gb.data.getFila(indexGroup);
+            DataFrame slice = gb.data.getRow(indexGroup);
             
             Map<Integer, Integer> mappedIndexes = new HashMap<>();
             for(int i = 0; i < indexGroup.size(); i++)
@@ -455,14 +496,14 @@ public class GroupBy implements Cloneable
                 mappedIndexes.put(i, indexGroup.get(i));
             }
             
-            Map<Integer, Integer> orderIndex = slice.getColumna(tag).sort(ascending);
+            Map<Integer, Integer> orderIndex = slice.getCol(tag).sort(ascending);
             Map<Integer, Integer> newOrder = new HashMap<>();
 
             for(Map.Entry<Integer, Integer> entry: orderIndex.entrySet())
             {
                 newOrder.put(mappedIndexes.get(entry.getKey()), mappedIndexes.get(entry.getValue()));
             }
-            gb.data = gb.data.orderByIndex(newOrder);
+            gb.data = gb.data.sortByIndex(newOrder);
         }
 
         return gb;

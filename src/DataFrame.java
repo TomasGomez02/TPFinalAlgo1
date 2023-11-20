@@ -5,7 +5,7 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-import utils.ColumnaInexistenteException;
+import utils.UnexistentColumnException;
 import utils.DataType;
 import utils.Types;
 
@@ -20,20 +20,20 @@ public class DataFrame implements Cloneable {
     
     @SuppressWarnings("rawtypes")   // Literalmente es lo que dice
     private Map<String, Column> data;
-    private List<String> etiquetas;
-    private Map<String, DataType> tiposColumna;
+    private List<String> tags;
+    private Map<String, DataType> columnTypes;
 
     public DataFrame(){
         this.data = new LinkedHashMap<>();
-        this.etiquetas = new ArrayList<>();
-        this.tiposColumna = new LinkedHashMap<>();
+        this.tags = new ArrayList<>();
+        this.columnTypes = new LinkedHashMap<>();
     }
 
     @SuppressWarnings("rawtypes")
-    public DataFrame(Map<String, Column> data, Map<String, DataType> tiposColumna){
+    public DataFrame(Map<String, Column> data, Map<String, DataType> columnTypes){
         this.data = new LinkedHashMap<>(data);
-        this.tiposColumna = new LinkedHashMap<>(tiposColumna);
-        this.etiquetas = new ArrayList<>(data.keySet());
+        this.columnTypes = new LinkedHashMap<>(columnTypes);
+        this.tags = new ArrayList<>(data.keySet());
     }
 
     @SuppressWarnings("rawtypes")
@@ -41,8 +41,8 @@ public class DataFrame implements Cloneable {
         this();
         for (int i=0; i < data.size(); i++){
             this.data.put(String.valueOf(i), data.get(i).clone());
-            this.etiquetas.add(String.valueOf(i));
-            this.tiposColumna.put(String.valueOf(i), data.get(i).getColumnType());
+            this.tags.add(String.valueOf(i));
+            this.columnTypes.put(String.valueOf(i), data.get(i).getColumnType());
         }
     }
 
@@ -51,8 +51,8 @@ public class DataFrame implements Cloneable {
         this();
         for (int i=0; i < data.length; i++){
             this.data.put(String.valueOf(i), data[i].clone());
-            this.etiquetas.add(String.valueOf(i));
-            this.tiposColumna.put(String.valueOf(i), data[i].getColumnType());
+            this.tags.add(String.valueOf(i));
+            this.columnTypes.put(String.valueOf(i), data[i].getColumnType());
         }
     }
 
@@ -61,19 +61,19 @@ public class DataFrame implements Cloneable {
         this();
         for (String colName : data.keySet()){
             this.data.put(colName, data.get(colName).clone());
-            this.etiquetas.add(colName);
-            this.tiposColumna.put(colName, data.get(colName).getColumnType());
+            this.tags.add(colName);
+            this.columnTypes.put(colName, data.get(colName).getColumnType());
         }
     }
 
     /**
      * Verifica si la lista de etiquetas contiene la etiqueta especificada.
      * 
-     * @param etiqueta la etiqueta que se busca en la lista
+     * @param tag la etiqueta que se busca en la lista
      * @return         <code>true</code> si la etiqueta se encuentra en la lista, <code>false</code> si la etiqueta no se encuentra en la lista
      */
-    public boolean contieneEtiqueta(String etiqueta){
-        return this.etiquetas.contains(etiqueta);
+    public boolean containsCol(String tag){
+        return this.tags.contains(tag);
     }
 
     /**
@@ -81,8 +81,8 @@ public class DataFrame implements Cloneable {
      * 
      * @return una lista que contiene todas las etiquetas 
      */
-    public List<String> nombreColumnas(){
-        return new ArrayList<>(this.etiquetas);
+    public List<String> colNames(){
+        return new ArrayList<>(this.tags);
     }
 
     /**
@@ -90,8 +90,8 @@ public class DataFrame implements Cloneable {
      * 
      * @return la cantidad de columnas 
      */
-    public int cantidadColumnas(){
-        return this.etiquetas.size();
+    public int nCol(){
+        return this.tags.size();
     }
 
     /**
@@ -99,11 +99,11 @@ public class DataFrame implements Cloneable {
      * 
      * @return si no se encuentran datos devuelve 0. De lo contrario, devuelve la cantidad de filas
      */
-    public int cantidadFilas(){
+    public int nRow(){
         if (this.data.isEmpty()){
             return 0;
         }
-        return this.data.get(etiquetas.get(0)).length();
+        return this.data.get(tags.get(0)).length();
     }
 
     /**
@@ -111,8 +111,8 @@ public class DataFrame implements Cloneable {
      * 
      * @return un mapa que representa la asociacion entre los nombres de las columnas y sus tipos de datos.
      */
-    public Map<String, DataType> tiposColumna(){
-        return new LinkedHashMap<>(this.tiposColumna);
+    public Map<String, DataType> colTypes(){
+        return new LinkedHashMap<>(this.columnTypes);
     }
 
     public String toString(){
@@ -122,46 +122,46 @@ public class DataFrame implements Cloneable {
 
     /**
      * Imprime una porcion del dataframe delimitado por un indice de inicio y un indice final.
-     * @param indiceInicio primer indice de fila a imprimir
-     * @param indiceFinal ultimo indice de fila a imprimir 
+     * @param startindex primer indice de fila a imprimir
+     * @param finalIndex ultimo indice de fila a imprimir 
      */
-    public void printDesdeHasta(int indiceInicio, int indiceFinal){
-        printDesdeHasta(indiceInicio, indiceFinal, 4);
+    public void printRange(int startindex, int finalIndex){
+        printRange(startindex, finalIndex, 4);
     }
 
     /**
      * Imprime una porcion del dataframe delimitado por un indice de inicio y un indice final.
      * 
-     * @param indiceInicio primer indice de fila a imprimir
-     * @param indiceFinal  ultimo indice de fila a imprimir 
-     * @param OFFSETMINIMO valor minimo de desplazamiento utilizado para ajustar el centrado de las etiquetas y el contenido de las celdas
+     * @param startIndex primer indice de fila a imprimir
+     * @param finalIndex  ultimo indice de fila a imprimir 
+     * @param MINIMUMOFFSET valor minimo de desplazamiento utilizado para ajustar el centrado de las etiquetas y el contenido de las celdas
      */
-    public void printDesdeHasta(int indiceInicio, int indiceFinal, final int OFFSETMINIMO){
-        if (indiceInicio < -1){
-            indiceInicio = 0;
+    public void printRange(int startIndex, int finalIndex, final int MINIMUMOFFSET){
+        if (startIndex < -1){
+            startIndex = 0;
         }
-        if (indiceFinal > cantidadFilas()){
-            indiceFinal = cantidadFilas();
+        if (finalIndex > nRow()){
+            finalIndex = nRow();
         }
 
         final int COLUMNASMAX = 10;
         final String OVERFLOWSTRING = "...|";
 
-        final boolean COLUMNASOVERFLOW = (cantidadColumnas() > COLUMNASMAX);
-        int cantColumnas = COLUMNASOVERFLOW ? COLUMNASMAX : cantidadColumnas();
+        final boolean COLUMNASOVERFLOW = (nCol() > COLUMNASMAX);
+        int cantColumnas = COLUMNASOVERFLOW ? COLUMNASMAX : nCol();
 
         String fila = "";
         String sep = "|";
         int[] tamaño = new int[cantColumnas];
-        int tamañoIndice = String.valueOf(indiceFinal).length();
+        int tamañoIndice = String.valueOf(finalIndex).length();
 
         int espacioIzq;
         int espacioDer;
 
         for (int i = 0; i < cantColumnas; i++){
-            tamaño[i] = OFFSETMINIMO * 2;
-            if (etiquetas.get(i).length() + OFFSETMINIMO > tamaño[i]){
-                tamaño[i] = etiquetas.get(i).length() + OFFSETMINIMO;
+            tamaño[i] = MINIMUMOFFSET * 2;
+            if (tags.get(i).length() + MINIMUMOFFSET > tamaño[i]){
+                tamaño[i] = tags.get(i).length() + MINIMUMOFFSET;
             }
         }
 
@@ -170,7 +170,7 @@ public class DataFrame implements Cloneable {
         
         for (int i = 0; i < cantColumnas; i++)
         {
-            int diff = tamaño[i] - etiquetas.get(i).length();
+            int diff = tamaño[i] - tags.get(i).length();
             espacioIzq = diff / 2;
             if (diff % 2 == 0)
             {
@@ -180,7 +180,7 @@ public class DataFrame implements Cloneable {
             {
                 espacioDer = espacioIzq+1;
             }
-            fila += " ".repeat(espacioIzq)+etiquetas.get(i)+" ".repeat(espacioDer)+sep;
+            fila += " ".repeat(espacioIzq)+tags.get(i)+" ".repeat(espacioDer)+sep;
         }
 
         int cantidadSepHeader = 0;
@@ -197,15 +197,15 @@ public class DataFrame implements Cloneable {
 
         fila = "";
         // Esta parte es para escribir los valores
-        for (int row=indiceInicio; row <= indiceFinal; row++){
+        for (int row=startIndex; row <= finalIndex; row++){
             int diffTamañoIndice = tamañoIndice - String.valueOf(row).length();
             fila += row + " ".repeat(diffTamañoIndice) + sep;
             for (int i = 0; i < cantColumnas; i++) {
-                String elem = String.valueOf(getCelda(etiquetas.get(i), row));
+                String elem = String.valueOf(getValue(tags.get(i), row));
 
                 if(elem.length() > tamaño[i])
                 {
-                    elem = stringRecortado(elem, tamaño[i]);
+                    elem = shortenedString(elem, tamaño[i]);
                 }
 
                 int diff = tamaño[i] - elem.length();
@@ -230,14 +230,15 @@ public class DataFrame implements Cloneable {
     /**
      * Recorta una cadena dada en base a un tamaño indicado y le agrega  "..."  al final.
      *  
-     * @param stringOriginal cadena a recortar
-     * @param tamaño         cantidad de caracteres maximos deseados
+     * @param originalString cadena a recortar
+     * @param size         cantidad de caracteres maximos deseados
      * @return               una cadena recortada con el tamaño especificado de caracteres seguida de "..." 
      */
-    private String stringRecortado(String stringOriginal, int tamaño){
+    private String shortenedString(String originalString, int size)
+    {
         String stringNuevo = "";
-        char[] charArr = stringOriginal.toCharArray();
-        for(int i = 0; i < tamaño - 3; i++)
+        char[] charArr = originalString.toCharArray();
+        for(int i = 0; i < size - 3; i++)
         {
             stringNuevo += charArr[i];
         }
@@ -250,10 +251,10 @@ public class DataFrame implements Cloneable {
      * @param cantidadFilas el numero de filas a imprimir
      */
     public void head(int cantidadFilas){
-        if (cantidadFilas > this.cantidadFilas()){
-            cantidadFilas = this.cantidadFilas();
+        if (cantidadFilas > this.nRow()){
+            cantidadFilas = this.nRow();
         }
-        printDesdeHasta(0, cantidadFilas - 1);
+        printRange(0, cantidadFilas - 1);
     }
 
     /**
@@ -269,10 +270,10 @@ public class DataFrame implements Cloneable {
      * @param cantidadFilas la cantidad de filas a imprimir
      */
     public void tail(int cantidadFilas){
-        if (cantidadFilas > this.cantidadFilas()){
-            cantidadFilas = this.cantidadFilas();
+        if (cantidadFilas > this.nRow()){
+            cantidadFilas = this.nRow();
         }
-        printDesdeHasta(this.cantidadFilas() - cantidadFilas - 1, this.cantidadFilas() - 1);
+        printRange(this.nRow() - cantidadFilas - 1, this.nRow() - 1);
     }
     /**
      * Imprime las ultimas cinco filas del dataframe.
@@ -286,11 +287,11 @@ public class DataFrame implements Cloneable {
      */
     public void info(){
         System.out.println("<"+this.getClass()+">");
-        System.out.println("Indices: 0 hasta "+(cantidadFilas()-1));
-        System.out.println("Data de columnas (total "+cantidadColumnas()+" columnas): ");
+        System.out.println("Indices: 0 hasta "+(nRow()-1));
+        System.out.println("Data de columnas (total "+nCol()+" columnas): ");
         
         int espacioColName = 12;
-        for (String colname : this.etiquetas){
+        for (String colname : this.tags){
             if (colname.length() > espacioColName){
                 espacioColName = colname.length() +2;
             }
@@ -304,14 +305,14 @@ public class DataFrame implements Cloneable {
         fila = "";
         System.out.println("-".repeat(espacioColName + ESPACIOTITULO*2));
 
-        for (String colName : this.etiquetas){
-            int nonNull = getColumna(colName).length() - getColumna(colName).nNull();
+        for (String colName : this.tags){
+            int nonNull = getCol(colName).length() - getCol(colName).nNull();
             int espacioNum = ESPACIOTITULO - String.valueOf(nonNull).length();
             fila += colName;
             fila += " ".repeat(espacioColName - colName.length());
-            fila += getColumna(colName).length() - getColumna(colName).nNull();
+            fila += getCol(colName).length() - getCol(colName).nNull();
             fila += " ".repeat(espacioNum);
-            fila += this.tiposColumna.get(colName);
+            fila += this.columnTypes.get(colName);
             System.out.println(fila);
             fila = "";
         }
@@ -321,88 +322,88 @@ public class DataFrame implements Cloneable {
      * Establece el valor para una celda indicada.
      * 
      * @param <T>      tipo de dato del valor a asignar
-     * @param etiqueta etiqueta de la columna a la que pertenece la celda
-     * @param indice   indice de fila de la celda
-     * @param valor    el nuevo valor que se le asignara a la celda
-     * @throws ColumnaInexistenteException si la etiqueta especificada no existe en la estructura de datos
+     * @param tag etiqueta de la columna a la que pertenece la celda
+     * @param index   indice de fila de la celda
+     * @param value    el nuevo valor que se le asignara a la celda
+     * @throws UnexistentColumnException si la etiqueta especificada no existe en la estructura de datos
      */
-    public <T> void setCelda(String etiqueta, int indice, T valor){
-        if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException(etiqueta);
+    public <T> void setValue(String tag, int index, T value){
+        if (!this.containsCol(tag)){
+            throw new UnexistentColumnException(tag);
         }
-        this.data.get(etiqueta).set(indice, valor);
+        this.data.get(tag).set(index, value);
     }
 
     /**
      * Obtiene el valor de una celda indicada.
      * 
-     * @param etiqueta etiqueta de la columna a la que pertenece la celda
-     * @param indice   indice de fila de la celda 
+     * @param tag etiqueta de la columna a la que pertenece la celda
+     * @param index   indice de fila de la celda 
      * @return         el valor contenido en la celda indicada
-     * @throws ColumnaInexistenteException si la etiqueta especificada no existe en la estructura de datos
+     * @throws UnexistentColumnException si la etiqueta especificada no existe en la estructura de datos
      */
-    public Object getCelda(String etiqueta, int indice){
-        if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException(etiqueta);
+    public Object getValue(String tag, int index){
+        if (!this.containsCol(tag)){
+            throw new UnexistentColumnException(tag);
         }
-        return this.data.get(etiqueta).get(indice);
+        return this.data.get(tag).get(index);
     }
 
     /**
      * Obtiene el valor de una celda y lo convierte al tipo de dato especificado.
      * 
      * @param <T>      el tipo de dato del valor a obtener
-     * @param etiqueta etiqueta de la columna a la que pertenece la celda
-     * @param indice   indice de fila de la celda 
-     * @param tipoDato la clase que representa el tipo de dato esperado para el valor de la celda
+     * @param tag etiqueta de la columna a la que pertenece la celda
+     * @param index   indice de fila de la celda 
+     * @param dataType la clase que representa el tipo de dato esperado para el valor de la celda
      * @return         el valor de la celda especificada convertido al tipo de dato proporcionado
-     * @throws ColumnaInexistenteException si la etiqueta especificada no existe en la estructura de datos
+     * @throws UnexistentColumnException si la etiqueta especificada no existe en la estructura de datos
      */
-    public <T> T getCelda(String etiqueta, int indice, Class<T> tipoDato){
-        if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException(etiqueta);
+    public <T> T getValue(String tag, int index, Class<T> dataType){
+        if (!this.containsCol(tag)){
+            throw new UnexistentColumnException(tag);
         }
-        return tipoDato.cast(data.get(etiqueta).get(indice));
+        return dataType.cast(data.get(tag).get(index));
     }
 
     /**
      * Añade una nueva celda al final de la columna especificada. 
      * 
      * @param <T>      tipo de dato del valor que tendra la celda añadida
-     * @param etiqueta etiqueta de la columna a la que pertenece la celda
-     * @param valor    valor que tendra la celda añadida
-     * @throws ColumnaInexistenteException si la etiqueta especificada no existe en la estructura de datos
+     * @param tag etiqueta de la columna a la que pertenece la celda
+     * @param value    valor que tendra la celda añadida
+     * @throws UnexistentColumnException si la etiqueta especificada no existe en la estructura de datos
      */
-    private <T> void añadirCelda(String etiqueta, T valor){
-        if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException();
+    private <T> void addValue(String tag, T value){
+        if (!this.containsCol(tag)){
+            throw new UnexistentColumnException();
         }
-        this.data.get(etiqueta).add(valor);
+        this.data.get(tag).add(value);
     }
     @Override
     public DataFrame clone(){
         Map<String, Column> columnas = new LinkedHashMap<>();
         Map<String, DataType> dataTypes = new LinkedHashMap<>();
-        for (String colName : this.etiquetas){
-            columnas.put(colName, this.getColumna(colName).clone());
-            dataTypes.put(colName, this.tiposColumna.get(colName));
+        for (String colName : this.tags){
+            columnas.put(colName, this.getCol(colName).clone());
+            dataTypes.put(colName, this.columnTypes.get(colName));
         }
         return new DataFrame(columnas, dataTypes);
     }
 
     public DataFrame switchRows(int row1, int row2)
     {
-        if(row1 < 0 || row1 >= cantidadFilas())
+        if(row1 < 0 || row1 >= nRow())
             throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + row1);
-        if(row2 < 0 || row2 >= cantidadFilas())
+        if(row2 < 0 || row2 >= nRow())
             throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + row2);
 
         DataFrame df = clone();
 
-        for(String etiqueta: etiquetas)
+        for(String etiqueta: tags)
         {
-            df = df.setRow(this.getFila(row1), row2)
-                    .setRow(this.getFila(row2), row1);
+            df = df.setRow(this.getRow(row1), row2)
+                    .setRow(this.getRow(row2), row1);
         }
 
         return df;
@@ -410,13 +411,13 @@ public class DataFrame implements Cloneable {
 
     public DataFrame setRow(DataFrame fila, int index)
     {
-        if(index < 0 || index >= cantidadFilas())
+        if(index < 0 || index >= nRow())
             throw new IndexOutOfBoundsException("DataFrame no contiene la fila: " + index);
         DataFrame df = clone();
         
-        for(String etiqueta: etiquetas)
+        for(String etiqueta: tags)
         {
-            df.setCelda(etiqueta, index, fila.getCelda(etiqueta, 0, Types.evaluarTipo(tiposColumna.get(etiqueta))));
+            df.setValue(etiqueta, index, fila.getValue(etiqueta, 0, Types.evaluateType(columnTypes.get(etiqueta))));
         }
 
         return df;
@@ -425,17 +426,17 @@ public class DataFrame implements Cloneable {
     /**
      * Agrega una nueva columna de booleanos al dataframe. 
      * 
-     * @param etiqueta etiqueta de la nueva columna
-     * @param columna  lista de booleanos que contiene los valores que tendran las celdas de la nueva columna
+     * @param tag etiqueta de la nueva columna
+     * @param col  lista de booleanos que contiene los valores que tendran las celdas de la nueva columna
      */
-    public DataFrame addColumna(String etiqueta, Column columna){
+    public DataFrame addCol(String tag, Column col){
         DataFrame df = clone();
-        if (df.contieneEtiqueta(etiqueta)){
-            throw new RuntimeException("la columna "+etiqueta+" ya existe");
+        if (df.containsCol(tag)){
+            throw new RuntimeException("la columna "+tag+" ya existe");
         }
-        df.data.put(etiqueta, columna.clone());
-        df.tiposColumna.put(etiqueta, columna.getColumnType());
-        df.etiquetas.add(etiqueta);
+        df.data.put(tag, col.clone());
+        df.columnTypes.put(tag, col.getColumnType());
+        df.tags.add(tag);
         df.head();
         return df;
     }
@@ -443,28 +444,28 @@ public class DataFrame implements Cloneable {
     /**
      * Obtiene una columna completa a partir de su etiqueta. 
      * 
-     * @param etiqueta etiqueta de la columna a obtener 
+     * @param tag etiqueta de la columna a obtener 
      * @return         la columna completa asociada a la etiqueta especificada
      */
-    public Column getColumna(String etiqueta){
-        if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException(etiqueta);
+    public Column getCol(String tag){
+        if (!this.containsCol(tag)){
+            throw new UnexistentColumnException(tag);
         }
-        return this.data.get(etiqueta);
+        return this.data.get(tag);
     }
 
     /**
      * Obtiene un nuevo Dataframe que contiene las columnas proporcionadas a partir de sus etiquetas. 
      * 
-     * @param etiqueta array de las etiquetas de las columnas a obtener 
+     * @param tags array de las etiquetas de las columnas a obtener 
      * @return         Dataframe que contiene las columnas obtenidas 
      */
-    public DataFrame getColumna(String[] etiqueta){
+    public DataFrame getCol(String[] tags){
         Map<String, Column> columnas = new LinkedHashMap<>();
         Map<String, DataType> tiposCol = new LinkedHashMap<>();
-        for (String colName : etiqueta){
-            columnas.put(colName, this.getColumna(colName));
-            tiposCol.put(colName, this.tiposColumna.get(colName));
+        for (String colName : tags){
+            columnas.put(colName, this.getCol(colName));
+            tiposCol.put(colName, this.columnTypes.get(colName));
         }
         return new DataFrame(columnas, tiposCol);
     }
@@ -472,131 +473,125 @@ public class DataFrame implements Cloneable {
     /**
      * Obtiene un nuevo Dataframe que contiene las columnas proporcionadas a partir de sus etiquetas. 
      * 
-     * @param etiqueta lista de las etiquetas de las columnas a obtener
+     * @param tags lista de las etiquetas de las columnas a obtener
      * @return         Dataframe que contiene las columnas obtenidas 
      */
-    public DataFrame getColumna(List<String> etiqueta){
+    public DataFrame getCol(List<String> tags){
         Map<String, Column> columnas = new LinkedHashMap<>();
         Map<String, DataType> tiposCol = new LinkedHashMap<>();
-        for (String colName : etiqueta){
-            columnas.put(colName, this.getColumna(colName));
-            tiposCol.put(colName, this.tiposColumna.get(colName));
+        for (String colName : tags){
+            columnas.put(colName, this.getCol(colName));
+            tiposCol.put(colName, this.columnTypes.get(colName));
         }
         return new DataFrame(columnas, tiposCol);
-    }
-
-    /**
-     * Añade una nueva fila al DataFrame.
-     * 
-     * @param fila DataFrame que representa la nueva fila a añadir
-     */
-    public void addFila(DataFrame fila){
-        for (String colName : this.etiquetas){
-            switch (this.tiposColumna.get(colName)) {
-                case STRING:
-                    this.añadirCelda(colName, fila.getCelda(colName, 0, String.class));
-                    break;
-                case INT:
-                    this.añadirCelda(colName, fila.getCelda(colName, 0, Integer.class));
-                    break;
-                case DOUBLE:
-                    this.añadirCelda(colName, fila.getCelda(colName, 0, Double.class));
-                    break;
-                case BOOL:
-                    this.añadirCelda(colName, fila.getCelda(colName, 0, Boolean.class));
-                    break;
-                default:
-                    System.out.println("Error en DataFrame.añadirFila");
-                    System.out.println("Falta un tipo de dato para la columna: "+colName);
-                    break;
-            }
-        }
     }
 
     /**
      * Añade una nueva fila al DataFrame.
      *  
-     * @param fila mapa que contiene los nombres de las columnas y sus valores asociados 
-     * @throws ColumnaInexistenteException Si alguna de las columnas en el mapa no existe en el DataFrame actual
+     * @param row mapa que contiene los nombres de las columnas y sus valores asociados 
+     * @throws UnexistentColumnException Si alguna de las columnas en el mapa no existe en el DataFrame actual
      */
-    public void addFila(Map<String, Object> fila){
-        for (String colName : fila.keySet()){
-            this.data.get(colName).add(fila.get(colName));
+    public void addRow(Map<String, Object> row){
+        for (String colName : row.keySet()){
+            this.data.get(colName).add(row.get(colName));
         }
     }
 
     /**
      * Concatena dos Dataframe.
      * 
-     * @param otro dataframe de tipo Dataframe
+     * @param other dataframe de tipo Dataframe
      */
-    public void concatDataFrame(DataFrame otro){
-        for (int i=0; i < otro.cantidadFilas(); i++){
-            this.addFila(otro.getFila(i));
+    public DataFrame concat(DataFrame other){
+        DataFrame df = clone();
+        for (int i=0; i < other.nRow(); i++){
+            for (String colName : df.tags){
+                switch (df.columnTypes.get(colName)) {
+                    case STRING:
+                        df.addValue(colName, other.getValue(colName, 0, String.class));
+                        break;
+                    case INT:
+                        df.addValue(colName, other.getValue(colName, 0, Integer.class));
+                        break;
+                    case DOUBLE:
+                        df.addValue(colName, other.getValue(colName, 0, Double.class));
+                        break;
+                    case BOOL:
+                        df.addValue(colName, other.getValue(colName, 0, Boolean.class));
+                        break;
+                    default:
+                        System.out.println("Error en DataFrame.añadirFila");
+                        System.out.println("Falta un tipo de dato para la columna: "+colName);
+                        break;
+                }
+            }
         }
+
+        return df;
     }
 
     /**
      * Obtiene y devuelve los valores de la fila indicada.
      * 
-     * @param fila indice de la fila a obtener
+     * @param row indice de la fila a obtener
      * @return     la fila obtenida en formato Dataframe
      */
-    public DataFrame getFila(int fila){
-        if (0 <= fila && fila <= this.cantidadFilas()-1){
+    public DataFrame getRow(int row){
+        if (0 <= row && row <= this.nRow()-1){
             Map<String, Column> otro = new LinkedHashMap<>();
-            for (String colName : this.etiquetas){
-                switch (this.tiposColumna.get(colName)){
+            for (String colName : this.tags){
+                switch (this.columnTypes.get(colName)){
                     case STRING:
                         otro.put(colName, new StringColumn());
-                        otro.get(colName).add(getCelda(colName, fila, String.class));
+                        otro.get(colName).add(getValue(colName, row, String.class));
                         break;
                     case INT:
                         otro.put(colName, new IntegerColumn());
-                        otro.get(colName).add(getCelda(colName, fila, Integer.class));
+                        otro.get(colName).add(getValue(colName, row, Integer.class));
                         break;
                     case DOUBLE:
                         otro.put(colName, new DoubleColumn());
-                        otro.get(colName).add(getCelda(colName, fila, Double.class));
+                        otro.get(colName).add(getValue(colName, row, Double.class));
                         break;
                     case BOOL:
                         otro.put(colName, new BooleanColumn());
-                        otro.get(colName).add(getCelda(colName, fila, Boolean.class));
+                        otro.get(colName).add(getValue(colName, row, Boolean.class));
                         break;
                 }
             }
-            return new DataFrame(otro, tiposColumna);
+            return new DataFrame(otro, columnTypes);
         }
-        throw new RuntimeException("El DataFrame no contiene la fila: "+fila);
+        throw new RuntimeException("El DataFrame no contiene la fila: "+row);
     }
     
     /**
      * Obtiene y devuelve un Dataframe formado solo por las filas correspondientes a los indices proporcionados.
      * 
-     * @param fila array de enteros que representan los indices de las filas a obtener
+     * @param rows array de enteros que representan los indices de las filas a obtener
      * @return     un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
-    public DataFrame getFila(int[] fila){
-        Arrays.sort(fila);
-        System.out.println(fila);
-        DataFrame copia = this.getFila(fila[0]);
-        for (int i=1; i < fila.length; i++){
-            copia.addFila(this.getFila(fila[i]));
+    public DataFrame getRow(int[] rows){
+        Arrays.sort(rows);
+        System.out.println(rows);
+        DataFrame copia = this.getRow(rows[0]);
+        for (int i=1; i < rows.length; i++){
+            copia.concat(this.getRow(rows[i]));
         }
         return copia;
     }
 
     /**
      * Obtiene y devuelve un Dataframe formado solo por las filas correspondientes a los indices proporcionados.
-     * @param fila lista de Integer que representan los indices de las filas a obtener
+     * @param rows lista de Integer que representan los indices de las filas a obtener
      * @return un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
-    public DataFrame getFila(Integer[] fila){
-        Arrays.sort(fila);
+    public DataFrame getRow(Integer[] rows){
+        Arrays.sort(rows);
         // System.out.println(fila);
-        DataFrame copia = this.getFila(fila[0]);
-        for (int i=1; i < fila.length; i++){
-            copia.addFila(this.getFila(fila[i]));
+        DataFrame copia = this.getRow(rows[0]);
+        for (int i=1; i < rows.length; i++){
+            copia.concat(this.getRow(rows[i]));
         }
         return copia;
     }
@@ -604,15 +599,15 @@ public class DataFrame implements Cloneable {
     /**
      * Obtiene y devuelve un Dataframe formado solo por las filas correspondientes a los indices proporcionados.
      * 
-     * @param fila lista de Integer que representan los indices de las filas a obtener
+     * @param rows lista de Integer que representan los indices de las filas a obtener
      * @return     un nuevo Dataframe que contiene las filas correspondientes a los indices proporcionados
      */
-    public DataFrame getFila(List<Integer> fila){
-        fila.sort(null);
+    public DataFrame getRow(List<Integer> rows){
+        rows.sort(null);
         // System.out.println(fila);
-        DataFrame copia = this.getFila(fila.get(0));
-        for (int i=1; i < fila.size(); i++){
-            copia.addFila(this.getFila(fila.get(i)));
+        DataFrame copia = this.getRow(rows.get(0));
+        for (int i=1; i < rows.size(); i++){
+            copia.concat(this.getRow(rows.get(i)));
         }
         return copia;
     }
@@ -620,24 +615,24 @@ public class DataFrame implements Cloneable {
     /**
      * Elimina una columna del dataframe a partir de su etiqueta. 
      * 
-     * @param etiqueta la etiqueta de la columna a eliminar
-     * @throws ColumnaInexistenteException Si la columna con la etiqueta especificada no existe en el DataFrame
+     * @param tag la etiqueta de la columna a eliminar
+     * @throws UnexistentColumnException Si la columna con la etiqueta especificada no existe en el DataFrame
      */
-    public DataFrame eliminarCol(String etiqueta){
-        if (!contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException(etiqueta);
+    public DataFrame removeCol(String tag){
+        if (!containsCol(tag)){
+            throw new UnexistentColumnException(tag);
         }
         DataFrame df = clone();
-        df.data.remove(etiqueta);
-        df.tiposColumna.remove(etiqueta);
-        df.etiquetas.remove(df.etiquetas.indexOf(etiqueta));
+        df.data.remove(tag);
+        df.columnTypes.remove(tag);
+        df.tags.remove(df.tags.indexOf(tag));
         return df;
     }
 
-    public DataFrame eliminarCol(String[] etiquetas){
-        DataFrame df = eliminarCol(etiquetas[0]);
-        for (int i=1; i < etiquetas.length; i++){
-            df = df.eliminarCol(etiquetas[i]);
+    public DataFrame removeCol(String[] tag){
+        DataFrame df = removeCol(tag[0]);
+        for (int i=1; i < tag.length; i++){
+            df = df.removeCol(tag[i]);
         }
         return df;
     }
@@ -666,14 +661,14 @@ public class DataFrame implements Cloneable {
     /**
      * Crea un Dataframe que contiene las filas correspondientes a los indices de inicio y fin indicados.
      * 
-     * @param indiceInicio indice de la primera fila a incluir en el nuevo DataFrame
-     * @param indiceFinal  indice de la ultima fila a incluir en el nuevo DataFrame
+     * @param startIndex indice de la primera fila a incluir en el nuevo DataFrame
+     * @param endIndex  indice de la ultima fila a incluir en el nuevo DataFrame
      * @return             un nuevo Dataframe formado por las filas indicadas
      */
-    public DataFrame recortar(int indiceInicio, int indiceFinal){
-        DataFrame copia = this.getFila(indiceInicio);
-        for (int i=indiceInicio+1; i <= indiceFinal; i++){
-            copia.addFila(this.getFila(i));
+    public DataFrame slice(int startIndex, int endIndex){
+        DataFrame copia = this.getRow(startIndex);
+        for (int i=startIndex+1; i <= endIndex; i++){
+            copia.concat(this.getRow(i));
         }
         return copia;
     }
@@ -681,19 +676,19 @@ public class DataFrame implements Cloneable {
     /**
      * Ordena una columna del dataframe de manera creciente o decreciente.
      * 
-     * @param etiqueta  etiqueta de la columna a ordenar
-     * @param creciente indica si la ordenamiento debe ser ascendente (true) o descendente (false)
+     * @param tag  etiqueta de la columna a ordenar
+     * @param ascending indica si la ordenamiento debe ser ascendente (true) o descendente (false)
      */
-    public DataFrame ordenar(String etiqueta, boolean creciente){
-        if (!contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException(etiqueta);
+    public DataFrame sort(String tag, boolean ascending){
+        if (!containsCol(tag)){
+            throw new UnexistentColumnException(tag);
         }
 
-        Map<Integer, Integer> orden = getColumna(etiqueta).sort(creciente);
+        Map<Integer, Integer> orden = getCol(tag).sort(ascending);
         DataFrame copia = this.clone();
         
-        for (String colName : this.etiquetas){
-            copia.data.put(colName, getColumna(colName).sortByIndex(orden));
+        for (String colName : this.tags){
+            copia.data.put(colName, getCol(colName).sortByIndex(orden));
         }
         return copia;
     }
@@ -702,13 +697,13 @@ public class DataFrame implements Cloneable {
     {
         for(String tag: tags)
         {
-            if(!contieneEtiqueta(tag))
-                throw new ColumnaInexistenteException(tag);
+            if(!containsCol(tag))
+                throw new UnexistentColumnException(tag);
         }
 
         DataFrame df = clone();
         List<String> groupedTags = new ArrayList<>();
-        df = df.ordenar(tags[0], increasing);
+        df = df.sort(tags[0], increasing);
 
         for(int i = 1; i < tags.length; i++)
         {
@@ -718,7 +713,7 @@ public class DataFrame implements Cloneable {
         return df;
     }
 
-    public DataFrame orderByIndex(Map<Integer, Integer> indexes)
+    public DataFrame sortByIndex(Map<Integer, Integer> indexes)
     {
         if(!indexes.keySet().equals(new HashSet<Integer>(indexes.values())))
         {
@@ -728,7 +723,7 @@ public class DataFrame implements Cloneable {
 
         for(Map.Entry<Integer, Integer> entry: indexes.entrySet())
         {
-            df = df.setRow(getFila(entry.getKey()), entry.getValue());
+            df = df.setRow(getRow(entry.getKey()), entry.getValue());
         }
 
         return df;
@@ -740,7 +735,7 @@ public class DataFrame implements Cloneable {
         {
             throw new IllegalArgumentException("La fracción debe estar entre 0.0 y 1.0.");
         }
-        long cant = Math.round(fraction * cantidadFilas());
+        long cant = Math.round(fraction * nRow());
         return sample((int) cant);
     }
 
@@ -751,35 +746,35 @@ public class DataFrame implements Cloneable {
 
         while(indexes.size() < n)
         {
-            int indice = rand.nextInt(cantidadFilas());
+            int indice = rand.nextInt(nRow());
             if(!indexes.contains(indice))
             {
                 indexes.add(indice);
             }
         }
 
-        return getFila(indexes);
+        return getRow(indexes);
     }
 
     /**
      * Filtra la filas de una columna del dataframe segun la conidicion proporcionada.
      * 
      * @param <T>      tipo de datos de la columna a filtrar
-     * @param etiqueta etiqueta de la columna a filtrar
-     * @param filtro   el predicado que define las condiciones de filtrado
+     * @param tag etiqueta de la columna a filtrar
+     * @param filter   el predicado que define las condiciones de filtrado
      * @return         nuevo DataFrame que contiene solo las filas que cumplen con las condiciones de filtrado
      * @throws UnsupportedOperationException si el metodo no fue implementado
      */
-    public <T> DataFrame filtrar(String etiqueta, Predicate<T> filtro){
-        if (!contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException(etiqueta);
+    public <T> DataFrame filter(String tag, Predicate<T> filter){
+        if (!containsCol(tag)){
+            throw new UnexistentColumnException(tag);
         }
 
-        List<Integer> indices = this.getColumna(etiqueta).filter(filtro);
+        List<Integer> indices = this.getCol(tag).filter(filter);
         DataFrame filtrado = this.clone();
 
-        for (String colName : this.etiquetas){
-            filtrado.data.put(colName, getColumna(colName).filterByIndex(indices));
+        for (String colName : this.tags){
+            filtrado.data.put(colName, getCol(colName).filterByIndex(indices));
         }
         return filtrado;
     }
@@ -788,17 +783,17 @@ public class DataFrame implements Cloneable {
      * Aplica una transformacion a los valores de la columna utilizando el operador proporcionado.
      * 
      * @param <T>            tipo de datos de la columna a transformar
-     * @param etiqueta       etiqueta de la columna a transformar
-     * @param transformacion operador que define la transformacion a aplicar 
+     * @param tag       etiqueta de la columna a transformar
+     * @param transformer operador que define la transformacion a aplicar 
      * @return               devuelve un nuevo DataFrame con la transformacion aplicada
-     * @throws ColumnaInexistenteException Si la columna con la etiqueta especificada no existe en el DataFrame
+     * @throws UnexistentColumnException Si la columna con la etiqueta especificada no existe en el DataFrame
      */
-    public <T> DataFrame transformCol(String etiqueta, UnaryOperator<T> transformacion){
-        if (!this.contieneEtiqueta(etiqueta)){
-            throw new ColumnaInexistenteException(etiqueta);
+    public <T> DataFrame transformCol(String tag, UnaryOperator<T> transformer){
+        if (!this.containsCol(tag)){
+            throw new UnexistentColumnException(tag);
         }
         DataFrame copia = this.clone();
-        copia.data.put(etiqueta, this.getColumna(etiqueta).transform(transformacion));
+        copia.data.put(tag, this.getCol(tag).transform(transformer));
         return copia;
     }
 

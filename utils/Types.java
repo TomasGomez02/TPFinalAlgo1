@@ -7,12 +7,12 @@ public class Types
     /**
      * Evalua el tipo de dato y devuelve la correspondiente clase de Java.
      * 
-     * @param tipo tipo de datp a evaluar
+     * @param type tipo de datp a evaluar
      * @return     la clase asociada al tipo de dato. Si el tipo no tiene una correspondencia, devuelve null.
      */
-    public static Class evaluarTipo(DataType tipo)
+    public static Class evaluateType(DataType type)
     {
-        switch(tipo)
+        switch(type)
         {
             case BOOL:
                 return Boolean.class;
@@ -90,7 +90,7 @@ public class Types
         if(n.intValue() == 0.0)
             return false;
 
-        throw new CasteoIlegalException(n.toString(), Number.class.toString(), Boolean.class.toString());
+        throw new IllegalCastException(n.toString(), Number.class.toString(), Boolean.class.toString());
     }
 
 

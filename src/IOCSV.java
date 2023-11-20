@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-import utils.CasteoIlegalException;
+import utils.IllegalCastException;
 import utils.DataType;
 
 public final class IOCSV 
@@ -314,7 +314,7 @@ public final class IOCSV
                     colCasteada = col;
             }
         }
-        catch(CasteoIlegalException e)
+        catch(IllegalCastException e)
         {
             colCasteada = autodetectarColumna(col, tiposEtiqueta, index, count + 1);
         }
@@ -330,7 +330,7 @@ public final class IOCSV
     private static String getHeaderLine(DataFrame df)
     {
         String linea = "";
-        for(String etiqueta: df.nombreColumnas()) {
+        for(String etiqueta: df.colNames()) {
             linea += etiqueta + ",";
         }
         return linea;
@@ -345,10 +345,10 @@ public final class IOCSV
     private static String getRowLine(DataFrame df)
     {
         String linea = "";
-        List<String> headers = df.nombreColumnas();
+        List<String> headers = df.colNames();
         for(String header: headers)
         {
-            String celda = String.valueOf(df.getCelda(header, 0));
+            String celda = String.valueOf(df.getValue(header, 0));
             if(celda.contains(","))
                 celda = "\"" + celda + "\"";
             else if(celda.equals("null"))
@@ -372,9 +372,9 @@ public final class IOCSV
             bw.write(getHeaderLine(data));
             bw.newLine();
 
-            for(int i = 0; i < data.cantidadFilas(); i++)
+            for(int i = 0; i < data.nRow(); i++)
             {
-                bw.write(getRowLine(data.getFila(i)));
+                bw.write(getRowLine(data.getRow(i)));
                 bw.newLine();
             }
         }

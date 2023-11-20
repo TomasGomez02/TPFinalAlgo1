@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import utils.CasteoIlegalException;
+import utils.IllegalCastException;
 import utils.Types;
 
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ public class DoubleColumn extends NumberColumn<Double>
         data = new ArrayList<>();
     }
 
-    public DoubleColumn(List<Double> lista)
+    public DoubleColumn(List<Double> list)
     {
         this();
-        for(Double num: lista)
+        for(Double num: list)
             data.add(num);
     }
 
@@ -268,12 +268,12 @@ public class DoubleColumn extends NumberColumn<Double>
         return copia;
     }
 
-    public static DoubleColumn toDoubleColumn(Column col) throws CasteoIlegalException
+    public static DoubleColumn toDoubleColumn(Column col) throws IllegalCastException
     {
         return toDoubleColumn(col, false);
     }
 
-    public static DoubleColumn toDoubleColumn(Column col, boolean force) throws CasteoIlegalException
+    public static DoubleColumn toDoubleColumn(Column col, boolean force) throws IllegalCastException
     {
         switch (col.getColumnType()) 
         {
@@ -288,7 +288,7 @@ public class DoubleColumn extends NumberColumn<Double>
         }
     }
     
-    private static DoubleColumn fromStringColumn (Column<String> col, boolean force) throws CasteoIlegalException
+    private static DoubleColumn fromStringColumn (Column<String> col, boolean force) throws IllegalCastException
     {
         List<Double> datos = new ArrayList<>();
 
@@ -309,7 +309,7 @@ public class DoubleColumn extends NumberColumn<Double>
             catch(NumberFormatException e)
             {
                 if(!force)
-                    throw new CasteoIlegalException(col.get(i), String.class.toString(), Double.class.toString());
+                    throw new IllegalCastException(col.get(i), String.class.toString(), Double.class.toString());
                 else
                     datos.add(null);
             }

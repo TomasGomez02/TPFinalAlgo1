@@ -49,11 +49,11 @@ public class Test
 
         // IOCSV.toCSV(gb.unGroup(), "datasets/ganamos.csv");
 
-        df.eliminarCol("featuring");
-        df.eliminarCol("bonus_track");
-        df.eliminarCol("promotional_release");
-        df.eliminarCol("single_release");
-        df.eliminarCol("artist");
+        df.removeCol("featuring");
+        df.removeCol("bonus_track");
+        df.removeCol("promotional_release");
+        df.removeCol("single_release");
+        df.removeCol("artist");
         
         df.sort(new String[]{"album_name", "key", "danceability"}, true).head(25);
 
