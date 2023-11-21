@@ -1,6 +1,5 @@
 package koala;
 
-
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -517,7 +516,20 @@ public class DataFrame implements Cloneable {
      * 
      * @param other dataframe de tipo Dataframe
      */
-    public DataFrame concat(DataFrame other){
+    public DataFrame concat(DataFrame other) throws IllegalArgumentException
+    {
+        if(other.nCol() != nCol())
+        {
+            throw new IllegalArgumentException("other debe tener " + nCol() + " columnas, pero tiene " + other.nCol());
+        }
+        for(String tag: tags)
+        {
+            if(!other.containsCol(tag))
+                throw new IllegalArgumentException("otro no contiene la columna " + tag);
+            if(!other.columnTypes.get(tag).equals(columnTypes.get(tag)))
+                throw new IllegalArgumentException("Columna " + tag + " debe ser de tipo " + columnTypes.get(tag) + ", no de tipo " + other.columnTypes.get(tag));
+        }
+
         DataFrame df = clone();
         for (int i=0; i < other.nRow(); i++){
             for (String colName : df.tags){
