@@ -151,14 +151,11 @@ public final class IOCSV
             }
             
         } catch (FileNotFoundException e) {
-            System.out.println(e.getClass());
-            System.out.println("Error: Archivo no encontrado. Path: "+file.getPath());
+            throw new IllegalArgumentException(e.getClass() + "Error: Archivo no encontrado. Path: " + file.getPath());
         } catch (IOException e){
-            System.out.println(e.getClass());
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException(e.getClass() + e.getMessage());
         } catch (Exception e){
-            System.out.println(e.getClass());
-            System.out.println(e.getMessage());
+            throw new IllegalArgumentException(e.getClass() + e.getMessage());
         }
 
         if(dataTypes != null)

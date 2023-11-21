@@ -7,8 +7,8 @@ import koala.*;
 public class Demo
 {
     public static void main(String[] args) {
-        DataFrame df = IOCSV.fromCSV("TPFinalAlgo1/koala/datasets/taylor_all_songs.csv");
-        // df.info();
+        DataFrame df = IOCSV.fromCSV("koala/datasets/taylor_all_songs.csv");
+        df.info();
 
         df = df.groupBy(new String[]{"album_name", "featuring", "bonus_track"}).std("duration_ms").mean("loudness").max("danceability").unGroup();
 

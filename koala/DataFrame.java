@@ -657,26 +657,24 @@ public class DataFrame implements Cloneable {
         return df;
     }
 
-    // /**
-    //  * Elimina una fila del dataframe a partir de su indice. 
-    //  * 
-    //  * @param etiqueta el indice de la fila a eliminar
-    //  */
-    // public DataFrame eliminarFila(int fila){
-    //     // if (0 <= fila && fila <= this.cantidadFilas()-1){
-    //     //     for (String colName : this.etiquetas){
-    //     //         this.getColumna(colName).eliminarCelda(fila);
-    //     //     }
-    //     //     return;
-    //     // }
-    //     // throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
-    //     if (fila < 0 || fila > this.cantidadFilas()-1){
-    //         throw new RuntimeException("La fila debe estar en el rango [0, "+cantidadFilas()+")");
-    //     }
-    //     for (String colName : this.etiquetas){
-    //         this.getColumna(colName).remove(fila);
-    //     }
-    // }
+    /**
+     * Elimina una fila del dataframe a partir de su indice. 
+     * 
+     * @param row el indice de la fila a eliminar
+     */
+    public DataFrame removeRow(int row){
+        DataFrame df = clone();
+        if (row < 0 || row >= df.nRow())
+        {
+            throw new IndexOutOfBoundsException("Indice fuera de rango. Debe estar entre 0 y " + (df.nRow() - 1));
+        }
+        for (String colName : df.tags)
+        {
+            df.getCol(colName).remove(row);
+        }
+
+        return df; 
+    }
 
     /**
      * Crea un Dataframe que contiene las filas correspondientes a los indices de inicio y fin indicados.
