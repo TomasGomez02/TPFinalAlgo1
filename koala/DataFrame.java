@@ -115,11 +115,16 @@ public class DataFrame implements Cloneable {
         return new LinkedHashMap<>(this.columnTypes);
     }
 
-    public String toString()
+    private String getTableString(int startIndex, int finalIndex, final int MINIMUMOFFSET)
     {
-        final int startIndex = 0;
-        final int finalIndex = (nRow() >= 10) ? 10 : nRow() - 1;
-        final int MINIMUMOFFSET = 4;
+        if (startIndex < -1)
+        {
+            startIndex = 0;
+        }
+        if (finalIndex >= nRow())
+        {
+            finalIndex = nRow() - 1;
+        }
 
         final int COLUMNASMAX = 10;
         final String OVERFLOWSTRING = "...|";
@@ -202,6 +207,12 @@ public class DataFrame implements Cloneable {
         return out;
     }
 
+    @Override
+    public String toString()
+    {
+        return getTableString(0, 10, 4);
+    }
+
     /**
      * Imprime una porcion del dataframe delimitado por un indice de inicio y un indice final.
      * @param startindex primer indice de fila a imprimir
@@ -218,95 +229,9 @@ public class DataFrame implements Cloneable {
      * @param finalIndex  ultimo indice de fila a imprimir 
      * @param MINIMUMOFFSET valor minimo de desplazamiento utilizado para ajustar el centrado de las etiquetas y el contenido de las celdas
      */
-    public void printRange(int startIndex, int finalIndex, final int MINIMUMOFFSET){
-        if (startIndex < -1){
-            startIndex = 0;
-        }
-        if (finalIndex > nRow()){
-            finalIndex = nRow();
-        }
-
-        final int COLUMNASMAX = 10;
-        final String OVERFLOWSTRING = "...|";
-
-        final boolean COLUMNASOVERFLOW = (nCol() > COLUMNASMAX);
-        int cantColumnas = COLUMNASOVERFLOW ? COLUMNASMAX : nCol();
-
-        String fila = "";
-        String sep = "|";
-        int[] tamaño = new int[cantColumnas];
-        int tamañoIndice = String.valueOf(finalIndex).length();
-
-        int espacioIzq;
-        int espacioDer;
-
-        for (int i = 0; i < cantColumnas; i++){
-            tamaño[i] = MINIMUMOFFSET * 2;
-            if (tags.get(i).length() + MINIMUMOFFSET > tamaño[i]){
-                tamaño[i] = tags.get(i).length() + MINIMUMOFFSET;
-            }
-        }
-
-        fila += " ".repeat(tamañoIndice) + sep;
-        // Esta parte es para escribir los nombres de las columnas
-        
-        for (int i = 0; i < cantColumnas; i++)
-        {
-            int diff = tamaño[i] - tags.get(i).length();
-            espacioIzq = diff / 2;
-            if (diff % 2 == 0)
-            {
-                espacioDer = espacioIzq;
-            } 
-            else 
-            {
-                espacioDer = espacioIzq+1;
-            }
-            fila += " ".repeat(espacioIzq)+tags.get(i)+" ".repeat(espacioDer)+sep;
-        }
-
-        int cantidadSepHeader = 0;
-        if(COLUMNASOVERFLOW)
-        {
-            fila += OVERFLOWSTRING;
-            cantidadSepHeader += OVERFLOWSTRING.length();
-        }
-        System.out.println(fila);
-        
-        for(int tam: tamaño)
-            cantidadSepHeader += tam + 1;
-        System.out.println("-".repeat(cantidadSepHeader + tamañoIndice + 1));
-
-        fila = "";
-        // Esta parte es para escribir los valores
-        for (int row=startIndex; row <= finalIndex; row++){
-            int diffTamañoIndice = tamañoIndice - String.valueOf(row).length();
-            fila += row + " ".repeat(diffTamañoIndice) + sep;
-            for (int i = 0; i < cantColumnas; i++) {
-                String elem = String.valueOf(getValue(tags.get(i), row));
-
-                if(elem.length() > tamaño[i])
-                {
-                    elem = shortenedString(elem, tamaño[i]);
-                }
-
-                int diff = tamaño[i] - elem.length();
-                espacioIzq = diff / 2;
-                if (diff % 2 == 0){
-                    espacioDer = espacioIzq;
-                } else{
-                    espacioDer = espacioIzq+1;
-                }
-                
-                //System.out.println(elem.length() + " - " + espacioIzq);
-
-                fila += " ".repeat(espacioIzq)+elem+" ".repeat(espacioDer)+sep;
-            }
-            if(COLUMNASOVERFLOW)
-                fila += OVERFLOWSTRING;
-            System.out.println(fila);
-            fila = "";
-        }
+    public void printRange(int startIndex, int finalIndex, final int MINIMUMOFFSET)
+    {
+        System.out.println(getTableString(startIndex, finalIndex, MINIMUMOFFSET));    
     }
 
     /**
