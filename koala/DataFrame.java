@@ -115,9 +115,91 @@ public class DataFrame implements Cloneable {
         return new LinkedHashMap<>(this.columnTypes);
     }
 
-    public String toString(){
-        this.head();
-        return "";
+    public String toString()
+    {
+        final int startIndex = 0;
+        final int finalIndex = (nRow() >= 10) ? 10 : nRow() - 1;
+        final int MINIMUMOFFSET = 4;
+
+        final int COLUMNASMAX = 10;
+        final String OVERFLOWSTRING = "...|";
+
+        final boolean COLUMNASOVERFLOW = (nCol() > COLUMNASMAX);
+        int cantColumnas = COLUMNASOVERFLOW ? COLUMNASMAX : nCol();
+
+        String out = "";
+        String sep = "|";
+        int[] tamaño = new int[cantColumnas];
+        int tamañoIndice = String.valueOf(finalIndex).length();
+
+        int espacioIzq;
+        int espacioDer;
+
+        for (int i = 0; i < cantColumnas; i++){
+            tamaño[i] = MINIMUMOFFSET * 2;
+            if (tags.get(i).length() + MINIMUMOFFSET > tamaño[i]){
+                tamaño[i] = tags.get(i).length() + MINIMUMOFFSET;
+            }
+        }
+
+        out += " ".repeat(tamañoIndice) + sep;
+        // Esta parte es para escribir los nombres de las columnas
+        
+        for (int i = 0; i < cantColumnas; i++)
+        {
+            int diff = tamaño[i] - tags.get(i).length();
+            espacioIzq = diff / 2;
+            if (diff % 2 == 0)
+            {
+                espacioDer = espacioIzq;
+            } 
+            else 
+            {
+                espacioDer = espacioIzq+1;
+            }
+            out += " ".repeat(espacioIzq)+tags.get(i)+" ".repeat(espacioDer)+sep;
+        }
+
+        int cantidadSepHeader = 0;
+        if(COLUMNASOVERFLOW)
+        {
+            out += OVERFLOWSTRING;
+            cantidadSepHeader += OVERFLOWSTRING.length();
+        }
+        out += '\n';
+        
+        for(int tam: tamaño)
+            cantidadSepHeader += tam + 1;
+        out += "-".repeat(cantidadSepHeader + tamañoIndice + 1) + '\n';
+
+        // Esta parte es para escribir los valores
+        for (int row=startIndex; row <= finalIndex; row++){
+            int diffTamañoIndice = tamañoIndice - String.valueOf(row).length();
+            out += row + " ".repeat(diffTamañoIndice) + sep;
+            for (int i = 0; i < cantColumnas; i++) {
+                String elem = String.valueOf(getValue(tags.get(i), row));
+
+                if(elem.length() > tamaño[i])
+                {
+                    elem = shortenedString(elem, tamaño[i]);
+                }
+
+                int diff = tamaño[i] - elem.length();
+                espacioIzq = diff / 2;
+                if (diff % 2 == 0){
+                    espacioDer = espacioIzq;
+                } else{
+                    espacioDer = espacioIzq+1;
+                }
+                
+
+                out += " ".repeat(espacioIzq)+elem+" ".repeat(espacioDer)+sep;
+            }
+            if(COLUMNASOVERFLOW)
+                out += OVERFLOWSTRING;
+            out += '\n';
+        }
+        return out;
     }
 
     /**
@@ -505,10 +587,14 @@ public class DataFrame implements Cloneable {
      * @param row mapa que contiene los nombres de las columnas y sus valores asociados 
      * @throws UnexistentColumnException Si alguna de las columnas en el mapa no existe en el DataFrame actual
      */
-    public void addRow(Map<String, Object> row){
+    public DataFrame addRow(Map<String, Object> row)
+    {
+        DataFrame df = clone();
         for (String colName : row.keySet()){
-            this.data.get(colName).add(row.get(colName));
+            df.data.get(colName).add(row.get(colName));
         }
+
+        return df;
     }
 
     /**
@@ -727,10 +813,10 @@ public class DataFrame implements Cloneable {
      * Ordena las etiquetas del Dataframe de manera ascendente o descendente.
      * 
      * @param tags       Arreglo de nombres de columnas a ordenar
-     * @param increasing indica la forma de ordenamiento (true para ascendente, false para descendente).
+     * @param ascending indica la forma de ordenamiento (true para ascendente, false para descendente).
      * @return           un nuevo Dataframe ordenado segun las columnas y el orden indicado
      */
-    public DataFrame sort(String[] tags, boolean increasing)
+    public DataFrame sort(String[] tags, boolean ascending)
     {
         for(String tag: tags)
         {
@@ -740,12 +826,12 @@ public class DataFrame implements Cloneable {
 
         DataFrame df = clone();
         List<String> groupedTags = new ArrayList<>();
-        df = df.sort(tags[0], increasing);
+        df = df.sort(tags[0], ascending);
 
         for(int i = 1; i < tags.length; i++)
         {
             groupedTags.add(tags[i - 1]);
-            df = df.groupBy(groupedTags).sort(tags[i], increasing).unGroup();
+            df = df.groupBy(groupedTags).sort(tags[i], ascending).unGroup();
         }
         return df;
     }
