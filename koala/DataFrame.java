@@ -897,4 +897,24 @@ public class DataFrame implements Cloneable {
         
         return new GroupBy(this, etiquetas);
     }
+
+    /**
+     * Rellena celdas NA de la columna dada con el valor dado.
+     * 
+     * @param <T>
+     * @param tag nombre de la columna a llenar.
+     * @param value valor para rellenar los NA.
+     * @return
+     */
+    public <T> DataFrame fillNA(String tag, T value)
+    {
+        DataFrame df = clone();
+        if (!df.containsCol(tag)){
+            throw new UnexistentColumnException(tag);
+        }
+
+        df.data.put(tag, df.getCol(tag).fillNA(value));
+
+        return df;
+    }
 }

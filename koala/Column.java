@@ -220,4 +220,23 @@ public abstract class Column<T> implements Cloneable {
 
         return lista;
     }
+
+    /**
+     * Rellena todos los valores NA de la columna con un valor.
+     * 
+     * @param value valor para rellenar los NA.
+     * @return
+     */
+    public Column<T> fillNA(T value)
+    {
+        Column<T> col = clone();
+        for(int i = 0; i < length(); i++)
+        {
+            if(col.get(i) == null)
+            {
+                col.set(i, value);
+            }
+        }
+        return col;
+    }
 }
