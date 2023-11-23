@@ -78,7 +78,6 @@ public abstract class Column<T> implements Cloneable {
      * 
      * @param other columna de tipo Columna que se va a concatenar a la columna actual 
      */
-    
     public void concat(Column<T> other){
         for (int i=0; i < other.length(); i++){
             this.add(other.get(i));
