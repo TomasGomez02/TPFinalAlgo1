@@ -612,7 +612,7 @@ public class DataFrame implements Cloneable {
         System.out.println(rows);
         DataFrame copia = this.getRow(rows[0]);
         for (int i=1; i < rows.length; i++){
-            copia.concat(this.getRow(rows[i]));
+            copia = copia.concat(this.getRow(rows[i]));
         }
         return copia;
     }
