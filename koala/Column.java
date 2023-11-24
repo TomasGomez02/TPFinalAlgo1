@@ -106,7 +106,7 @@ public abstract class Column<T> implements Cloneable {
     public int nNull(){
         int count = 0;
         for (int i=0; i < length(); i++){
-            if (get(i) == null){
+            if (isNA(i)){
                 count++;
             }
         }
@@ -231,11 +231,16 @@ public abstract class Column<T> implements Cloneable {
         Column<T> col = clone();
         for(int i = 0; i < length(); i++)
         {
-            if(col.get(i) == null)
+            if(col.isNA(i))
             {
                 col.set(i, value);
             }
         }
         return col;
+    }
+
+    public boolean isNA(int index)
+    {
+        return get(index) == null;
     }
 }

@@ -456,7 +456,7 @@ public class DataFrame implements Cloneable {
         }
         df.data.put(tag, col.clone());
         df.columnTypes.put(tag, col.getColumnType());
-        df.tags.add(tag);
+        df.tags.add(tag); 
         return df;
     }
 
@@ -708,7 +708,7 @@ public class DataFrame implements Cloneable {
     public DataFrame slice(int startIndex, int endIndex){
         DataFrame copia = this.getRow(startIndex);
         for (int i=startIndex+1; i <= endIndex; i++){
-            copia.concat(this.getRow(i));
+            copia = copia.concat(this.getRow(i));
         }
         return copia;
     }

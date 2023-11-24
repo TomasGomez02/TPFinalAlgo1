@@ -231,4 +231,9 @@ public class StringColumn extends Column<String> {
         }
         return unica;
     }
+
+    @Override
+    public boolean isNA(int index) {
+        return get(index) == null || get(index).equals("") || get(index).toLowerCase().equals("na");  
+    }
 }
